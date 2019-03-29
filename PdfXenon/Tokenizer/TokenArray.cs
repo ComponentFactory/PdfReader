@@ -11,4 +11,12 @@ namespace PdfXenon.Standard
             return "Array Open";
         }
     }
+
+    public class TokenArrayClose : TokenBase
+    {
+        public override string ToString()
+        {
+            return "Array Close";
+        }
+    }
 }

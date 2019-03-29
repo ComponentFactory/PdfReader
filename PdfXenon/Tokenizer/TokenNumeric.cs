@@ -28,5 +28,8 @@ namespace PdfXenon.Standard
 
         public int? Integer { get; set; }
         public double? Real { get; set; }
+
+        public bool IsInteger { get => Integer.HasValue; }
+        public bool IsReal { get => Real.HasValue; }
     }
 }

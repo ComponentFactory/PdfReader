@@ -14,6 +14,7 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("<"));
             TokenError n = t.GetToken() as TokenError;
             Assert.NotNull(n);
+            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         [Fact]
@@ -22,6 +23,8 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("<["));
             TokenError n = t.GetToken() as TokenError;
             Assert.NotNull(n);
+            Assert.True(t.GetToken() is TokenArrayOpen);
+            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         [Fact]
@@ -30,6 +33,8 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("< ["));
             TokenError n = t.GetToken() as TokenError;
             Assert.NotNull(n);
+            Assert.True(t.GetToken() is TokenArrayOpen);
+            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         [Fact]
@@ -38,6 +43,7 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("< <"));
             TokenError n = t.GetToken() as TokenError;
             Assert.NotNull(n);
+            Assert.True(t.GetToken() is TokenError);
         }
 
         [Fact]
@@ -46,6 +52,7 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream(">"));
             TokenError n = t.GetToken() as TokenError;
             Assert.NotNull(n);
+            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         [Fact]
@@ -54,6 +61,8 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream(">["));
             TokenError n = t.GetToken() as TokenError;
             Assert.NotNull(n);
+            Assert.True(t.GetToken() is TokenArrayOpen);
+            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         [Fact]
@@ -62,6 +71,8 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("> ["));
             TokenError n = t.GetToken() as TokenError;
             Assert.NotNull(n);
+            Assert.True(t.GetToken() is TokenArrayOpen);
+            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         [Fact]
@@ -70,6 +81,7 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("> >"));
             TokenError n = t.GetToken() as TokenError;
             Assert.NotNull(n);
+            Assert.True(t.GetToken() is TokenError);
         }
 
         [Fact]
@@ -79,6 +91,7 @@ namespace UnitTesting
             TokenDictionaryOpen n = t.GetToken() as TokenDictionaryOpen;
             Assert.NotNull(n);
             Assert.True(n == TokenBase.DictionaryOpen);
+            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         [Fact]
@@ -88,6 +101,7 @@ namespace UnitTesting
             TokenDictionaryClose n = t.GetToken() as TokenDictionaryClose;
             Assert.NotNull(n);
             Assert.True(n == TokenBase.DictionaryClose);
+            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         [Fact]
@@ -102,6 +116,7 @@ namespace UnitTesting
             TokenDictionaryClose n2 = t.GetToken() as TokenDictionaryClose;
             Assert.NotNull(n2);
             Assert.True(n2 == TokenBase.DictionaryClose);
+            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         [Fact]
@@ -132,6 +147,7 @@ namespace UnitTesting
             n2 = t.GetToken() as TokenDictionaryClose;
             Assert.NotNull(n2);
             Assert.True(n2 == TokenBase.DictionaryClose);
+            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         private MemoryStream StringToStream(string str)

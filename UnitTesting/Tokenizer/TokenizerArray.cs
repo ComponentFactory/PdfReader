@@ -15,6 +15,7 @@ namespace UnitTesting
             TokenArrayOpen n = t.GetToken() as TokenArrayOpen;
             Assert.NotNull(n);
             Assert.True(n == TokenBase.ArrayOpen);
+            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         [Fact]
@@ -24,6 +25,7 @@ namespace UnitTesting
             TokenArrayClose n = t.GetToken() as TokenArrayClose;
             Assert.NotNull(n);
             Assert.True(n == TokenBase.ArrayClose);
+            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         [Fact]
@@ -38,6 +40,7 @@ namespace UnitTesting
             TokenArrayClose n2 = t.GetToken() as TokenArrayClose;
             Assert.NotNull(n2);
             Assert.True(n2 == TokenBase.ArrayClose);
+            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         [Fact]
@@ -68,6 +71,7 @@ namespace UnitTesting
             n2 = t.GetToken() as TokenArrayClose;
             Assert.NotNull(n2);
             Assert.True(n2 == TokenBase.ArrayClose);
+            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         private MemoryStream StringToStream(string str)

@@ -8,6 +8,7 @@ namespace PdfXenon.Standard
     {
         public static TokenKeyword True = new TokenKeyword("true");
         public static TokenKeyword False = new TokenKeyword("false");
+        public static TokenKeyword Null = new TokenKeyword("null");
 
         private static Dictionary<string, TokenKeyword> _lookup;
 

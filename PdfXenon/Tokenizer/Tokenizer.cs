@@ -33,7 +33,7 @@ namespace PdfXenon.Standard
             TokenBase t = GetAnyToken();
 
             if (IgnoreComments)
-                while(t is TokenComment)
+                while (t is TokenComment)
                     t = GetAnyToken();
 
             return t;
@@ -68,6 +68,7 @@ namespace PdfXenon.Standard
 
         private bool IsWhitespace(int index)
         {
+            // TODO, convert to array bool lookup
             char c = _line[index];
             return (c == 0) ||      // Null
                    (c == 9) ||      // Tab
@@ -79,6 +80,7 @@ namespace PdfXenon.Standard
 
         private bool IsDelimiter(int index)
         {
+            // TODO, convert to array bool lookup
             char c = _line[index];
             return (c == '(') || (c == ')') ||
                    (c == '<') || (c == '>') ||
@@ -94,22 +96,30 @@ namespace PdfXenon.Standard
 
         private bool IsNumberStart(int index)
         {
+            // TODO, convert to array bool lookup
             char c = _line[index];
             return ((c >= '0') && (c <= '9')) ||
-                   (c == '+') || 
+                   (c == '+') ||
                    (c == '-') ||
                    (c == '.');
         }
 
         private bool IsHexadecimal(char c)
         {
+            // TODO, convert to array bool lookup
             return ((c >= '0') && (c <= '9')) ||
                    ((c >= 'a') && (c <= 'f')) ||
                    ((c >= 'A') && (c <= 'F'));
         }
 
+        private bool IsHexadecimalString(int index)
+        {
+            return IsHexadecimal(_line[index]) || IsWhitespace(index);
+        }
+
         private int HexToDigit(char c)
         {
+            // TODO, convert to array integer lookup
             if ((c >= '0') && (c <= '9'))
                 return c - '0';
             else if ((c >= 'a') && (c <= 'f'))
@@ -184,9 +194,11 @@ namespace PdfXenon.Standard
                             case '/':
                                 return GetName();
                             case '<':
-                                return GetDictionaryOpen();
+                                return GetStringOrDictionary();
                             case '>':
                                 return GetDictionaryClose();
+                            case '(':
+                                return GetStringLiteral();
                             case '[':
                                 _index++;
                                 return TokenBase.ArrayOpen;
@@ -278,17 +290,35 @@ namespace PdfXenon.Standard
             return new TokenName(name);
         }
 
-        private TokenBase GetDictionaryOpen()
+        private TokenBase GetStringOrDictionary()
         {
-            // Check the next character is also a '<'
-            if (((_index + 1) < _length) && (_line[_index + 1] == '<'))
+            _index++;
+            if (_index >= _length)
+                return new TokenError(Stream.Position, $"Unexpected end of line after '<'.");
+
+            // Is the next character another '<'
+            if (_line[_index] == '<')
             {
-                _index += 2;
+                _index++;
                 return TokenBase.DictionaryOpen;
             }
             else
             {
-                return new TokenError(Stream.Position, $"Expected another '<' after the initial '<'.");
+                // Find the run of hexadecimal characters and whitespace
+                int end = _index;
+                while ((end < _length) && IsHexadecimalString(end))
+                    end++;
+
+                if (end == _length)
+                    return new TokenError(Stream.Position, $"Missing closing '>' at end of hexadecimal string.");
+
+                if (_line[end] != '>')
+                    return new TokenError(Stream.Position, $"Invalid character '{_line[end]}' found in hexadecimal string.");
+
+                string str = _line.Substring(_index, end - _index);
+                _index = end + 1;
+
+                return new TokenString(str, true);
             }
         }
 
@@ -302,8 +332,17 @@ namespace PdfXenon.Standard
             }
             else
             {
+                _index++;
                 return new TokenError(Stream.Position, $"Expected another '>' after the initial '>'.");
             }
+        }
+
+        private TokenBase GetStringLiteral()
+        {
+            _index++;
+
+            // TODO
+            return null;
         }
     }
 }

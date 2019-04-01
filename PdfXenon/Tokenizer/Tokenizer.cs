@@ -264,9 +264,6 @@ namespace PdfXenon.Standard
 
             _index = end;
 
-            if (name.Length < 2)
-                return new TokenError(Stream.Position, $"Name cannot be zero length.");
-
             // Is there an escape sequence to process
             while (true)
             {

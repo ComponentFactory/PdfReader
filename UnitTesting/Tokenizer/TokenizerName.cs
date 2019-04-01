@@ -9,11 +9,22 @@ namespace UnitTesting
     public class TokenizerName : HelperMethods
     {
         [Fact]
-        public void NameZeroLength()
+        public void NameZeroLength1()
         {
             Tokenizer t = new Tokenizer(StringToStream("/"));
-            TokenError e = t.GetToken() as TokenError;
-            Assert.NotNull(e);
+            TokenName n = t.GetToken() as TokenName;
+            Assert.NotNull(n);
+            Assert.True(n.Name == "");
+            Assert.True(t.GetToken() is TokenEmpty);
+        }
+
+        [Fact]
+        public void NameZeroLength2()
+        {
+            Tokenizer t = new Tokenizer(StringToStream("/ "));
+            TokenName n = t.GetToken() as TokenName;
+            Assert.NotNull(n);
+            Assert.True(n.Name == "");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 

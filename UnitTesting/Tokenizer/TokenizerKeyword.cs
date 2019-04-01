@@ -6,16 +6,16 @@ using Xunit;
 
 namespace UnitTesting
 {
-    public class TokenizerKeyword
+    public class TokenizerKeyword : HelperMethods
     {
         [Fact]
         public void KeywordFail()
         {
             Tokenizer t = new Tokenizer(StringToStream("random"));
             TokenBase k = t.GetToken();
-
             Assert.NotNull(k);
             Assert.True(k is TokenError);
+            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         [Fact]
@@ -23,7 +23,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("true"));
             TokenKeyword k = t.GetToken() as TokenKeyword;
-
             Assert.NotNull(k);
             Assert.True(k == TokenKeyword.True);
             Assert.True(t.GetToken() is TokenEmpty);
@@ -43,7 +42,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("false"));
             TokenKeyword k = t.GetToken() as TokenKeyword;
-
             Assert.NotNull(k);
             Assert.True(k == TokenKeyword.False);
             Assert.True(t.GetToken() is TokenEmpty);
@@ -59,9 +57,28 @@ namespace UnitTesting
         }
 
         [Fact]
+        public void KeywordNull()
+        {
+            Tokenizer t = new Tokenizer(StringToStream("null"));
+            TokenKeyword k = t.GetToken() as TokenKeyword;
+            Assert.NotNull(k);
+            Assert.True(k == TokenKeyword.Null);
+            Assert.True(t.GetToken() is TokenEmpty);
+        }
+
+        [Fact]
+        public void KeywordNullIncorrect()
+        {
+            Tokenizer t = new Tokenizer(StringToStream("Null"));
+            TokenError e = t.GetToken() as TokenError;
+            Assert.NotNull(e);
+            Assert.True(t.GetToken() is TokenEmpty);
+        }
+
+        [Fact]
         public void KeywordMultiple()
         {
-            Tokenizer t = new Tokenizer(StringToStream("true false true false"));
+            Tokenizer t = new Tokenizer(StringToStream("true false true false null"));
 
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
@@ -78,13 +95,12 @@ namespace UnitTesting
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k == TokenKeyword.False);
-            Assert.True(t.GetToken() is TokenEmpty);
-        }
 
-        private MemoryStream StringToStream(string str)
-        {
-            byte[] bytes = ASCIIEncoding.ASCII.GetBytes(str);
-            return new MemoryStream(bytes);
+            k = t.GetToken() as TokenKeyword;
+            Assert.NotNull(k);
+            Assert.True(k == TokenKeyword.Null);
+
+            Assert.True(t.GetToken() is TokenEmpty);
         }
     }
 }

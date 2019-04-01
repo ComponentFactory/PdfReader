@@ -6,7 +6,7 @@ using Xunit;
 
 namespace UnitTesting
 {
-    public class TokenizerNumeric
+    public class TokenizerNumeric : HelperMethods
     {
         public double RealPos = +1.79769313486232;
         public double RealNeg = -1.79769313486232;
@@ -16,7 +16,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("0"));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Integer.HasValue);
             Assert.True(n.Integer.Value == 0);
@@ -28,7 +27,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("-0"));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Integer.HasValue);
             Assert.True(n.Integer.Value == 0);
@@ -40,7 +38,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("+0"));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Integer.HasValue);
             Assert.True(n.Integer.Value == 0);
@@ -52,7 +49,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("1"));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Integer.HasValue);
             Assert.True(n.Integer.Value == 1);
@@ -64,7 +60,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("-1"));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Integer.HasValue);
             Assert.True(n.Integer.Value == -1);
@@ -76,7 +71,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("+1"));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Integer.HasValue);
             Assert.True(n.Integer.Value == 1);
@@ -88,7 +82,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream(int.MaxValue.ToString()));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Integer.HasValue);
             Assert.True(n.Integer.Value == int.MaxValue);
@@ -100,7 +93,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream(int.MinValue.ToString()));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Integer.HasValue);
             Assert.True(n.Integer.Value == int.MinValue);
@@ -112,7 +104,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("0.0"));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Real.HasValue);
             Assert.True(n.Real.Value == 0);
@@ -124,7 +115,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("-0.0"));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Real.HasValue);
             Assert.True(n.Real.Value == 0);
@@ -136,7 +126,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("+0.0"));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Real.HasValue);
             Assert.True(n.Real.Value == 0);
@@ -148,7 +137,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("1.0"));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Real.HasValue);
             Assert.True(n.Real.Value == 1);
@@ -160,7 +148,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("-1.0"));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Real.HasValue);
             Assert.True(n.Real.Value == -1);
@@ -172,7 +159,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("+1.0"));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Real.HasValue);
             Assert.True(n.Real.Value == 1);
@@ -184,7 +170,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream(".1"));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Real.HasValue);
             Assert.True(n.Real.Value == 0.1);
@@ -196,7 +181,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("-.1"));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Real.HasValue);
             Assert.True(n.Real.Value == -0.1);
@@ -208,7 +192,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("+.1"));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Real.HasValue);
             Assert.True(n.Real.Value == 0.1);
@@ -220,7 +203,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream(RealPos.ToString()));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Real.HasValue);
             Assert.True(n.Real.Value == RealPos);
@@ -232,7 +214,6 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream(RealNeg.ToString()));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Real.HasValue);
             Assert.True(n.Real.Value == RealNeg);
@@ -244,17 +225,10 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("+" + RealPos.ToString()));
             TokenNumeric n = t.GetToken() as TokenNumeric;
-
             Assert.NotNull(n);
             Assert.True(n.Real.HasValue);
             Assert.True(n.Real.Value == RealPos);
             Assert.True(t.GetToken() is TokenEmpty);
-        }
-
-        private MemoryStream StringToStream(string str)
-        {
-            byte[] bytes = ASCIIEncoding.ASCII.GetBytes(str);
-            return new MemoryStream(bytes);
         }
     }
 }

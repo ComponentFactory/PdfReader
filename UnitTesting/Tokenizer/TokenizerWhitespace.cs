@@ -6,7 +6,7 @@ using Xunit;
 
 namespace UnitTesting
 {
-    public class TokenizerWhitespace
+    public class TokenizerWhitespace : HelperMethods
     {
         [Fact]
         public void WhitespaceNull()
@@ -70,12 +70,6 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("   \r\n\x09\x09\x09\r\n\x09   \x09"));
             Assert.True(t.GetToken() is TokenEmpty);
             Assert.True(t.GetToken() is TokenEmpty);
-        }
-
-        private MemoryStream StringToStream(string str)
-        {
-            byte[] bytes = ASCIIEncoding.ASCII.GetBytes(str);
-            return new MemoryStream(bytes);
         }
     }
 }

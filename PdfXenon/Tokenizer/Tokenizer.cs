@@ -66,10 +66,9 @@ namespace PdfXenon.Standard
             return (_line != null) && (_index < _length);
         }
 
-        private bool IsWhitespace(int index)
+        private bool IsWhitespace(char c)
         {
             // TODO, convert to array bool lookup
-            char c = _line[index];
             return (c == 0) ||      // Null
                    (c == 9) ||      // Tab
                    (c == 10) ||     // Line Feed
@@ -78,30 +77,14 @@ namespace PdfXenon.Standard
                    (c == 32);       // Space
         }
 
-        private bool IsDelimiter(int index)
+        private bool IsDelimiter(char c)
         {
             // TODO, convert to array bool lookup
-            char c = _line[index];
             return (c == '(') || (c == ')') ||
                    (c == '<') || (c == '>') ||
                    (c == '[') || (c == ']') ||
                    (c == '{') || (c == '}') ||
                    (c == '/') || (c == '%');
-        }
-
-        private bool IsRegular(int index)
-        {
-            return !IsWhitespace(index) && !IsDelimiter(index);
-        }
-
-        private bool IsNumberStart(int index)
-        {
-            // TODO, convert to array bool lookup
-            char c = _line[index];
-            return ((c >= '0') && (c <= '9')) ||
-                   (c == '+') ||
-                   (c == '-') ||
-                   (c == '.');
         }
 
         private bool IsHexadecimal(char c)
@@ -112,9 +95,23 @@ namespace PdfXenon.Standard
                    ((c >= 'A') && (c <= 'F'));
         }
 
-        private bool IsHexadecimalString(int index)
+        private bool IsNumberStart(char c)
         {
-            return IsHexadecimal(_line[index]) || IsWhitespace(index);
+            // TODO, convert to array bool lookup
+            return ((c >= '0') && (c <= '9')) ||
+                   (c == '+') ||
+                   (c == '-') ||
+                   (c == '.');
+        }
+
+        private bool IsHexadecimalOrWhitespace(char c)
+        {
+            return IsHexadecimal(c) || IsWhitespace(c);
+        }
+
+        private bool IsRegular(char c)
+        {
+            return !IsWhitespace(c) && !IsDelimiter(c);
         }
 
         private int HexToDigit(char c)
@@ -151,7 +148,7 @@ namespace PdfXenon.Standard
                 // Skip all whitespace characters
                 while (_index < _length)
                 {
-                    if (IsWhitespace(_index))
+                    if (IsWhitespace(_line[_index]))
                         _index++;
                     else
                         return;
@@ -171,13 +168,13 @@ namespace PdfXenon.Standard
             {
                 // Find the run of regular characters
                 int end = _index;
-                while ((end < _length) && IsRegular(end))
+                while ((end < _length) && IsRegular(_line[end]))
                     end++;
 
                 // If at least one regular character
                 if (end > _index)
                 {
-                    if (IsNumberStart(_index))
+                    if (IsNumberStart(_line[_index]))
                         return GetNumber(end);
                     else
                         return GetKeyword(end);
@@ -185,7 +182,7 @@ namespace PdfXenon.Standard
                 else
                 {
                     // Must have found a delimiter instead
-                    if (IsDelimiter(_index))
+                    if (IsDelimiter(_line[_index]))
                     {
                         switch (_line[_index])
                         {
@@ -194,7 +191,7 @@ namespace PdfXenon.Standard
                             case '/':
                                 return GetName();
                             case '<':
-                                return GetStringOrDictionary();
+                                return GetDictionaryOpenOrHexString();
                             case '>':
                                 return GetDictionaryClose();
                             case '(':
@@ -260,7 +257,7 @@ namespace PdfXenon.Standard
         {
             // Find the run of regular characters
             int end = _index + 1;
-            while ((end < _length) && IsRegular(end))
+            while ((end < _length) && IsRegular(_line[end]))
                 end++;
 
             string name = _line.Substring(_index + 1, end - _index - 1);
@@ -290,7 +287,7 @@ namespace PdfXenon.Standard
             return new TokenName(name);
         }
 
-        private TokenBase GetStringOrDictionary()
+        private TokenBase GetDictionaryOpenOrHexString()
         {
             _index++;
             if (_index >= _length)
@@ -306,7 +303,7 @@ namespace PdfXenon.Standard
             {
                 // Find the run of hexadecimal characters and whitespace
                 int end = _index;
-                while ((end < _length) && IsHexadecimalString(end))
+                while ((end < _length) && IsHexadecimalOrWhitespace(_line[end]))
                     end++;
 
                 if (end == _length)

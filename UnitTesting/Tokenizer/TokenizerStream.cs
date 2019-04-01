@@ -6,7 +6,7 @@ using Xunit;
 
 namespace UnitTesting
 {
-    public class TokenizerStream
+    public class TokenizerStream : HelperMethods
     {
         [Fact]
         public void EmptyStream()
@@ -117,12 +117,6 @@ namespace UnitTesting
             Assert.NotNull(a10);
             Assert.True(a10.Comment == "%comment");
             Assert.True(t.GetToken() is TokenEmpty);
-        }
-
-        private MemoryStream StringToStream(string str)
-        {
-            byte[] bytes = ASCIIEncoding.ASCII.GetBytes(str);
-            return new MemoryStream(bytes);
         }
     }
 }

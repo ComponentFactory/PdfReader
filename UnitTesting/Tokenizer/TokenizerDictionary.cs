@@ -6,7 +6,7 @@ using Xunit;
 
 namespace UnitTesting
 {
-    public class TokenizerDictionary
+    public class TokenizerDictionary : HelperMethods
     {
         [Fact]
         public void DictionaryOpenFail()
@@ -148,12 +148,6 @@ namespace UnitTesting
             Assert.NotNull(n2);
             Assert.True(n2 == TokenBase.DictionaryClose);
             Assert.True(t.GetToken() is TokenEmpty);
-        }
-
-        private MemoryStream StringToStream(string str)
-        {
-            byte[] bytes = ASCIIEncoding.ASCII.GetBytes(str);
-            return new MemoryStream(bytes);
         }
     }
 }

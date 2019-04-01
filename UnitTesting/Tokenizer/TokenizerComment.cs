@@ -6,7 +6,7 @@ using Xunit;
 
 namespace UnitTesting
 {
-    public class TokenizerComment
+    public class TokenizerComment : HelperMethods
     {
         [Fact]
         public void CommentIgnore()
@@ -21,8 +21,8 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("%comment"));
             t.IgnoreComments = false;
-            TokenComment c = t.GetToken() as TokenComment;
 
+            TokenComment c = t.GetToken() as TokenComment;
             Assert.NotNull(c);
             Assert.True(c.Comment == "%comment");
             Assert.True(t.GetToken() is TokenEmpty);
@@ -33,8 +33,8 @@ namespace UnitTesting
         {
             Tokenizer t = new Tokenizer(StringToStream("\x00\x09\x0A\x0C\x0D%comment"));
             t.IgnoreComments = false;
-            TokenComment c = t.GetToken() as TokenComment;
 
+            TokenComment c = t.GetToken() as TokenComment;
             Assert.NotNull(c);
             Assert.True(c.Comment == "%comment");
             Assert.True(t.GetToken() is TokenEmpty);
@@ -59,12 +59,6 @@ namespace UnitTesting
             Assert.True(c.Comment == "%three");
 
             Assert.True(t.GetToken() is TokenEmpty);
-        }
-
-        private MemoryStream StringToStream(string str)
-        {
-            byte[] bytes = ASCIIEncoding.ASCII.GetBytes(str);
-            return new MemoryStream(bytes);
         }
     }
 }

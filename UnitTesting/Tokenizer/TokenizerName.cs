@@ -6,7 +6,7 @@ using Xunit;
 
 namespace UnitTesting
 {
-    public class TokenizerName
+    public class TokenizerName : HelperMethods
     {
         [Fact]
         public void NameZeroLength()
@@ -75,12 +75,6 @@ namespace UnitTesting
             Assert.NotNull(n);
             Assert.True(n.Name == "A(B)");
             Assert.True(t.GetToken() is TokenEmpty);
-        }
-
-        private MemoryStream StringToStream(string str)
-        {
-            byte[] bytes = ASCIIEncoding.ASCII.GetBytes(str);
-            return new MemoryStream(bytes);
         }
     }
 }

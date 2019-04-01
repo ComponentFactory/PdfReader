@@ -6,7 +6,7 @@ using Xunit;
 
 namespace UnitTesting
 {
-    public class TokenizerArray
+    public class TokenizerArray : HelperMethods
     {
         [Fact]
         public void ArrayOpen()
@@ -72,12 +72,6 @@ namespace UnitTesting
             Assert.NotNull(n2);
             Assert.True(n2 == TokenBase.ArrayClose);
             Assert.True(t.GetToken() is TokenEmpty);
-        }
-
-        private MemoryStream StringToStream(string str)
-        {
-            byte[] bytes = ASCIIEncoding.ASCII.GetBytes(str);
-            return new MemoryStream(bytes);
         }
     }
 }

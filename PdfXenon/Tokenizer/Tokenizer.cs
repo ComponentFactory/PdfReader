@@ -315,7 +315,7 @@ namespace PdfXenon.Standard
                 string str = _line.Substring(_index, end - _index);
                 _index = end + 1;
 
-                return new TokenString(str, true);
+                return new TokenHexString(str);
             }
         }
 
@@ -336,10 +336,80 @@ namespace PdfXenon.Standard
 
         private TokenBase GetStringLiteral()
         {
+            // Move past the '(' start literal string marker
             _index++;
 
-            // TODO
-            return null;
+            int nesting = 0;
+            int first = _index;
+            bool continuation = false;
+
+            StringBuilder sb = new StringBuilder();
+
+            // Keep scanning until we get to the end of literal string ')' marker
+            while (true)
+            {
+                // Scan rest of the current line
+                while (_index < _length)
+                {
+                    // Is this the start of an escape sequence
+                    if (_line[_index] == '\\')
+                    {
+                        // If the last character, then indicates no newline should be appended into the literal string
+                        if (_index >= (_length - 1))
+                            continuation = true;
+                        else
+                        {
+                            // Skip over the following escaped character for first digit of escaped number
+                            _index++;
+                        }
+                    }
+                    else if (_line[_index] == ')')
+                    {
+                        // If the balancing end marker then we have finished
+                        if (nesting == 0)
+                        {
+                            sb.Append(_line.Substring(first, _index - first));
+
+                            // Move past the ')' marker
+                            _index++;
+
+                            return new TokenLiteralString(sb.ToString());
+                        }
+                        else
+                            nesting--;
+                    }
+                    else if (_line[_index] == '(')
+                        nesting++;
+
+                    _index++;
+                }
+
+                if (continuation)
+                {
+                    // Append everything from the first character
+                    sb.Append(_line.Substring(first, _index - first - 1));
+                }
+                else
+                {
+                    // Append everything from the first character but excluding the continuation marker
+                    sb.Append(_line.Substring(first, _index - first));
+                    sb.Append("\n");
+                }
+
+                _line = Reader.ReadLine();
+                if (_line != null)
+                {
+                    _length = _line.Length;
+                    _index = 0;
+                    first = _index;
+                    continuation = false;
+                }
+                else
+                {
+                    // End of content before end of string literal
+                    return new TokenError(Stream.Position, $"End of content before end of literal string character ')'.");
+                }
+            }
         }
     }
 }

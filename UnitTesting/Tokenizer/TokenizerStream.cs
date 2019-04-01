@@ -27,10 +27,9 @@ namespace UnitTesting
             Assert.NotNull(a1);
             Assert.True(a1 == TokenBase.ArrayOpen);
 
-            TokenString a2 = t.GetToken() as TokenString;
+            TokenHexString a2 = t.GetToken() as TokenHexString;
             Assert.NotNull(a2);
             Assert.True(a2.HexString == "6465");
-            Assert.True(a2.IsHex);
 
             TokenDictionaryOpen a3 = t.GetToken() as TokenDictionaryOpen;
             Assert.NotNull(a3);
@@ -78,10 +77,9 @@ namespace UnitTesting
             Assert.NotNull(a1);
             Assert.True(a1 == TokenBase.ArrayOpen);
 
-            TokenString a2 = t.GetToken() as TokenString;
+            TokenHexString a2 = t.GetToken() as TokenHexString;
             Assert.NotNull(a2);
             Assert.True(a2.HexString == "64 65");
-            Assert.True(a2.IsHex);
 
             TokenDictionaryOpen a3 = t.GetToken() as TokenDictionaryOpen;
             Assert.NotNull(a3);

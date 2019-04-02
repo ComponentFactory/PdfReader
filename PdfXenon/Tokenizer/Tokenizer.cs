@@ -4,13 +4,13 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class Tokenizer : IDisposable
+    public class Tokenizer
     {
         private int _index;
         private int _length;
         private string _line;
         private long _position;
-        private ASCIIReader _reader;
+        private TokenReader _reader;
 
         public Tokenizer(Stream stream)
         {
@@ -20,11 +20,6 @@ namespace PdfXenon.Standard
             // Stream is no use if we cannot read from it
             if (!stream.CanRead)
                 throw new ApplicationException("cannot read from stream");
-        }
-
-        public void Dispose()
-        {
-            ClearReader();
         }
 
         public bool IgnoreComments { get; set; } = true;
@@ -42,23 +37,14 @@ namespace PdfXenon.Standard
 
         private Stream Stream { get; set; }
 
-        private ASCIIReader Reader
+        private TokenReader Reader
         {
             get
             {
                 if (_reader == null)
-                    _reader = new ASCIIReader(Stream);
+                    _reader = new TokenReader(Stream);
 
                 return _reader;
-            }
-        }
-
-        private void ClearReader()
-        {
-            if (_reader != null)
-            {
-                _reader.Dispose();
-                _reader = null;
             }
         }
 

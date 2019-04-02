@@ -4,20 +4,11 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class Parser : IDisposable
+    public class Parser
     {
         public Parser(Stream stream)
         {
             Tokenizer = new Tokenizer(stream);
-        }
-
-        public void Dispose()
-        {
-            if (Tokenizer != null)
-            {
-                Tokenizer.Dispose();
-                Tokenizer = null;
-            }
         }
 
         public void TestParse()

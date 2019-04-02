@@ -5,14 +5,14 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class ASCIIReader : IDisposable
+    public class TokenReader
     {
         private Stream _stream;
         private byte[] _bytes;
         private int _start;
         private int _end;
 
-        public ASCIIReader(Stream stream)
+        public TokenReader(Stream stream)
         {
             _stream = stream;
             Position = stream.Position;
@@ -47,7 +47,7 @@ namespace PdfXenon.Standard
                     // Reached an end of line marker?
                     if ((c == '\r') || (c == '\n'))
                     {
-                        // Append unprocessed characters before the end of line marker
+                        // Append the unprocessed characters before the end of line marker
                         sb.Append(Encoding.ASCII.GetChars(_bytes, _start, index - _start));
 
                         // Processing continues after the first end of line marker
@@ -73,7 +73,7 @@ namespace PdfXenon.Standard
 
                 } while (index < _end);
 
-                // Append unprocessed characters
+                // Append the unprocessed characters
                 sb.Append(Encoding.ASCII.GetChars(_bytes, _start, index - _start));
 
             } while (ReadBytes() > 0);

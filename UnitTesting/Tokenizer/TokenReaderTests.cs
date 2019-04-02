@@ -6,13 +6,13 @@ using Xunit;
 
 namespace UnitTesting
 {
-    public class ASCIIReaderTests : HelperMethods
+    public class TokenReaderTests : HelperMethods
     {
         [Fact]
         public void Single1()
         {
             MemoryStream ms = StringToStream("");
-            ASCIIReader r = new ASCIIReader(ms);
+            TokenReader r = new TokenReader(ms);
 
             Assert.True(r.Position == 0);
             Assert.True(r.ReadLine() == null);
@@ -23,7 +23,7 @@ namespace UnitTesting
         public void Single2()
         {
             MemoryStream ms = StringToStream("123");
-            ASCIIReader r = new ASCIIReader(ms);
+            TokenReader r = new TokenReader(ms);
 
             Assert.True(r.Position == 0);
             Assert.True(r.ReadLine() == "123");
@@ -34,7 +34,7 @@ namespace UnitTesting
         public void TwoCarriageReturn()
         {
             MemoryStream ms = StringToStream("123\r456");
-            ASCIIReader r = new ASCIIReader(ms);
+            TokenReader r = new TokenReader(ms);
 
             Assert.True(r.Position == 0);
             Assert.True(r.ReadLine() == "123");
@@ -47,7 +47,7 @@ namespace UnitTesting
         public void TwoLineFeed()
         {
             MemoryStream ms = StringToStream("123\n456");
-            ASCIIReader r = new ASCIIReader(ms);
+            TokenReader r = new TokenReader(ms);
 
             Assert.True(r.Position == 0);
             Assert.True(r.ReadLine() == "123");
@@ -60,7 +60,7 @@ namespace UnitTesting
         public void TwoBoth()
         {
             MemoryStream ms = StringToStream("123\r\n456");
-            ASCIIReader r = new ASCIIReader(ms);
+            TokenReader r = new TokenReader(ms);
 
             Assert.True(r.Position == 0);
             Assert.True(r.ReadLine() == "123");
@@ -73,7 +73,7 @@ namespace UnitTesting
         public void ThreeCarriageReturn()
         {
             MemoryStream ms = StringToStream("123\r\r456");
-            ASCIIReader r = new ASCIIReader(ms);
+            TokenReader r = new TokenReader(ms);
 
             Assert.True(r.Position == 0);
             Assert.True(r.ReadLine() == "123");
@@ -88,7 +88,7 @@ namespace UnitTesting
         public void ThreeLineFeed()
         {
             MemoryStream ms = StringToStream("123\n\n456");
-            ASCIIReader r = new ASCIIReader(ms);
+            TokenReader r = new TokenReader(ms);
 
             Assert.True(r.Position == 0);
             Assert.True(r.ReadLine() == "123");

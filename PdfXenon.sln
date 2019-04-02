@@ -5,7 +5,9 @@ VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PdfXenon.Standard", "PdfXenon\PdfXenon.Standard.csproj", "{80E025DE-6427-4EA3-904A-2D71E61DDA58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PdfXenon.UnitTesting", "UnitTesting\PdfXenon.UnitTesting.csproj", "{818FEC8F-17B4-4E6D-B0DE-0FBA73F6C9AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PdfXenon.UnitTesting", "UnitTesting\PdfXenon.UnitTesting.csproj", "{818FEC8F-17B4-4E6D-B0DE-0FBA73F6C9AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{B719C92C-4D11-4861-A2CB-CD9E23F9AA98}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{818FEC8F-17B4-4E6D-B0DE-0FBA73F6C9AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{818FEC8F-17B4-4E6D-B0DE-0FBA73F6C9AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{818FEC8F-17B4-4E6D-B0DE-0FBA73F6C9AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B719C92C-4D11-4861-A2CB-CD9E23F9AA98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B719C92C-4D11-4861-A2CB-CD9E23F9AA98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B719C92C-4D11-4861-A2CB-CD9E23F9AA98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B719C92C-4D11-4861-A2CB-CD9E23F9AA98}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

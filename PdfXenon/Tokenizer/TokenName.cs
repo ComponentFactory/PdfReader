@@ -6,14 +6,15 @@ namespace PdfXenon.Standard
 {
     public class TokenName : TokenBase
     {
-        public TokenName(string name)
+        public TokenName(long position, string name)
+            : base(position)
         {
             Name = name;
         }
 
         public override string ToString()
         {
-            return $"Name:{Name}";
+            return $"Name: {Name}, Pos: {Position}";
         }
 
         public string Name { get; private set; }

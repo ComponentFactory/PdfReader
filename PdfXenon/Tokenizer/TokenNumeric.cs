@@ -6,12 +6,14 @@ namespace PdfXenon.Standard
 {
     public class TokenNumeric : TokenBase
     {
-        public TokenNumeric(int integer)
+        public TokenNumeric(long position, int integer)
+            : base(position)
         {
             Integer = integer;
         }
 
-        public TokenNumeric(double real)
+        public TokenNumeric(long position, double real)
+            : base(position)
         {
             Real = real;
         }
@@ -19,11 +21,11 @@ namespace PdfXenon.Standard
         public override string ToString()
         {
             if (Integer.HasValue)
-                return $"Integer:{Integer.Value}";
+                return $"Integer: {Integer.Value}, Pos: {Position}";
             else if (Real.HasValue)
-                return $"Real:{Integer.Value}";
+                return $"Real: {Real.Value}, Pos: {Position}";
             else
-                return $"Numeric:(null)";
+                return $"Numeric: (null), Pos: {Position}";
         }
 
         public int? Integer { get; set; }

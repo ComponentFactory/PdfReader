@@ -14,8 +14,27 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("<20>"));
             TokenHexString s = t.GetToken() as TokenHexString;
             Assert.NotNull(s);
+            Assert.True(s.Position == 0);
             Assert.True(s.HexString == "20");
             Assert.True(s.ActualString == " ");
+            Assert.True(t.GetToken() is TokenEmpty);
+        }
+
+        [Fact]
+        public void HexStringDouble()
+        {
+            Tokenizer t = new Tokenizer(StringToStream("<20><64>"));
+            TokenHexString s = t.GetToken() as TokenHexString;
+            Assert.NotNull(s);
+            Assert.True(s.Position == 0);
+            Assert.True(s.HexString == "20");
+            Assert.True(s.ActualString == " ");
+
+            s = t.GetToken() as TokenHexString;
+            Assert.NotNull(s);
+            Assert.True(s.Position == 4);
+            Assert.True(s.HexString == "64");
+            Assert.True(s.ActualString == "d");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -25,6 +44,7 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("<20 >"));
             TokenHexString s = t.GetToken() as TokenHexString;
             Assert.NotNull(s);
+            Assert.True(s.Position == 0);
             Assert.True(s.HexString == "20 ");
             Assert.True(s.ActualString == " ");
             Assert.True(t.GetToken() is TokenEmpty);
@@ -36,6 +56,7 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("<2 0 >"));
             TokenHexString s = t.GetToken() as TokenHexString;
             Assert.NotNull(s);
+            Assert.True(s.Position == 0);
             Assert.True(s.HexString == "2 0 ");
             Assert.True(s.ActualString == " ");
             Assert.True(t.GetToken() is TokenEmpty);
@@ -47,6 +68,7 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("< 2 0 >"));
             TokenHexString s = t.GetToken() as TokenHexString;
             Assert.NotNull(s);
+            Assert.True(s.Position == 0);
             Assert.True(s.HexString == " 2 0 ");
             Assert.True(s.ActualString == " ");
             Assert.True(t.GetToken() is TokenEmpty);
@@ -58,6 +80,7 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("< 20 >"));
             TokenHexString s = t.GetToken() as TokenHexString;
             Assert.NotNull(s);
+            Assert.True(s.Position == 0);
             Assert.True(s.HexString == " 20 ");
             Assert.True(s.ActualString == " ");
             Assert.True(t.GetToken() is TokenEmpty);
@@ -69,6 +92,7 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("< 20>"));
             TokenHexString s = t.GetToken() as TokenHexString;
             Assert.NotNull(s);
+            Assert.True(s.Position == 0);
             Assert.True(s.HexString == " 20");
             Assert.True(s.ActualString == " ");
             Assert.True(t.GetToken() is TokenEmpty);
@@ -80,6 +104,7 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("<6465>"));
             TokenHexString s = t.GetToken() as TokenHexString;
             Assert.NotNull(s);
+            Assert.True(s.Position == 0);
             Assert.True(s.HexString == "6465");
             Assert.True(s.ActualString == "de");
             Assert.True(t.GetToken() is TokenEmpty);
@@ -92,6 +117,7 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("<64 65 >"));
             TokenHexString s = t.GetToken() as TokenHexString;
             Assert.NotNull(s);
+            Assert.True(s.Position == 0);
             Assert.True(s.HexString == "64 65 ");
             Assert.True(s.ActualString == "de");
             Assert.True(t.GetToken() is TokenEmpty);
@@ -103,6 +129,7 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("<"));
             TokenError e = t.GetToken() as TokenError;
             Assert.NotNull(e);
+            Assert.True(e.Position == 0);
         }
 
         [Fact]
@@ -111,6 +138,7 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("<00"));
             TokenError e = t.GetToken() as TokenError;
             Assert.NotNull(e);
+            Assert.True(e.Position == 0);
         }
 
         [Fact]
@@ -119,6 +147,7 @@ namespace UnitTesting
             Tokenizer t = new Tokenizer(StringToStream("<00["));
             TokenError e = t.GetToken() as TokenError;
             Assert.NotNull(e);
+            Assert.True(e.Position == 0);
         }
     }
 }

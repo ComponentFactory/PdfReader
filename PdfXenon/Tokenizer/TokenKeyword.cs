@@ -1,42 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace PdfXenon.Standard
 {
     public class TokenKeyword : TokenBase
     {
-        public static TokenKeyword True = new TokenKeyword("true");
-        public static TokenKeyword False = new TokenKeyword("false");
-        public static TokenKeyword Null = new TokenKeyword("null");
+        private static Dictionary<string, PdfKeyword> _lookup;
 
-        private static Dictionary<string, TokenKeyword> _lookup;
-
-        public static void Register(TokenKeyword token)
+        static TokenKeyword()
         {
-            if (_lookup == null)
-                _lookup = new Dictionary<string, TokenKeyword>();
+            _lookup = new Dictionary<string, PdfKeyword>();
 
-            _lookup.Add(token.Keyword, token);
+            foreach (object val in Enum.GetValues(typeof(PdfKeyword)))
+            {
+                string name = Enum.GetName(typeof(PdfKeyword), val);
+                string keyword = name;
+
+                object[] attrs = typeof(PdfKeyword).GetMember(name)[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
+                if ((attrs != null) && (attrs.Length > 0))
+                    keyword = ((DescriptionAttribute)attrs[0]).Description;
+
+                _lookup.Add(keyword, (PdfKeyword)val);
+            }
         }
 
-        public static TokenKeyword CheckKeywords(string keyword)
+        public static TokenKeyword CheckKeywords(long position, string keyword)
         {
-            _lookup.TryGetValue(keyword, out TokenKeyword ret);
-            return ret;
+            if (_lookup.TryGetValue(keyword, out PdfKeyword pdfKeyword))
+                return new TokenKeyword(position, pdfKeyword);
+
+            return null;
         }
 
-        public TokenKeyword(string keyword)
+        public TokenKeyword(long position, PdfKeyword keyword)
+            : base(position)
         {
             Keyword = keyword;
-            Register(this);
         }
 
         public override string ToString()
         {
-            return $"Keyword:{Keyword}";
+            return $"Keyword: {Keyword}, Pos: {Position}";
         }
 
-        public string Keyword { get; private set; }
+        public PdfKeyword Keyword { get; private set; }
     }
 }

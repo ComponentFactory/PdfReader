@@ -8,14 +8,15 @@ namespace PdfXenon.Standard
     {
         private string _actual;
 
-        public TokenHexString(string str)
+        public TokenHexString(long position, string str)
+            : base(position)
         {
             HexString = str;
         }
 
         public override string ToString()
         {
-            return $"HexString: Len:{HexString.Length} ";
+            return $"HexString: Len:{HexString.Length}, Pos: {Position}";
         }
 
         public string HexString { get; private set; }

@@ -6,10 +6,11 @@ namespace PdfXenon.Standard
 {
     public abstract class TokenBase
     {
-        public static TokenEmpty Empty = new TokenEmpty();
-        public static TokenArrayOpen ArrayOpen = new TokenArrayOpen();
-        public static TokenArrayClose ArrayClose = new TokenArrayClose();
-        public static TokenDictionaryOpen DictionaryOpen = new TokenDictionaryOpen();
-        public static TokenDictionaryClose DictionaryClose = new TokenDictionaryClose();
+        public TokenBase(long position)
+        {
+            Position = position;
+        }
+
+        public long Position { get; private set; }
     }
 }

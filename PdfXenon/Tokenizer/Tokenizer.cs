@@ -9,7 +9,8 @@ namespace PdfXenon.Standard
         private int _index;
         private int _length;
         private string _line;
-        private StreamReader _reader;
+        private long _position;
+        private ASCIIReader _reader;
 
         public Tokenizer(Stream stream)
         {
@@ -41,12 +42,12 @@ namespace PdfXenon.Standard
 
         private Stream Stream { get; set; }
 
-        private StreamReader Reader
+        private ASCIIReader Reader
         {
             get
             {
                 if (_reader == null)
-                    _reader = new StreamReader(Stream, ASCIIEncoding.ASCII);
+                    _reader = new ASCIIReader(Stream);
 
                 return _reader;
             }
@@ -132,6 +133,7 @@ namespace PdfXenon.Standard
                 // Do we need to fetch the next line of characters?
                 if (!HasLine())
                 {
+                    _position = Reader.Position;
                     _line = Reader.ReadLine();
                     if (_line != null)
                     {
@@ -163,9 +165,11 @@ namespace PdfXenon.Standard
 
             // Have we run out of content?
             if (!HasLine())
-                return TokenBase.Empty;
+                return new TokenEmpty(_position);
             else
             {
+                long position = _position + _index;
+
                 // Find the run of regular characters
                 int end = _index;
                 while ((end < _length) && IsRegular(_line[end]))
@@ -198,70 +202,74 @@ namespace PdfXenon.Standard
                                 return GetStringLiteral();
                             case '[':
                                 _index++;
-                                return TokenBase.ArrayOpen;
+                                return new TokenArrayOpen(position);
                             case ']':
                                 _index++;
-                                return TokenBase.ArrayClose;
+                                return new TokenArrayClose(position);
                         }
                     }
 
                     // Found invalid character for this position
-                    return new TokenError(Stream.Position, $"Cannot parse '{_line[_index]}' as a delimiter or whitespace.");
+                    return new TokenError(position, $"Cannot parse '{_line[_index]}' as a delimiter or whitespace.");
                 }
             }
         }
 
         private TokenBase GetNumber(int end)
         {
+            long position = _position + _index;
             string text = _line.Substring(_index, end - _index);
             _index = end;
 
             if (int.TryParse(text, out int integer))
-                return new TokenNumeric(integer);
+                return new TokenNumeric(position, integer);
             else
             {
                 if (double.TryParse(text, out double real))
-                    return new TokenNumeric(real);
+                    return new TokenNumeric(position, real);
                 else
                 {
                     // String is not a recognized number format
-                    return new TokenError(Stream.Position, $"Cannot parse '{text}' as a number.");
+                    return new TokenError(position, $"Cannot parse '{text}' as a number.");
                 }
             }
         }
 
         private TokenBase GetKeyword(int end)
         {
+            long position = _position + _index;
             string text = _line.Substring(_index, end - _index);
             _index = end;
 
-            TokenKeyword token = TokenKeyword.CheckKeywords(text);
+            TokenKeyword token = TokenKeyword.CheckKeywords(position, text);
             if (token != null)
                 return token;
 
             // String is not a recognized keyword
-            return new TokenError(Stream.Position, $"Cannot parse '{text}' as a keyword.");
+            return new TokenError(position, $"Cannot parse '{text}' as a keyword.");
         }
 
         private TokenBase GetComment()
         {
+            long position = _position + _index;
             string comment = _line.Substring(_index);
 
             // Continue processing at start of the next line
             _line = null;
 
-            return new TokenComment(comment);
+            return new TokenComment(position, comment);
         }
 
         private TokenBase GetName()
         {
+            long position = _position + _index;
+
             // Find the run of regular characters
             int end = _index + 1;
             while ((end < _length) && IsRegular(_line[end]))
                 end++;
 
             string name = _line.Substring(_index + 1, end - _index - 1);
-
             _index = end;
 
             // Is there an escape sequence to process
@@ -272,7 +280,7 @@ namespace PdfXenon.Standard
                 {
                     // Check there are two digits after it
                     if ((escape > (name.Length - 3)) || !IsHexadecimal(name[escape + 1]) || !IsHexadecimal(name[escape + 2]))
-                        return new TokenError(Stream.Position, $"Escaped character in Name not followed by two hex digits.");
+                        return new TokenError(position + escape, $"Escaped character in Name not followed by two hex digits.");
 
                     char val = (char)(HexToDigit(name[escape + 1]) * 16 + HexToDigit(name[escape + 2]));
                     name = name.Replace(name.Substring(escape, 3), $"{val}");
@@ -281,20 +289,22 @@ namespace PdfXenon.Standard
                     break;
             }
 
-            return new TokenName(name);
+            return new TokenName(position, name);
         }
 
         private TokenBase GetDictionaryOpenOrHexString()
         {
+            long position = _position + _index;
+
             _index++;
             if (_index >= _length)
-                return new TokenError(Stream.Position, $"Unexpected end of line after '<'.");
+                return new TokenError(position, $"Unexpected end of line after '<'.");
 
             // Is the next character another '<'
             if (_line[_index] == '<')
             {
                 _index++;
-                return TokenBase.DictionaryOpen;
+                return new TokenDictionaryOpen(position);
             }
             else
             {
@@ -304,35 +314,39 @@ namespace PdfXenon.Standard
                     end++;
 
                 if (end == _length)
-                    return new TokenError(Stream.Position, $"Missing closing '>' at end of hexadecimal string.");
+                    return new TokenError(position, $"Missing closing '>' at end of hexadecimal string.");
 
                 if (_line[end] != '>')
-                    return new TokenError(Stream.Position, $"Invalid character '{_line[end]}' found in hexadecimal string.");
+                    return new TokenError(position, $"Invalid character '{_line[end]}' found in hexadecimal string.");
 
                 string str = _line.Substring(_index, end - _index);
                 _index = end + 1;
 
-                return new TokenHexString(str);
+                return new TokenHexString(position, str);
             }
         }
 
         private TokenBase GetDictionaryClose()
         {
+            long position = _position + _index;
+
             // Check the next character is also a '>'
             if (((_index + 1) < _length) && (_line[_index + 1] == '>'))
             {
                 _index += 2;
-                return TokenBase.DictionaryClose;
+                return new TokenDictionaryClose(position);
             }
             else
             {
                 _index++;
-                return new TokenError(Stream.Position, $"Expected another '>' after the initial '>'.");
+                return new TokenError(position, $"Expected another '>' after the initial '>'.");
             }
         }
 
         private TokenBase GetStringLiteral()
         {
+            long position = _position + _index;
+
             // Move past the '(' start literal string marker
             _index++;
 
@@ -370,7 +384,7 @@ namespace PdfXenon.Standard
                             // Move past the ')' marker
                             _index++;
 
-                            return new TokenLiteralString(sb.ToString());
+                            return new TokenLiteralString(position, sb.ToString());
                         }
                         else
                             nesting--;
@@ -404,7 +418,7 @@ namespace PdfXenon.Standard
                 else
                 {
                     // End of content before end of string literal
-                    return new TokenError(Stream.Position, $"End of content before end of literal string character ')'.");
+                    return new TokenError(position, $"End of content before end of literal string character ')'.");
                 }
             }
         }

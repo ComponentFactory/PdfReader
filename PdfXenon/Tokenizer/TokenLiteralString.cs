@@ -8,14 +8,15 @@ namespace PdfXenon.Standard
     {
         private string _actual;
 
-        public TokenLiteralString(string str)
+        public TokenLiteralString(long position, string str)
+            : base(position)
         {
             LiteralString = str;
         }
 
         public override string ToString()
         {
-            return $"LiteralString: Len:{LiteralString.Length} ";
+            return $"LiteralString: Len:{LiteralString.Length}, Pos: {Position}";
         }
 
         public string LiteralString { get; private set; }

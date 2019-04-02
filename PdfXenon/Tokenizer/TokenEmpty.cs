@@ -6,9 +6,14 @@ namespace PdfXenon.Standard
 {
     public class TokenEmpty : TokenBase
     {
+        public TokenEmpty(long position)
+            : base(position)
+        {
+        }
+
         public override string ToString()
         {
-            return "(Empty)";
+            return $"(Empty), Pos: {Position}";
         }
     }
 }

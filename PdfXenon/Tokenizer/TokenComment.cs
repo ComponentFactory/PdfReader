@@ -6,14 +6,15 @@ namespace PdfXenon.Standard
 {
     public class TokenComment : TokenBase
     {
-        public TokenComment(string comment)
+        public TokenComment(long position, string comment)
+            : base(position)
         {
             Comment = comment;
         }
 
         public override string ToString()
         {
-            return $"Comment:{Comment}";
+            return $"Comment: {Comment}, Pos: {Position}";
         }
 
         public string Comment { get; private set; }

@@ -6,17 +6,27 @@ namespace PdfXenon.Standard
 {
     public class TokenArrayOpen : TokenBase
     {
+        public TokenArrayOpen(long position)
+            : base(position)
+        {
+        }
+
         public override string ToString()
         {
-            return "Array Open";
+            return $"Array: Open, Pos: {Position}";
         }
     }
 
     public class TokenArrayClose : TokenBase
     {
+        public TokenArrayClose(long position)
+            : base(position)
+        {
+        }
+
         public override string ToString()
         {
-            return "Array Close";
+            return $"Array: Close, Pos: {Position}";
         }
     }
 }

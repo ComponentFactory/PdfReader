@@ -6,6 +6,11 @@ namespace PdfXenon.Standard
 {
     public abstract class TokenString : TokenBase
     {
+        public TokenString(long position)
+            : base(position)
+        {
+        }
+
         public abstract string ActualString { get; }
     }
 }

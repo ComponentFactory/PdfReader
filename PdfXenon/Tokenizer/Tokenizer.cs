@@ -6,11 +6,64 @@ namespace PdfXenon.Standard
 {
     public class Tokenizer
     {
+        // Lookup arrays are fast and simple when the source is ASCII characters and so limimted to 256 values
+        private static bool[] _whitespaceLookup;
+        private static char[] _whitespaceChars = new char[] { '\0', '\t', '\n', '\f', '\r', ' ' };
+        private static bool[] _delimiterLookup;
+        private static char[] _delimiterChars = new char[] { '(', ')', '<', '>', '[', ']', '{', '}', '/', '%' };
+        private static bool[] _delimiterOrWhitespaceLookup;
+        private static bool[] _hexadecimalLookup;
+        private static char[] _hexadecimalChars = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F' };
+        private static bool[] _hexadecimalOrWhitespaceLookup;
+        private static bool[] _isStartOfNumberLookup;
+        private static char[] _isNumberStartChars = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '.' };
+        private static int[] _hexToDecimalLookup;
+
         private int _index;
         private int _length;
         private string _line;
         private long _position;
         private TokenReader _reader;
+
+        static Tokenizer()
+        {
+            _whitespaceLookup = new bool[256];
+            foreach (char character in _whitespaceChars)
+                _whitespaceLookup[character] = true;
+
+            _delimiterLookup = new bool[256];
+            foreach (char character in _delimiterChars)
+                _delimiterLookup[character] = true;
+
+            _hexadecimalLookup = new bool[256];
+            foreach (char character in _hexadecimalChars)
+                _hexadecimalLookup[character] = true;
+
+            _isStartOfNumberLookup = new bool[256];
+            foreach (char character in _isNumberStartChars)
+                _isStartOfNumberLookup[character] = true;
+
+            _hexadecimalOrWhitespaceLookup = new bool[256];
+            foreach (char character in _whitespaceChars)
+                _hexadecimalOrWhitespaceLookup[character] = true;
+            foreach (char character in _hexadecimalChars)
+                _hexadecimalOrWhitespaceLookup[character] = true;
+
+            _delimiterOrWhitespaceLookup = new bool[256];
+            foreach (char character in _whitespaceChars)
+                _delimiterOrWhitespaceLookup[character] = true;
+            foreach (char character in _delimiterChars)
+                _delimiterOrWhitespaceLookup[character] = true;
+
+            _hexToDecimalLookup = new int[256];
+            for (int i = 0; i < 10; i++)
+                _hexToDecimalLookup['0' + i] = i;
+            for (int i=0; i<6; i++)
+            {
+                _hexToDecimalLookup['a' + i] = i;
+                _hexToDecimalLookup['A' + i] = i;
+            }
+        }
 
         public Tokenizer(Stream stream)
         {
@@ -23,6 +76,7 @@ namespace PdfXenon.Standard
         }
 
         public bool IgnoreComments { get; set; } = true;
+
         public TokenBase CachedToken { get; set; }
 
         public TokenBase GetToken()
@@ -54,68 +108,40 @@ namespace PdfXenon.Standard
             }
         }
 
-        private bool HasLine()
-        {
-            return (_line != null) && (_index < _length);
-        }
-
         private bool IsWhitespace(char c)
         {
-            // TODO, convert to array bool lookup
-            return (c == 0) ||      // Null
-                   (c == 9) ||      // Tab
-                   (c == 10) ||     // Line Feed
-                   (c == 12) ||     // Form Feed
-                   (c == 13) ||     // Carriage Return
-                   (c == 32);       // Space
+            return _whitespaceLookup[c];
         }
 
         private bool IsDelimiter(char c)
         {
-            // TODO, convert to array bool lookup
-            return (c == '(') || (c == ')') ||
-                   (c == '<') || (c == '>') ||
-                   (c == '[') || (c == ']') ||
-                   (c == '{') || (c == '}') ||
-                   (c == '/') || (c == '%');
-        }
-
-        private bool IsHexadecimal(char c)
-        {
-            // TODO, convert to array bool lookup
-            return ((c >= '0') && (c <= '9')) ||
-                   ((c >= 'a') && (c <= 'f')) ||
-                   ((c >= 'A') && (c <= 'F'));
-        }
-
-        private bool IsNumberStart(char c)
-        {
-            // TODO, convert to array bool lookup
-            return ((c >= '0') && (c <= '9')) ||
-                   (c == '+') ||
-                   (c == '-') ||
-                   (c == '.');
-        }
-
-        private bool IsHexadecimalOrWhitespace(char c)
-        {
-            return IsHexadecimal(c) || IsWhitespace(c);
+            return _delimiterLookup[c];
         }
 
         private bool IsRegular(char c)
         {
-            return !IsWhitespace(c) && !IsDelimiter(c);
+            return !_delimiterOrWhitespaceLookup[c];
         }
 
-        private int HexToDigit(char c)
+        private bool IsHexadecimal(char c)
         {
-            // TODO, convert to array integer lookup
-            if ((c >= '0') && (c <= '9'))
-                return c - '0';
-            else if ((c >= 'a') && (c <= 'f'))
-                return c - 'a' + 10;
-            else
-                return c - 'A' + 10;
+            return _hexadecimalLookup[c];
+        }
+
+        private bool IsHexadecimalOrWhitespace(char c)
+        {
+            return _hexadecimalOrWhitespaceLookup[c];
+        }
+
+
+        private bool IsStartOfNumber(char c)
+        {
+            return _isStartOfNumberLookup[c];
+        }
+
+        private int ConvertHexToDecimal(char c)
+        {
+            return _hexToDecimalLookup[c];
         }
 
         private void SkipWhitespace()
@@ -123,10 +149,11 @@ namespace PdfXenon.Standard
             while (true)
             {
                 // Do we need to fetch the next line of characters?
-                if (!HasLine())
+                if ((_line == null) || (_index == _length))
                 {
                     _position = Reader.Position;
                     _line = Reader.ReadLine();
+
                     if (_line != null)
                     {
                         _length = _line.Length;
@@ -134,7 +161,7 @@ namespace PdfXenon.Standard
                     }
                     else
                     {
-                        // No more lines, we must be done
+                        // No more lines, finished
                         break;
                     }
                 }
@@ -156,7 +183,7 @@ namespace PdfXenon.Standard
             SkipWhitespace();
 
             // Have we run out of content?
-            if (!HasLine())
+            if ((_line == null) || (_index == _length))
                 return new TokenEmpty(_position);
             else
             {
@@ -170,7 +197,7 @@ namespace PdfXenon.Standard
                 // If at least one regular character
                 if (end > _index)
                 {
-                    if (IsNumberStart(_line[_index]))
+                    if (IsStartOfNumber(_line[_index]))
                         return GetNumber(end);
                     else
                         return GetKeyword(end);
@@ -202,7 +229,7 @@ namespace PdfXenon.Standard
                     }
 
                     // Found invalid character for this position
-                    return new TokenError(position, $"Cannot parse '{_line[_index]}' as a delimiter or whitespace.");
+                    return new TokenError(position, $"Cannot parse '{_line[_index]}' as a delimiter or regular character.");
                 }
             }
         }
@@ -244,6 +271,8 @@ namespace PdfXenon.Standard
         private TokenBase GetComment()
         {
             long position = _position + _index;
+
+            // Everything till end of the line is the comment
             string comment = _line.Substring(_index);
 
             // Continue processing at start of the next line
@@ -264,21 +293,19 @@ namespace PdfXenon.Standard
             string name = _line.Substring(_index + 1, end - _index - 1);
             _index = end;
 
-            // Is there an escape sequence to process
+            // Convert any escape sequences
             while (true)
             {
                 int escape = name.IndexOf('#');
-                if (escape >= 0)
-                {
-                    // Check there are two digits after it
-                    if ((escape > (name.Length - 3)) || !IsHexadecimal(name[escape + 1]) || !IsHexadecimal(name[escape + 2]))
-                        return new TokenError(position + escape, $"Escaped character in Name not followed by two hex digits.");
-
-                    char val = (char)(HexToDigit(name[escape + 1]) * 16 + HexToDigit(name[escape + 2]));
-                    name = name.Replace(name.Substring(escape, 3), $"{val}");
-                }
-                else
+                if (escape < 0)
                     break;
+
+                // Check there are two digits after it
+                if ((escape > (name.Length - 3)) || !IsHexadecimal(name[escape + 1]) || !IsHexadecimal(name[escape + 2]))
+                    return new TokenError(position + escape, $"Escaped character inside name is not followed by two hex digits.");
+
+                char val = (char)(ConvertHexToDecimal(name[escape + 1]) * 16 + ConvertHexToDecimal(name[escape + 2]));
+                name = name.Replace(name.Substring(escape, 3), $"{val}");
             }
 
             return new TokenName(position, name);
@@ -306,7 +333,7 @@ namespace PdfXenon.Standard
                     end++;
 
                 if (end == _length)
-                    return new TokenError(position, $"Missing closing '>' at end of hexadecimal string.");
+                    return new TokenError(position, $"Missing '>' at end of hexadecimal string.");
 
                 if (_line[end] != '>')
                     return new TokenError(position, $"Invalid character '{_line[end]}' found in hexadecimal string.");
@@ -331,7 +358,7 @@ namespace PdfXenon.Standard
             else
             {
                 _index++;
-                return new TokenError(position, $"Expected another '>' after the initial '>'.");
+                return new TokenError(position, $"Missing '>' after the initial '>'.");
             }
         }
 
@@ -357,7 +384,7 @@ namespace PdfXenon.Standard
                     // Is this the start of an escape sequence
                     if (_line[_index] == '\\')
                     {
-                        // If the last character, then indicates no newline should be appended into the literal string
+                        // If the last character, then '\' indicates that no newline should be appended into the literal string
                         if (_index >= (_length - 1))
                             continuation = true;
                         else
@@ -368,7 +395,7 @@ namespace PdfXenon.Standard
                     }
                     else if (_line[_index] == ')')
                     {
-                        // If the balancing end marker then we have finished
+                        // If the balancing end marker then we are finished
                         if (nesting == 0)
                         {
                             sb.Append(_line.Substring(first, _index - first));

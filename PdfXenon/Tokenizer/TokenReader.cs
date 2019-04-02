@@ -19,10 +19,6 @@ namespace PdfXenon.Standard
             _bytes = new byte[1024];
         }
 
-        public void Dispose()
-        {
-        }
-
         public long Position { get; private set; }
 
         public string ReadLine()

@@ -3,8 +3,9 @@ using System;
 using System.Text;
 using System.IO;
 using Xunit;
+using UnitTesting;
 
-namespace UnitTesting
+namespace TokenizerUnitTesting
 {
     public class TokenizerLiteralString : HelperMethods
     {

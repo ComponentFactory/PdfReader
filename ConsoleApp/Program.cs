@@ -11,7 +11,6 @@ namespace ConsoleApp
             using (StreamReader reader = new StreamReader(@"d:\Blank.pdf"))
             {
                 Parser p = new Parser(reader.BaseStream);
-                p.TestParse();
             }
 
             Console.ReadLine();

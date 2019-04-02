@@ -23,10 +23,16 @@ namespace PdfXenon.Standard
         }
 
         public bool IgnoreComments { get; set; } = true;
+        public TokenBase CachedToken { get; set; }
 
         public TokenBase GetToken()
         {
-            TokenBase t = GetAnyToken();
+            TokenBase t = CachedToken;
+
+            if (t == null)
+                t = GetAnyToken();
+            else
+                CachedToken = null;
 
             if (IgnoreComments)
                 while (t is TokenComment)

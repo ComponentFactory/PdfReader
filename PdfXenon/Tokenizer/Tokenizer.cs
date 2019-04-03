@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -24,6 +25,7 @@ namespace PdfXenon.Standard
         private string _line;
         private long _position;
         private TokenReader _reader;
+        private Stack<TokenBase> _stack = new Stack<TokenBase>();
 
         static Tokenizer()
         {
@@ -77,20 +79,18 @@ namespace PdfXenon.Standard
 
         public bool IgnoreComments { get; set; } = true;
 
-        public TokenBase CachedToken { get; set; }
+        public void PushToken(TokenBase token)
+        {
+            _stack.Push(token);
+        }
 
         public TokenBase GetToken()
         {
-            TokenBase t = CachedToken;
-
-            if (t == null)
-                t = GetAnyToken();
-            else
-                CachedToken = null;
+            TokenBase t = _stack.Count > 0 ? _stack.Pop() : GetAnyToken();
 
             if (IgnoreComments)
                 while (t is TokenComment)
-                    t = GetAnyToken();
+                    t = _stack.Count > 0 ? _stack.Pop() : GetAnyToken();
 
             return t;
         }

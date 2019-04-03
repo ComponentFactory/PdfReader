@@ -18,21 +18,42 @@ namespace PdfXenon.Standard
             ThrowOnEmptyOrError(t);
 
             if (t is TokenName)
-            {
                 return new PdfName(t as TokenName);
-            }
             else if (t is TokenNumeric)
             {
+                // An object reference starts with an integer number (the object identifier)
+                TokenNumeric n = t as TokenNumeric;
+                if (n.IsInteger)
+                {
+                    TokenBase t2 = Tokenizer.GetToken();
+                    if (t2 is TokenNumeric)
+                    {
+                        // An object reference then has another integer number (the object generation)
+                        TokenNumeric n2 = t2 as TokenNumeric;
+                        if (n2.IsInteger)
+                        {
+                            TokenBase t3 = Tokenizer.GetToken();
+                            if (t3 is TokenKeyword)
+                            {
+                                // An object reference finally has the R keyword
+                                TokenKeyword k = t3 as TokenKeyword;
+                                if (k.Keyword == PdfKeyword.R)
+                                    return new PdfObjectReference(n, n2);
+                            }
+
+                            Tokenizer.PushToken(t3);
+                        }
+                    }
+
+                    Tokenizer.PushToken(t2);
+                }
+
                 return new PdfNumeric(t as TokenNumeric);
             }
             else if (t is TokenHexString)
-            {
                 return new PdfString(t as TokenHexString);
-            }
             else if (t is TokenLiteralString)
-            {
                 return new PdfString(t as TokenLiteralString);
-            }
             else if (t is TokenArrayOpen)
             {
                 List<PdfObject> objects = new List<PdfObject>();
@@ -54,6 +75,8 @@ namespace PdfXenon.Standard
             }
             else if (t is TokenDictionaryOpen)
             {
+                Dictionary<string, PdfDictEntry> entries = new Dictionary<string, PdfDictEntry>();
+
                 PdfObject value1 = null;
                 PdfObject value2 = null;
                 while (true)
@@ -64,6 +87,7 @@ namespace PdfXenon.Standard
                     else
                         ThrowOnEmptyOrError(t);
 
+                    // Key value must be a Name
                     PdfName name = value1 as PdfName;
                     if (name == null)
                         throw new ApplicationException($"Dictionary key must be a name instead of {name.GetType().Name} at position {name.Position}.");
@@ -73,10 +97,13 @@ namespace PdfXenon.Standard
                         throw new ApplicationException($"Dictionary value missing for key {name.Name} at position {name.Position}.");
                     else
                         ThrowOnEmptyOrError(t);
+
+                    // If key already exists then simply overwrite it with latest value
+                    entries[name.Name] = new PdfDictEntry() { Name = name, Object = value2 };
                 }
 
                 ThrowIfNot<TokenDictionaryClose>(Tokenizer.GetToken());
-                return new PdfDictionary(t.Position);
+                return new PdfDictionary(t.Position, entries);
             }
             else if (t is TokenKeyword)
             {
@@ -91,58 +118,8 @@ namespace PdfXenon.Standard
             }
 
             // Token is not one that starts an object, so put the token back
-            Tokenizer.CachedToken = t;
+            Tokenizer.PushToken(t);
             return null;
-
-            //if (t is TokenDictionaryOpen)
-            //{
-            //    while (true)
-            //    {
-            //        t = Tokenizer.GetToken();
-            //        if (t is TokenName)
-            //        {
-            //            ParseObject();
-            //        }
-            //        else if (t is TokenDictionaryClose)
-            //        {
-            //            return;
-            //        }
-            //        else
-            //            ThrowOnUnexpected(t);
-            //    }
-            //}
-            //else if (t is TokenName)
-            //{
-            //}
-            //else if (t is TokenNumeric)
-            //{
-            //    TokenNumeric n = (TokenNumeric)t;
-            //    if (n.IsInteger)
-            //    {
-            //        If followed by another number then it is an object reference
-            //        t = Tokenizer.GetToken();
-            //        if (t is TokenNumeric)
-            //        {
-            //            int identifier = n.Integer.Value;
-
-            //            n = (TokenNumeric)t;
-            //            if (n.IsInteger)
-            //            {
-            //                int generation = n.Integer.Value;
-
-            //                TokenKeyword k = ThrowIfNot<TokenKeyword>(Tokenizer.GetToken());
-            //                if (k.Keyword != PdfKeyword.R)
-            //                    throw new ApplicationException($"Object reference must use keyword 'R', at position {k.Position}.");
-            //            }
-            //            else
-            //                throw new ApplicationException($"Object reference must have a generation that is an integer, at position {n.Position}.");
-            //        }
-            //        else
-            //            Tokenizer.CachedToken = t;
-            //    }
-            //}
-            //else
-            //    ThrowOnUnexpected(t);
         }
 
         //public void TestParse()
@@ -223,8 +200,6 @@ namespace PdfXenon.Standard
         //    {
         //        // the xref keyword means we are finished
         //    }
-        //    else
-        //        ThrowOnUnexpected(t);
         //}
 
         private T ThrowIfNot<T>(TokenBase t) where T : TokenBase
@@ -245,11 +220,6 @@ namespace PdfXenon.Standard
                 throw new ApplicationException(t.ToString());
             else if (t is TokenEmpty)
                 throw new ApplicationException("Unexpected end of PDF document.");
-        }
-
-        private void ThrowOnUnexpected(TokenBase t)
-        {
-            throw new ApplicationException($"Unexpected PDF content at position {t.Position}.");
         }
 
         private Tokenizer Tokenizer { get; set; }

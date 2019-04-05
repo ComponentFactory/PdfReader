@@ -122,6 +122,108 @@ namespace PdfXenon.Standard
             return null;
         }
 
+        public PdfIndirectObject ParseIndirectObject()
+        {
+            TokenBase t = Tokenizer.GetToken();
+            ThrowOnEmptyOrError(t);
+
+            // Indirect object starts with an identifier number
+            if (!(t is TokenNumeric))
+            {
+                Tokenizer.PushToken(t);
+                return null;
+            }
+
+            TokenNumeric id = (TokenNumeric)t;
+            if (id.IsReal)
+            {
+                Tokenizer.PushToken(t);
+                return null;
+            }
+
+            // Indirect object then has a generation number
+            TokenBase u = Tokenizer.GetToken();
+            ThrowOnEmptyOrError(u);
+
+            if (!(u is TokenNumeric))
+            {
+                Tokenizer.PushToken(t);
+                Tokenizer.PushToken(u);
+                return null;
+            }
+
+            TokenNumeric gen = (TokenNumeric)u;
+            if (gen.IsReal)
+            {
+                Tokenizer.PushToken(t);
+                Tokenizer.PushToken(u);
+                return null;
+            }
+
+            // Indirect object then has the keyword 'obj'
+            TokenBase v = Tokenizer.GetToken();
+            ThrowOnEmptyOrError(v);
+            if (!(v is TokenKeyword) || ((v as TokenKeyword).Keyword != PdfKeyword.Obj))
+            {
+                Tokenizer.PushToken(t);
+                Tokenizer.PushToken(u);
+                Tokenizer.PushToken(v);
+                return null;
+            }
+
+            // Get actual object that is the content
+            PdfObject obj = ParseObject();
+            if (obj == null)
+                throw new ApplicationException($"Indirect object has missing content at position {t.Position}.");
+
+            // Must be followed by either a 'endobj' or a 'stream'
+            v = Tokenizer.GetToken();
+            ThrowOnEmptyOrError(v);
+
+            TokenKeyword keyword = (TokenKeyword)v;
+            if (keyword == null)
+                throw new ApplicationException($"Indirect object has missing 'endobj' at position {v.Position}.");
+
+            if (keyword.Keyword == PdfKeyword.EndObj)
+                return new PdfIndirectObject(id, gen, obj);
+            else if (keyword.Keyword == PdfKeyword.Stream)
+            {
+                PdfDictionary dictionary = obj as PdfDictionary;
+                if (dictionary == null)
+                    throw new ApplicationException($"Stream must be preceded by a dictionary at position {v.Position}.");
+
+                if (!dictionary.ContainsKey("Length"))
+                    throw new ApplicationException($"Stream dictionary must contain a 'Length' entry at position {v.Position}.");
+
+                PdfDictEntry entry = dictionary["Length"];
+                PdfNumeric length = entry.Object as PdfNumeric;
+                if ((length == null) || length.IsReal)
+                    throw new ApplicationException($"Stream dictionary has a 'Length' entry that is not an integer entry at position {v.Position}.");
+
+                if (length.Integer < 0)
+                    throw new ApplicationException($"Stream dictionary has a 'Length' less than 0 at position {v.Position}.");
+
+                byte[] bytes = Tokenizer.GetBytes(length.Integer);
+                if (bytes == null)
+                    throw new ApplicationException($"Cannot read in expected {length.Integer} bytes from stream at position {v.Position}.");
+
+                // Stream contents must be followed by 'endstream'
+                v = Tokenizer.GetToken();
+                ThrowOnEmptyOrError(v);
+
+                keyword = (TokenKeyword)v;
+                if (keyword == null)
+                    throw new ApplicationException($"Stream has missing 'endstream' after content at at position {v.Position}.");
+
+                if (keyword.Keyword != PdfKeyword.EndStream)
+                    throw new ApplicationException($"Stream has unexpected keyword {keyword.Keyword} instead of 'endstream' at position {v.Position}.");
+
+                return new PdfIndirectObject(id, gen, new PdfStream(dictionary, bytes));
+            }
+            else
+                throw new ApplicationException($"Indirect object has unexpected keyword {keyword.Keyword} at position {v.Position}.");
+        }
+
         //public void TestParse()
         //{
         //    try

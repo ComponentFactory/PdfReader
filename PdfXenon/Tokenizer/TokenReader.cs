@@ -21,14 +21,44 @@ namespace PdfXenon.Standard
 
         public long Position { get; private set; }
 
-        public string ReadLine()
+        public byte[] GetBytes(int length)
         {
-            if (_start == _end)
+            // Make sure we have some data to process
+            if ((_start == _end) && (ReadBytes() == 0))
+                return null;
+
+            // Skip over any line feed at end of preceding line
+            if (_bytes[_start] == '\r')
+                _start++;
+
+            byte[] ret = new byte[length];
+            int index = 0;
+
+            // Copy any remaining bytes in the buffer
+            if (_start < _end)
             {
-                // If there is no more content to return, then return null
-                if (ReadBytes() == 0)
+                int copy = Math.Min(length, (_end - _start));
+                Array.Copy(_bytes, _start, ret, 0, copy);
+                index += copy;
+                _start += copy;
+            }
+
+            // Read remaining bytes directly from the stream
+            if (index < length)
+            {
+                int copied = _stream.Read(ret, index, length - index);
+                if (copied < (length - index))
                     return null;
             }
+
+            return ret;
+        }
+
+        public string ReadLine()
+        {
+            // If there is no more content to return, then return null
+            if ((_start == _end) && (ReadBytes() == 0))
+                return null;
 
             StringBuilder sb = new StringBuilder();
 

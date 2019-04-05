@@ -23,6 +23,11 @@ namespace PdfXenon.Standard
             set { _entries[key] = value; }
         }
 
+        public bool ContainsKey(string key)
+        {
+            return _entries.ContainsKey(key);
+        }
+
         public override long Position { get => DictionaryOpenPosition; }
 
         private long DictionaryOpenPosition { get; set; }

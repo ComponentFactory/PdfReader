@@ -95,6 +95,11 @@ namespace PdfXenon.Standard
             return t;
         }
 
+        public byte[] GetBytes(int length)
+        {
+            return Reader.GetBytes(length);
+        }
+
         private Stream Stream { get; set; }
 
         private TokenReader Reader

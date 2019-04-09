@@ -12,6 +12,14 @@ namespace PdfXenon.Standard
             Token = token;
         }
 
+        public override string ToString()
+        {
+            if (IsInteger)
+                return $"PdfNumeric: Integer: {Integer}";
+            else
+                return $"PdfNumeric: Real: {Real}";
+        }
+
         public bool IsInteger { get => Token.IsInteger; }
         public int Integer { get => Token.Integer.Value; }
         public bool IsReal { get => Token.IsReal; }

@@ -14,6 +14,11 @@ namespace PdfXenon.Standard
             Obj = obj;
         }
 
+        public override string ToString()
+        {
+            return $"PdfIndirectObject: {Id} {Gen} Obj: {Obj.ToString()}";
+        }
+
         public int Id { get => TokenId.Integer.Value; }
         public int Gen { get => TokenGen.Integer.Value; }
         public PdfObject Obj { get; private set; }

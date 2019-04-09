@@ -12,6 +12,11 @@ namespace PdfXenon.Standard
             Token = token;
         }
 
+        public override string ToString()
+        {
+            return $"PdfNull";
+        }
+
         public override long Position { get => Token.Position; }
 
         private TokenKeyword Token { get; set; }

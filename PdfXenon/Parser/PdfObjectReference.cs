@@ -13,6 +13,11 @@ namespace PdfXenon.Standard
             TokenGen = gen;
         }
 
+        public override string ToString()
+        {
+            return $"PdfObjectReference: {Id} {Gen}";
+        }
+
         public int Id { get => TokenId.Integer.Value; }
         public int Gen { get => TokenGen.Integer.Value; }
         public override long Position { get => TokenId.Position; }

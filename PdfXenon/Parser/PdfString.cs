@@ -17,6 +17,11 @@ namespace PdfXenon.Standard
             Token = token;
         }
 
+        public override string ToString()
+        {
+            return $"PdfString: {String}";
+        }
+
         public string String
         {
             get

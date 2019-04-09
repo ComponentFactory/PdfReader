@@ -12,6 +12,11 @@ namespace PdfXenon.Standard
             Token = token;
         }
 
+        public override string ToString()
+        {
+            return $"PdfName: {Name}";
+        }
+
         public string Name { get => Token.Name; }
         public override long Position { get => Token.Position; }
 

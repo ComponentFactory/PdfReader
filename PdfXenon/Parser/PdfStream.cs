@@ -18,6 +18,11 @@ namespace PdfXenon.Standard
             Bytes = bytes;
         }
 
+        public override string ToString()
+        {
+            return $"PdfStream: Bytes:{Bytes.Length}";
+        }
+
         public override long Position { get => Dictionary.Position; }
 
         public string StringContent

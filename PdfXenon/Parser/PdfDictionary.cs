@@ -15,6 +15,20 @@ namespace PdfXenon.Standard
             _entries = entries;
         }
 
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine($"PdfDictionary: Count:{Count} (");
+
+            foreach (PdfDictEntry entry in _entries.Values)
+                sb.AppendLine($"    {entry.Name.Name} = {entry.Object.ToString()}");
+
+            sb.AppendLine(")");
+
+            return sb.ToString();
+        }
+
         public int Count { get => _entries.Count; }
 
         public PdfDictEntry this[string key]

@@ -1,0 +1,5 @@
+﻿Load a stream that has a stream reference as the Length, just scan until end of line is followed by endstream
+Load a unicode string by checking for prefix bytes, scan till the ) found
+Load the xref table
+Load the trailer
+Load the subsequent update blocks

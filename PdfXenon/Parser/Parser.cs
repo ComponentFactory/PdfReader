@@ -12,6 +12,31 @@ namespace PdfXenon.Standard
             Tokenizer = new Tokenizer(stream);
         }
 
+        private void ParseHeader(out int major, out int minor)
+        {
+            // The header is a comment token
+            Tokenizer.IgnoreComments = false;
+            TokenBase t = Tokenizer.GetToken();
+            if (!(t is TokenComment))
+                throw new ApplicationException("Missing PDF header.");
+
+            TokenComment c = (TokenComment)t;
+            if (!c.Comment.StartsWith("%PDF"))
+                throw new ApplicationException("PDF Header must start with %PDF text.");
+
+            string[] splits = c.Comment.Substring(5).Split('.');
+            if (splits.Length != 2)
+                throw new ApplicationException("PDF Header must have a major.minor version number.");
+
+            if (!int.TryParse(splits[0].Trim(), out major))
+                throw new ApplicationException("Could not parse the header major version number.");
+
+            if (!int.TryParse(splits[1].Trim(), out minor))
+                throw new ApplicationException("Could not parse the header minor version number.");
+
+            Tokenizer.IgnoreComments = true;
+        }
+
         public PdfObject ParseObject()
         {
             TokenBase t = Tokenizer.GetToken();
@@ -182,7 +207,7 @@ namespace PdfXenon.Standard
 
             TokenKeyword keyword = (TokenKeyword)v;
             if (keyword == null)
-                throw new ApplicationException($"Indirect object has missing 'endobj' at position {v.Position}.");
+                throw new ApplicationException($"Indirect object has missing 'endobj or 'stream' at position {v.Position}.");
 
             if (keyword.Keyword == PdfKeyword.EndObj)
                 return new PdfIndirectObject(id, gen, obj);
@@ -218,91 +243,69 @@ namespace PdfXenon.Standard
                 if (keyword.Keyword != PdfKeyword.EndStream)
                     throw new ApplicationException($"Stream has unexpected keyword {keyword.Keyword} instead of 'endstream' at position {v.Position}.");
 
+                // Stream contents must be followed by 'endobj'
+                v = Tokenizer.GetToken();
+                ThrowOnEmptyOrError(v);
+
+                keyword = (TokenKeyword)v;
+                if (keyword == null)
+                    throw new ApplicationException($"Indirect object has missing 'endobj' at position { v.Position }.");
+
+                if (keyword.Keyword != PdfKeyword.EndObj)
+                    throw new ApplicationException($"Indirect object has unexpected keyword {keyword.Keyword} instead of 'endobj' at position {v.Position}.");
+
                 return new PdfIndirectObject(id, gen, new PdfStream(dictionary, bytes));
             }
             else
                 throw new ApplicationException($"Indirect object has unexpected keyword {keyword.Keyword} at position {v.Position}.");
         }
 
-        //public void TestParse()
-        //{
-        //    try
-        //    {
-        //        ParseHeader(out int major, out int minor);
-        //        ParseIndirectObjects();
-        //    }
-        //    catch(ApplicationException ex)
-        //    {
-        //        Console.WriteLine(ex.Message);
-        //    }
-        //}
+        private List<PdfIndirectObject> ParseIndirectObjects()
+        {
+            List<PdfIndirectObject> indirects = new List<PdfIndirectObject>();
 
-        //private void ParseHeader(out int major, out int minor)
-        //{
-        //    // The header is a comment token
-        //    Tokenizer.IgnoreComments = false;
-        //    TokenBase t = Tokenizer.GetToken();
-        //    if (!(t is TokenComment))
-        //        throw new ApplicationException("Missing PDF header.");
+            while(true)
+            {
+                // Lookahead to the next token
+                TokenBase t = Tokenizer.GetToken();
+                ThrowOnEmptyOrError(t);
+                Tokenizer.PushToken(t);
 
-        //    TokenComment c = (TokenComment)t;
-        //    if (!c.Comment.StartsWith("%PDF"))
-        //        throw new ApplicationException("PDF Header must start with %PDF text.");
+                // Keep processing indirect objects until we reach the 'xref' keyword
+                if ((t is TokenKeyword) && (((TokenKeyword)t).Keyword == PdfKeyword.XRef))
+                    break;
 
-        //    string[] splits = c.Comment.Substring(5).Split('.');
-        //    if (splits.Length != 2)
-        //        throw new ApplicationException("PDF Header must have a major.minor version number.");
+                PdfIndirectObject indirect = ParseIndirectObject();
+                if (indirect == null)
+                    throw new ApplicationException($"Missing indirect object at postion {t.Position}.");
 
-        //    if (!int.TryParse(splits[0].Trim(), out major))
-        //        throw new ApplicationException("Could not parse the header major version number.");
+                Console.WriteLine(indirect.ToString());
+                indirects.Add(indirect);
+            }
 
-        //    if (!int.TryParse(splits[1].Trim(), out minor))
-        //        throw new ApplicationException("Could not parse the header minor version number.");
-        //}
+            return indirects;
+        }
 
-        //private void ParseIndirectObjects()
-        //{
-        //    // Ignore any comments before the next real token
-        //    Tokenizer.IgnoreComments = true;
-        //    TokenBase t = Tokenizer.GetToken();
-        //    ThrowOnEmptyOrError(t);
+        public void ParseAll()
+        {
+            try
+            {
+                ParseHeader(out int major, out int minor);
+                List<PdfIndirectObject> indirects = ParseIndirectObjects();
 
-        //    // Indirect objects start with an integer number
-        //    if (t is TokenNumeric)
-        //    {
-        //        TokenNumeric n = (TokenNumeric)t;
-        //        if (!n.IsInteger)
-        //            throw new ApplicationException($"Indirect object must have integer identifier, at position {n.Position}.");
+                // todo, lead the xref table
+                // todo, load the trailer
 
-        //        int identifier = n.Integer.Value;
-
-        //        n = ThrowIfNot<TokenNumeric>(Tokenizer.GetToken());
-        //        if (!n.IsInteger)
-        //            throw new ApplicationException($"Indirect object must have integer generation, at position {n.Position}.");
-
-        //        int generation = n.Integer.Value;
-
-        //        TokenKeyword k = ThrowIfNot<TokenKeyword>(Tokenizer.GetToken());
-        //        if (k.Keyword == PdfKeyword.Obj)
-        //        {
-        //            ParseObject();
-
-        //            k = ThrowIfNot<TokenKeyword>(Tokenizer.GetToken());
-        //            if (k.Keyword != PdfKeyword.EndObj)
-        //                throw new ApplicationException($"Indirect object has missing endobj, at position {n.Position}.");
-        //        }
-        //        else if (k.Keyword == PdfKeyword.R)
-        //        {
-        //            // todo
-        //        }
-        //        else
-        //            throw new ApplicationException($"Indirect object must specify an object or reference as content, at position {n.Position}.");
-        //    }
-        //    else if (t is TokenKeyword)
-        //    {
-        //        // the xref keyword means we are finished
-        //    }
-        //}
+                // while another update attched then
+                    // todo, load the indirect objects
+                    // todo, lead the xref table
+                    // todo, load the trailer
+            }
+            catch (ApplicationException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
 
         private T ThrowIfNot<T>(TokenBase t) where T : TokenBase
         {

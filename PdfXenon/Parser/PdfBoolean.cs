@@ -12,6 +12,11 @@ namespace PdfXenon.Standard
             Token = token;
         }
 
+        public override string ToString()
+        {
+            return $"PdfBoolean: {Value}";
+        }
+
         public bool Value { get => Token.Keyword == PdfKeyword.True; }
         public override long Position { get => Token.Position; }
 

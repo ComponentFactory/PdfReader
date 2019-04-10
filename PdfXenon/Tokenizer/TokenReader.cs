@@ -54,13 +54,13 @@ namespace PdfXenon.Standard
             return ret;
         }
 
-        public string ReadLine()
+        public byte[] ReadLine()
         {
             // If there is no more content to return, then return null
             if ((_start == _end) && (ReadBytes() == 0))
                 return null;
 
-            StringBuilder sb = new StringBuilder();
+            byte[] ret = null;
 
             do
             {
@@ -74,7 +74,7 @@ namespace PdfXenon.Standard
                     if ((c == '\r') || (c == '\n'))
                     {
                         // Append the unprocessed characters before the end of line marker
-                        sb.Append(Encoding.ASCII.GetChars(_bytes, _start, index - _start));
+                        ret = AppendBytes(_bytes, _start, index - _start, ret);
 
                         // Processing continues after the first end of line marker
                         _start = index + 1;
@@ -91,7 +91,7 @@ namespace PdfXenon.Standard
                             }
                         }
 
-                        return sb.ToString();
+                        return ret;
                     }
 
                     index++;
@@ -100,11 +100,28 @@ namespace PdfXenon.Standard
                 } while (index < _end);
 
                 // Append the unprocessed characters
-                sb.Append(Encoding.ASCII.GetChars(_bytes, _start, index - _start));
+                ret = AppendBytes(_bytes, _start, index - _start, ret);
 
             } while (ReadBytes() > 0);
 
-            return sb.ToString();
+            return ret;
+        }
+
+        private byte[] AppendBytes(byte[] bytes, int start, int length, byte[] existing)
+        {
+            if (existing == null)
+            {
+                byte[] ret = new byte[length];
+                Array.Copy(bytes, start, ret, 0, length);
+                return ret;
+            }
+            else
+            {
+                byte[] ret = new byte[existing.Length + length];
+                Array.Copy(existing, 0, ret, 0, existing.Length);
+                Array.Copy(bytes, start, ret, existing.Length, length);
+                return ret;
+            }
         }
 
         private int ReadBytes()

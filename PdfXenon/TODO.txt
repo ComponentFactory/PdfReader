@@ -1,5 +1,5 @@
-﻿Do not convert to Unicode in ReadLine, do it in Tokenizer so strings can be read in utf-8 etc..
-Load a unicode string (fe, ff) by checking for prefix bytes, scan till the ) found
+﻿Tokenizer.GetName append chars to StringBuilder checking for # as we go along
+LiteralString, Load a unicode string (fe, ff) by checking for prefix bytes, scan till the ) found
 Load a stream that has a stream reference as the Length, just scan until end of line is followed by endstream
 Load the xref table
 Load the trailer

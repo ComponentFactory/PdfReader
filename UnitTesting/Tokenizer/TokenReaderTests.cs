@@ -25,9 +25,14 @@ namespace TokenizerUnitTesting
         {
             MemoryStream ms = StringToStream("123");
             TokenReader r = new TokenReader(ms);
-
             Assert.True(r.Position == 0);
-            Assert.True(r.ReadLine() == "123");
+
+            byte[] line = r.ReadLine();
+            Assert.NotNull(line);
+            Assert.True(line.Length == 3);
+            Assert.True(line[0] == 49);
+            Assert.True(line[1] == 50);
+            Assert.True(line[2] == 51);
             Assert.True(r.Position == 3);
         }
 
@@ -36,11 +41,22 @@ namespace TokenizerUnitTesting
         {
             MemoryStream ms = StringToStream("123\r456");
             TokenReader r = new TokenReader(ms);
-
             Assert.True(r.Position == 0);
-            Assert.True(r.ReadLine() == "123");
+
+            byte[] line = r.ReadLine();
+            Assert.NotNull(line);
+            Assert.True(line.Length == 3);
+            Assert.True(line[0] == 49);
+            Assert.True(line[1] == 50);
+            Assert.True(line[2] == 51);
             Assert.True(r.Position == 4);
-            Assert.True(r.ReadLine() == "456");
+
+            line = r.ReadLine();
+            Assert.NotNull(line);
+            Assert.True(line.Length == 3);
+            Assert.True(line[0] == 52);
+            Assert.True(line[1] == 53);
+            Assert.True(line[2] == 54);
             Assert.True(r.Position == 7);
         }
 
@@ -49,11 +65,22 @@ namespace TokenizerUnitTesting
         {
             MemoryStream ms = StringToStream("123\n456");
             TokenReader r = new TokenReader(ms);
-
             Assert.True(r.Position == 0);
-            Assert.True(r.ReadLine() == "123");
+
+            byte[] line = r.ReadLine();
+            Assert.NotNull(line);
+            Assert.True(line.Length == 3);
+            Assert.True(line[0] == 49);
+            Assert.True(line[1] == 50);
+            Assert.True(line[2] == 51);
             Assert.True(r.Position == 4);
-            Assert.True(r.ReadLine() == "456");
+
+            line = r.ReadLine();
+            Assert.NotNull(line);
+            Assert.True(line.Length == 3);
+            Assert.True(line[0] == 52);
+            Assert.True(line[1] == 53);
+            Assert.True(line[2] == 54);
             Assert.True(r.Position == 7);
         }
 
@@ -62,11 +89,22 @@ namespace TokenizerUnitTesting
         {
             MemoryStream ms = StringToStream("123\r\n456");
             TokenReader r = new TokenReader(ms);
-
             Assert.True(r.Position == 0);
-            Assert.True(r.ReadLine() == "123");
+
+            byte[] line = r.ReadLine();
+            Assert.NotNull(line);
+            Assert.True(line.Length == 3);
+            Assert.True(line[0] == 49);
+            Assert.True(line[1] == 50);
+            Assert.True(line[2] == 51);
             Assert.True(r.Position == 5);
-            Assert.True(r.ReadLine() == "456");
+
+            line = r.ReadLine();
+            Assert.NotNull(line);
+            Assert.True(line.Length == 3);
+            Assert.True(line[0] == 52);
+            Assert.True(line[1] == 53);
+            Assert.True(line[2] == 54);
             Assert.True(r.Position == 8);
         }
 
@@ -75,13 +113,27 @@ namespace TokenizerUnitTesting
         {
             MemoryStream ms = StringToStream("123\r\r456");
             TokenReader r = new TokenReader(ms);
-
             Assert.True(r.Position == 0);
-            Assert.True(r.ReadLine() == "123");
+
+            byte[] line = r.ReadLine();
+            Assert.NotNull(line);
+            Assert.True(line.Length == 3);
+            Assert.True(line[0] == 49);
+            Assert.True(line[1] == 50);
+            Assert.True(line[2] == 51);
             Assert.True(r.Position == 4);
-            Assert.True(r.ReadLine() == "");
+
+            line = r.ReadLine();
+            Assert.NotNull(line);
+            Assert.True(line.Length == 0);
             Assert.True(r.Position == 5);
-            Assert.True(r.ReadLine() == "456");
+
+            line = r.ReadLine();
+            Assert.NotNull(line);
+            Assert.True(line.Length == 3);
+            Assert.True(line[0] == 52);
+            Assert.True(line[1] == 53);
+            Assert.True(line[2] == 54);
             Assert.True(r.Position == 8);
         }
 
@@ -90,13 +142,27 @@ namespace TokenizerUnitTesting
         {
             MemoryStream ms = StringToStream("123\n\n456");
             TokenReader r = new TokenReader(ms);
-
             Assert.True(r.Position == 0);
-            Assert.True(r.ReadLine() == "123");
+
+            byte[] line = r.ReadLine();
+            Assert.NotNull(line);
+            Assert.True(line.Length == 3);
+            Assert.True(line[0] == 49);
+            Assert.True(line[1] == 50);
+            Assert.True(line[2] == 51);
             Assert.True(r.Position == 4);
-            Assert.True(r.ReadLine() == "");
+
+            line = r.ReadLine();
+            Assert.NotNull(line);
+            Assert.True(line.Length == 0);
             Assert.True(r.Position == 5);
-            Assert.True(r.ReadLine() == "456");
+
+            line = r.ReadLine();
+            Assert.NotNull(line);
+            Assert.True(line.Length == 3);
+            Assert.True(line[0] == 52);
+            Assert.True(line[1] == 53);
+            Assert.True(line[2] == 54);
             Assert.True(r.Position == 8);
         }
     }

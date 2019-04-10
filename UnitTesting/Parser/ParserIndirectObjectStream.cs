@@ -12,7 +12,7 @@ namespace ParserUnitTesting
         [Fact]
         public void Unfiltered1()
         {
-            Parser p = new Parser(StringToStream("1 0 obj<</Length 2>>stream\n\rdeendstream"));
+            Parser p = new Parser(StringToStream("1 0 obj<</Length 2>>stream\n\rdeendstream\nendobj"));
             PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
 
             Assert.NotNull(i);
@@ -28,7 +28,7 @@ namespace ParserUnitTesting
         [Fact]
         public void Unfiltered2()
         {
-            Parser p = new Parser(StringToStream("1 0 obj<</Length 2>>stream\rde\nendstream"));
+            Parser p = new Parser(StringToStream("1 0 obj<</Length 2>>stream\rde\nendstream\nendobj"));
             PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
 
             Assert.NotNull(i);
@@ -54,7 +54,8 @@ namespace ParserUnitTesting
                                                                    0x0e, 0xf9, 0xce, 0x34, 0xd7, 0x02, 0x03, 0x6f, 0x95, 0x58, 0x07, 0x5f, 0x45, 0xe5, 0x36, 0xc8, 0x8f, 0xd2,
                                                                    0x0d, 0x27, 0x8f, 0xe9, 0x53, 0xd6, 0x98, 0x7e, 0x16, 0xfe, 0x36, 0x30, 0x5d, 0x16, 0x58, 0x5e,
                                                                    0x91, 0xf7, 0x4c, 0x79, 0x39, 0x1e, 0x99, 0xd0, 0x8f, 0x90, 0x5f, 0x51, 0xd1, 0x1e, 0x1d },
-                                                      "endstream"));
+                                                      "endstream\n" +
+                                                      "endobj"));
             PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
 
             Assert.NotNull(i);

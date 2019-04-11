@@ -7,6 +7,8 @@ namespace PdfXenon.Standard
 {
     public class Parser
     {
+        public event EventHandler<ResolveEventArgs> ResolveReference;
+
         public Parser(Stream stream)
         {
             Tokenizer = new Tokenizer(stream);
@@ -198,7 +200,14 @@ namespace PdfXenon.Standard
                     throw new ApplicationException($"Stream dictionary must contain a 'Length' entry at position {v.Position}.");
 
                 PdfDictEntry entry = dictionary["Length"];
-                PdfNumeric length = entry.Object as PdfNumeric;
+                PdfObject lengthObj = entry.Object;
+
+                // Resolve any object reference
+                PdfObjectReference reference = lengthObj as PdfObjectReference;
+                if (reference != null)
+                    lengthObj = OnResolveReference(reference);
+
+                PdfNumeric length = lengthObj as PdfNumeric;
                 if ((length == null) || length.IsReal)
                     throw new ApplicationException($"Stream dictionary has a 'Length' entry that is not an integer entry at position {v.Position}.");
 
@@ -350,6 +359,13 @@ namespace PdfXenon.Standard
             // Token is not one that starts an object, so put the token back
             Tokenizer.PushToken(t);
             return null;
+        }
+
+        protected virtual PdfObject OnResolveReference(PdfObjectReference reference)
+        {
+            ResolveEventArgs args = new ResolveEventArgs() { Reference = reference };
+            ResolveReference?.Invoke(this, args);
+            return args.Object;
         }
 
         private T ThrowIfNot<T>(TokenBase t) where T : TokenBase

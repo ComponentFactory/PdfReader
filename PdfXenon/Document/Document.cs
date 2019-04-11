@@ -25,6 +25,7 @@ namespace PdfXenon.Standard
         public void Load(Stream stream)
         {
             Parser parser = new Parser(stream);
+            parser.ResolveReference += Parser_ResolveReference;
 
             // PDF file should have a well known marker at top of file
             int versionMajor = 0;
@@ -65,6 +66,11 @@ namespace PdfXenon.Standard
                 }
 
             } while (xRefPosition > 0);
+        }
+
+        private void Parser_ResolveReference(object sender, ResolveEventArgs e)
+        {
+            // todo
         }
     }
 }

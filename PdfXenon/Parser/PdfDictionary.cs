@@ -42,6 +42,21 @@ namespace PdfXenon.Standard
             return _entries.ContainsKey(key);
         }
 
+        public bool TryGetValue(string key, out PdfObject obj)
+        {
+            PdfDictEntry entry;
+            if (_entries.TryGetValue(key, out entry))
+            {
+                obj = entry.Object;
+                return true;
+            }
+            else
+            {
+                obj = null;
+                return false;
+            }
+        }
+
         public override long Position { get => DictionaryOpenPosition; }
 
         private long DictionaryOpenPosition { get; set; }

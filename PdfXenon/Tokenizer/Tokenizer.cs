@@ -7,19 +7,22 @@ namespace PdfXenon.Standard
 {
     public class Tokenizer
     {
+        private const int EOF_SCAN_LENGTH = 1024;
+
         // Lookup arrays are fast and small because the source is ASCII characters, so limimted to a possible 256 values
         private static bool[] _whitespaceLookup;
-        private static byte[] _whitespace = new byte[] { 0, 9, 10, 12, 13, 32 };
         private static bool[] _delimiterLookup;
         private static bool[] _delimiterWhitespaceLookup;
-        private static byte[] _delimiter = new byte[] { 40, 41, 60, 62, 91, 93, 123, 125, 47, 37 };
         private static int[] _hexToDecimalLookup;
         private static bool[] _hexadecimalLookup;
         private static bool[] _hexadecimalWhitespaceLookup;
-        private static byte[] _hexadecimal = new byte[] { 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 97, 98, 99, 100, 101, 102 };
         private static bool[] _isNumericLookup;
-        private static byte[] _isNumericStart = new byte[] { 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 43, 45, 46 };
         private static bool[] _keywordLookup;
+        private static readonly byte[] _whitespace = new byte[] { 0, 9, 10, 12, 13, 32 };
+        private static readonly byte[] _delimiter = new byte[] { 40, 41, 60, 62, 91, 93, 123, 125, 47, 37 };
+        private static readonly byte[] _hexadecimal = new byte[] { 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 97, 98, 99, 100, 101, 102 };
+        private static readonly byte[] _isNumericStart = new byte[] { 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 43, 45, 46 };
+        private static readonly byte[] EOF_COMMENT = new byte[] { 70, 79, 69, 37, 37 };
 
         private int _index;
         private int _length;
@@ -79,12 +82,29 @@ namespace PdfXenon.Standard
             // Must have an actual stream reference
             Stream = stream ?? throw new ArgumentNullException("stream");
 
-            // Stream is no use if we cannot read from it
+            // Stream is no use if we cannot read from it!
             if (!stream.CanRead)
-                throw new ApplicationException("cannot read from stream");
+                throw new ApplicationException("Cannot read from stream.");
+
+            // Stream must be able to be randomly positioned
+            if (!stream.CanSeek)
+                throw new ApplicationException("Cannot seek within stream.");
         }
 
         public bool IgnoreComments { get; set; } = true;
+
+        public long Position
+        {
+            set
+            {
+                // Clear any cached bytes
+                _reader = null;
+                _line = null;
+
+                // Move stream to desired offset
+                Stream.Position = value;
+            }
+        }
 
         public void PushToken(TokenBase token)
         {
@@ -105,6 +125,79 @@ namespace PdfXenon.Standard
         public byte[] GetBytes(int length)
         {
             return Reader.GetBytes(length);
+        }
+
+        public TokenBase GetXRefEntry(int id)
+        {
+            // Ignore zero or more whitespace characters
+            SkipWhitespace();
+
+            if (_length < 18)
+                return new TokenError(_position, $"Cross-reference entry data is {_length} bytes instead of the expected 18.");
+
+            _index = _length;
+
+            return new TokenXRefEntry(_position,
+                                      id,
+                                      ConvertDecimalToInteger(11, 5),
+                                      ConvertDecimalToInteger(0, 10),
+                                      (_line[17] == 110)); // 'n'
+        }
+
+        public long GetXRefOffset()
+        {
+            // We expect the stream to be at least a certain minimal size
+            if (Stream.Length < EOF_SCAN_LENGTH)
+                throw new ApplicationException($"Stream must be at least {EOF_SCAN_LENGTH} bytes.");
+
+            // Load a section of byte from the end, enough to discover the location of the 'xref' section
+            byte[] bytes = new byte[EOF_SCAN_LENGTH];
+            Stream.Position = Stream.Length - bytes.Length;
+            if (Stream.Read(bytes, 0, bytes.Length) != bytes.Length)
+                throw new ApplicationException($"Failed to read in last {EOF_SCAN_LENGTH} bytes of stream.");
+
+            // Start scanning backwards from the end
+            int index = bytes.Length - 1;
+
+            // Find the %%EOF comment
+            int match = 0;
+            while(index > 0)
+            {
+                if (EOF_COMMENT[match] == bytes[index])
+                {
+                    match++;
+                    if (match == EOF_COMMENT.Length)
+                    {
+                        index--;
+                        break;
+                    }
+                }
+                else if (EOF_COMMENT[0] == bytes[index])
+                    match = 1;
+                else
+                    match = 0;
+
+                index--;
+            }
+
+            if (index == 0)
+                throw new ApplicationException($"Could not find %%EOF comment at end of the stream.");
+
+            // Skip any whitespace
+            while (IsWhitespace(bytes[index]))
+                index--;
+
+            if (index == 0)
+                throw new ApplicationException($"Could not find offset of the cross-reference table.");
+
+            int end = index;
+            while (IsNumeric(bytes[end]))
+                end--;
+
+            if (index == 0)
+                throw new ApplicationException($"Could not find offset of the cross-reference table.");
+
+            return ConvertDecimalToLong(bytes, end + 1, index - end);
         }
 
         private Stream Stream { get; set; }
@@ -158,6 +251,34 @@ namespace PdfXenon.Standard
         private int ConvertHexToDecimal(byte c)
         {
             return _hexToDecimalLookup[c];
+        }
+
+        private int ConvertDecimalToInteger(int start, int length)
+        {
+            int ret = 0;
+            int index = start;
+
+            for (int i = 0; i < length; i++)
+            {
+                ret *= 10;
+                ret += _line[index++] - 48; // '0'
+            }
+
+            return ret;
+        }
+
+        private long ConvertDecimalToLong(byte[] bytes, int start, int length)
+        {
+            long ret = 0;
+            int index = start;
+
+            for (int i = 0; i < length; i++)
+            {
+                ret *= 10;
+                ret += bytes[index++] - 48; // '0'
+            }
+
+            return ret;
         }
 
         private void SkipWhitespace()

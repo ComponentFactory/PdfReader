@@ -8,11 +8,8 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            using (StreamReader reader = new StreamReader(@"d:\Blank.pdf"))
-            {
-                Parser p = new Parser(reader.BaseStream);
-                p.ParseAll();
-            }
+            Document document = new Document();
+            document.Load(@"d:\Coffee.pdf");
 
             Console.ReadLine();
         }

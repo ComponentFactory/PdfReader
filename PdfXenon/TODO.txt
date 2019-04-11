@@ -1,4 +1,3 @@
-﻿Load the xref table
-Load the trailer
-Load the subsequent update blocks
-
+﻿Parser needs callback to resolve references
+Document resolve recursively
+Stream length needs to be resolvable

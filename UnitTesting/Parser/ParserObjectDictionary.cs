@@ -101,9 +101,25 @@ namespace ParserUnitTesting
         }
 
         [Fact]
-        public void DictName()
+        public void DictName1()
         {
             Parser p = new Parser(StringToStream("<</Example /Other>>"));
+            PdfDictionary d = p.ParseObject() as PdfDictionary;
+
+            Assert.NotNull(d);
+            Assert.True(d.Count == 1);
+
+            PdfDictEntry entry = d["Example"];
+            Assert.NotNull(entry);
+            Assert.True(entry.Name.Name == "Example");
+            Assert.True(entry.Object is PdfName);
+            Assert.True((entry.Object as PdfName).Name == "Other");
+        }
+
+        [Fact]
+        public void DictName2()
+        {
+            Parser p = new Parser(StringToStream("<</Example/Other>>"));
             PdfDictionary d = p.ParseObject() as PdfDictionary;
 
             Assert.NotNull(d);

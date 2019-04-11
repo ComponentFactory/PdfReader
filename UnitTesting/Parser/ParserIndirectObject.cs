@@ -78,6 +78,40 @@ namespace ParserUnitTesting
         }
 
         [Fact]
+        public void NumericInteger5()
+        {
+            Parser p = new Parser(StringToStream("1 0 obj42 endobj"));
+            PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
+
+            Assert.NotNull(i);
+            Assert.True(i.Id == 1);
+            Assert.True(i.Gen == 0);
+            Assert.NotNull(i.Obj);
+
+            PdfNumeric o = i.Obj as PdfNumeric;
+            Assert.NotNull(o);
+            Assert.True(o.IsInteger);
+            Assert.True(o.Integer == 42);
+        }
+
+        [Fact]
+        public void NumericInteger6()
+        {
+            Parser p = new Parser(StringToStream("1 0 obj42endobj"));
+            PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
+
+            Assert.NotNull(i);
+            Assert.True(i.Id == 1);
+            Assert.True(i.Gen == 0);
+            Assert.NotNull(i.Obj);
+
+            PdfNumeric o = i.Obj as PdfNumeric;
+            Assert.NotNull(o);
+            Assert.True(o.IsInteger);
+            Assert.True(o.Integer == 42);
+        }
+
+        [Fact]
         public void StringLiteral()
         {
             Parser p = new Parser(StringToStream("1 0 obj\n(de)\nendobj"));

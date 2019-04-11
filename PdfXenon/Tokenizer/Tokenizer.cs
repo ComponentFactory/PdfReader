@@ -7,18 +7,19 @@ namespace PdfXenon.Standard
 {
     public class Tokenizer
     {
-        // Lookup arrays are fast and simple when the source is ASCII characters and so limimted to 256 values
+        // Lookup arrays are fast and small because the source is ASCII characters, so limimted to a possible 256 values
         private static bool[] _whitespaceLookup;
-        private static byte[] _whitespace = new byte[] { 0, 9, 10, 12,13, 32 };
+        private static byte[] _whitespace = new byte[] { 0, 9, 10, 12, 13, 32 };
         private static bool[] _delimiterLookup;
+        private static bool[] _delimiterWhitespaceLookup;
         private static byte[] _delimiter = new byte[] { 40, 41, 60, 62, 91, 93, 123, 125, 47, 37 };
-        private static bool[] _delimiterOrWhitespaceLookup;
         private static int[] _hexToDecimalLookup;
         private static bool[] _hexadecimalLookup;
-        private static bool[] _hexadecimalOrWhitespaceLookup;
-        private static byte[] _hexadecimal = new byte[] { 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 97, 98, 99, 100,101, 102 };
-        private static bool[] _isStartOfNumberLookup;
-        private static byte[] _isNumberStart = new byte[] { 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 43, 45, 46 };
+        private static bool[] _hexadecimalWhitespaceLookup;
+        private static byte[] _hexadecimal = new byte[] { 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 97, 98, 99, 100, 101, 102 };
+        private static bool[] _isNumericLookup;
+        private static byte[] _isNumericStart = new byte[] { 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 43, 45, 46 };
+        private static bool[] _keywordLookup;
 
         private int _index;
         private int _length;
@@ -41,30 +42,36 @@ namespace PdfXenon.Standard
             foreach (byte code in _hexadecimal)
                 _hexadecimalLookup[code] = true;
 
-            _isStartOfNumberLookup = new bool[256];
-            foreach (byte code in _isNumberStart)
-                _isStartOfNumberLookup[code] = true;
+            _isNumericLookup = new bool[256];
+            foreach (byte code in _isNumericStart)
+                _isNumericLookup[code] = true;
 
-            _hexadecimalOrWhitespaceLookup = new bool[256];
+            _hexadecimalWhitespaceLookup = new bool[256];
             foreach (byte code in _whitespace)
-                _hexadecimalOrWhitespaceLookup[code] = true;
+                _hexadecimalWhitespaceLookup[code] = true;
             foreach (byte code in _hexadecimal)
-                _hexadecimalOrWhitespaceLookup[code] = true;
+                _hexadecimalWhitespaceLookup[code] = true;
 
-            _delimiterOrWhitespaceLookup = new bool[256];
+            _delimiterWhitespaceLookup = new bool[256];
             foreach (byte code in _whitespace)
-                _delimiterOrWhitespaceLookup[code] = true;
+                _delimiterWhitespaceLookup[code] = true;
             foreach (byte code in _delimiter)
-                _delimiterOrWhitespaceLookup[code] = true;
+                _delimiterWhitespaceLookup[code] = true;
 
             _hexToDecimalLookup = new int[256];
             for (int i = 0; i < 10; i++)
-                _hexToDecimalLookup[48 + i] = i;
-            for (int i=0; i<6; i++)
+                _hexToDecimalLookup[48 + i] = i;    // '0' + i
+            for (int i = 0; i < 6; i++)
             {
-                _hexToDecimalLookup[97 + i] = i;
-                _hexToDecimalLookup[65 + i] = i;
+                _hexToDecimalLookup[65 + i] = i;    // 'a' + i
+                _hexToDecimalLookup[97 + i] = i;    // 'A' + i
             }
+
+            _keywordLookup = new bool[256];
+            for (int i = 65; i <= 90; i++)  // a -> z
+                _keywordLookup[i] = true;
+            for (int i = 97; i <= 122; i++) // A -> Z
+                _keywordLookup[i] = true;
         }
 
         public Tokenizer(Stream stream)
@@ -125,7 +132,12 @@ namespace PdfXenon.Standard
 
         private bool IsRegular(byte c)
         {
-            return !_delimiterOrWhitespaceLookup[c];
+            return !_delimiterWhitespaceLookup[c];
+        }
+
+        private bool IsKeyword(byte c)
+        {
+            return _keywordLookup[c];
         }
 
         private bool IsHexadecimal(byte c)
@@ -135,12 +147,12 @@ namespace PdfXenon.Standard
 
         private bool IsHexadecimalOrWhitespace(byte c)
         {
-            return _hexadecimalOrWhitespaceLookup[c];
+            return _hexadecimalWhitespaceLookup[c];
         }
 
-        private bool IsStartOfNumber(byte c)
+        private bool IsNumeric(byte c)
         {
-            return _isStartOfNumberLookup[c];
+            return _isNumericLookup[c];
         }
 
         private int ConvertHexToDecimal(byte c)
@@ -201,7 +213,7 @@ namespace PdfXenon.Standard
                 // If at least one regular character
                 if (end > _index)
                 {
-                    if (IsStartOfNumber(_line[_index]))
+                    if (IsNumeric(_line[_index]))
                         return GetNumber(end);
                     else
                         return GetKeyword(end);
@@ -241,8 +253,14 @@ namespace PdfXenon.Standard
         private TokenBase GetNumber(int end)
         {
             long position = _position + _index;
-            string text = new string(Encoding.ASCII.GetChars(_line, _index, end - _index));
-            _index = end;
+
+            // Rescan looking for the more restrictive set of numeric characters
+            int key = _index;
+            while ((key < end) && IsNumeric(_line[key]))
+                key++;
+
+            string text = new string(Encoding.ASCII.GetChars(_line, _index, key - _index));
+            _index = key;
 
             if (int.TryParse(text, out int integer))
                 return new TokenNumeric(position, integer);
@@ -261,8 +279,14 @@ namespace PdfXenon.Standard
         private TokenBase GetKeyword(int end)
         {
             long position = _position + _index;
-            string text = new string(Encoding.ASCII.GetChars(_line, _index, end - _index));
-            _index = end;
+
+            // Rescan looking for the more restrictive set of keyword characters
+            int key = _index;
+            while ((key < end) && IsKeyword(_line[key]))
+                key++;
+
+            string text = new string(Encoding.ASCII.GetChars(_line, _index, key - _index));
+            _index = key;
 
             TokenKeyword token = TokenKeyword.CheckKeywords(position, text);
             if (token != null)
@@ -375,7 +399,9 @@ namespace PdfXenon.Standard
 
             int nesting = 0;
             int first = _index;
+            int scanned = 0;
             bool continuation = false;
+            bool checkedBOM = false;
 
             StringBuilder sb = new StringBuilder();
 
@@ -386,7 +412,7 @@ namespace PdfXenon.Standard
                 while (_index < _length)
                 {
                     // Is this the start of an escape sequence
-                    if (_line[_index] == 92)
+                    if (_line[_index] == 92)    // '\'
                     {
                         // If the last character, then '\' indicates that no newline should be appended into the literal string
                         if (_index >= (_length - 1))
@@ -397,12 +423,12 @@ namespace PdfXenon.Standard
                             _index++;
                         }
                     }
-                    else if (_line[_index] == 41)
+                    else if (_line[_index] == 41)   // ')'
                     {
                         // If the balancing end marker then we are finished
                         if (nesting == 0)
                         {
-                            sb.Append(new string(Encoding.ASCII.GetChars(_line, first, _index - first)));
+                            sb.Append(Encoding.ASCII.GetString(_line, first, _index - first));
 
                             // Move past the ')' marker
                             _index++;
@@ -412,21 +438,33 @@ namespace PdfXenon.Standard
                         else
                             nesting--;
                     }
-                    else if (_line[_index] == 40)
+                    else if (_line[_index] == 40)   // '('
                         nesting++;
 
                     _index++;
+                    scanned++;
+
+                    if (!checkedBOM && (scanned == 2))
+                    {
+                        // Check for the UTF16 Byte Order Mark (little endian or big endian versions)
+                        if ((_line[_index - 2] == 0xFE) && (_line[_index - 1] == 0xFF))
+                            return GetStringLiteralUTF16(position, true);
+                        else if ((_line[_index - 2] == 0xFF) && (_line[_index - 1] == 0xFE))
+                            return GetStringLiteralUTF16(position, false);
+                    }
                 }
+
+                checkedBOM = true;
 
                 if (continuation)
                 {
                     // Append everything from the first character
-                    sb.Append(new string(Encoding.ASCII.GetChars(_line, first, _index - first - 1)));
+                    sb.Append(Encoding.ASCII.GetString(_line, first, _index - first - 1));
                 }
                 else
                 {
                     // Append everything from the first character but excluding the continuation marker
-                    sb.Append(new string(Encoding.ASCII.GetChars(_line, first, _index - first)));
+                    sb.Append(Encoding.ASCII.GetString(_line, first, _index - first));
                     sb.Append("\n");
                 }
 
@@ -444,6 +482,40 @@ namespace PdfXenon.Standard
                     return new TokenError(position, $"End of content before end of literal string character ')'.");
                 }
             }
+        }
+
+        private TokenBase GetStringLiteralUTF16(long position, bool bigEndian)
+        {
+            int first = _index;
+            byte temp;
+
+            // Scan rest of the current line
+            while (_index < _length)
+            {
+                // Is this the endof the literal
+                if (_line[_index] == 41)    // ')'
+                {
+                    string literal = Encoding.Unicode.GetString(_line, first, _index - first);
+
+                    // Move past the ')' marker
+                    _index++;
+
+                    return new TokenLiteralString(position, literal);
+                }
+
+                _index += 2;
+
+                if (bigEndian && (_index < _length))
+                {
+                    // Switch byte order of each character pair
+                    temp = _line[_index - 1];
+                    _line[_index - 1] = _line[_index - 2];
+                    _line[_index - 2] = temp;
+                }
+            }
+
+            // End of content before end of string literal
+            return new TokenError(position, $"End of content before end of UTF16 literal string character.");
         }
     }
 }

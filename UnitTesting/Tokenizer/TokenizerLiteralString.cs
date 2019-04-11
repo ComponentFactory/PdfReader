@@ -1,4 +1,4 @@
-using PdfXenon.Standard;
+﻿using PdfXenon.Standard;
 using System;
 using System.Text;
 using System.IO;
@@ -294,6 +294,182 @@ namespace TokenizerUnitTesting
             Assert.True(s.Position == 0);
             Assert.True(s.LiteralString == "abc\\0def");
             Assert.True(s.ActualString == "abc\0def");
+            Assert.True(t.GetToken() is TokenEmpty);
+        }
+
+        [Fact]
+        public void UTF16BigEndianA()
+        {
+            Tokenizer t = new Tokenizer(BytesToStream(new byte[] {
+                                                        0x28,           // ( 
+                                                        0xFE,  0xFF,    // UTF16 Byte Order Mark
+                                                        0x00,  0x57,    // W
+                                                        0x29            // )
+                                                      }));
+
+            TokenLiteralString s = t.GetToken() as TokenLiteralString;
+            Assert.NotNull(s);
+            Assert.True(s.Position == 0);
+            Assert.True(s.ActualString == "W");
+            Assert.True(t.GetToken() is TokenEmpty);
+        }
+
+        [Fact]
+        public void UTF16BigEndianB()
+        {
+            Tokenizer t = new Tokenizer(BytesToStream(new byte[] {
+                                                        0x28,           // ( 
+                                                        0xFE,  0xFF,    // UTF16 Byte Order Mark
+                                                        0x20,  0xAC,    // €
+                                                        0x29            // )
+                                                      }));
+
+            TokenLiteralString s = t.GetToken() as TokenLiteralString;
+            Assert.NotNull(s);
+            Assert.True(s.Position == 0);
+            Assert.True(s.ActualString == "€");
+            Assert.True(t.GetToken() is TokenEmpty);
+        }
+
+        [Fact]
+        public void UTF16BigEndianC()
+        {
+            Tokenizer t = new Tokenizer(BytesToStream(new byte[] {
+                                                        0x28,                       // ( 
+                                                        0xFE,  0xFF,                // UTF16 Byte Order Mark
+                                                        0xD8,  0x01, 0xDC,  0x37,   // 𐐷
+                                                        0x29                        // )
+                                                      }));
+
+            TokenLiteralString s = t.GetToken() as TokenLiteralString;
+            Assert.NotNull(s);
+            Assert.True(s.Position == 0);
+            Assert.True(s.ActualString == "𐐷");
+            Assert.True(t.GetToken() is TokenEmpty);
+        }
+
+        [Fact]
+        public void UTF16BigEndianD()
+        {
+            Tokenizer t = new Tokenizer(BytesToStream(new byte[] {
+                                                        0x28,                       // ( 
+                                                        0xFE,  0xFF,                // UTF16 Byte Order Mark
+                                                        0xD8,  0x52, 0xDF,  0x62,   // 𤭢
+                                                        0x29                        // )
+                                                      }));
+
+            TokenLiteralString s = t.GetToken() as TokenLiteralString;
+            Assert.NotNull(s);
+            Assert.True(s.Position == 0);
+            Assert.True(s.ActualString == "𤭢");
+            Assert.True(t.GetToken() is TokenEmpty);
+        }
+
+        [Fact]
+        public void UTF16BigEndianE()
+        {
+            Tokenizer t = new Tokenizer(BytesToStream(new byte[] {
+                                                        0x28,                       // ( 
+                                                        0xFE,  0xFF,                // UTF16 Byte Order Mark
+                                                        0xD8,  0x01, 0xDC,  0x37,   // 𐐷
+                                                        0x00,  0x57,                // W
+                                                        0x20,  0xAC,                // €
+                                                        0xD8,  0x52, 0xDF,  0x62,   // 𤭢
+                                                        0x29                        // )
+                                                      }));
+
+            TokenLiteralString s = t.GetToken() as TokenLiteralString;
+            Assert.NotNull(s);
+            Assert.True(s.Position == 0);
+            Assert.True(s.ActualString == "𐐷W€𤭢");
+            Assert.True(t.GetToken() is TokenEmpty);
+        }
+
+        [Fact]
+        public void UTF16LittleEndianA()
+        {
+            Tokenizer t = new Tokenizer(BytesToStream(new byte[] {
+                                                        0x28,           // ( 
+                                                        0xFF,  0xFE,    // UTF16 Byte Order Mark
+                                                        0x57,  0x00,    // W
+                                                        0x29            // )
+                                                      }));
+
+            TokenLiteralString s = t.GetToken() as TokenLiteralString;
+            Assert.NotNull(s);
+            Assert.True(s.Position == 0);
+            Assert.True(s.ActualString == "W");
+            Assert.True(t.GetToken() is TokenEmpty);
+        }
+
+        [Fact]
+        public void UTF16LittleEndianB()
+        {
+            Tokenizer t = new Tokenizer(BytesToStream(new byte[] {
+                                                        0x28,           // ( 
+                                                        0xFF,  0xFE,    // UTF16 Byte Order Mark
+                                                        0xAC,  0x20,    // €
+                                                        0x29            // )
+                                                      }));
+
+            TokenLiteralString s = t.GetToken() as TokenLiteralString;
+            Assert.NotNull(s);
+            Assert.True(s.Position == 0);
+            Assert.True(s.ActualString == "€");
+            Assert.True(t.GetToken() is TokenEmpty);
+        }
+
+        [Fact]
+        public void UTF16LittleEndianC()
+        {
+            Tokenizer t = new Tokenizer(BytesToStream(new byte[] {
+                                                        0x28,                       // ( 
+                                                        0xFF,  0xFE,                // UTF16 Byte Order Mark
+                                                        0x01,  0xD8, 0x37,  0xDC,   // 𐐷
+                                                        0x29                        // )
+                                                      }));
+
+            TokenLiteralString s = t.GetToken() as TokenLiteralString;
+            Assert.NotNull(s);
+            Assert.True(s.Position == 0);
+            Assert.True(s.ActualString == "𐐷");
+            Assert.True(t.GetToken() is TokenEmpty);
+        }
+
+        [Fact]
+        public void UTF16LittleEndianD()
+        {
+            Tokenizer t = new Tokenizer(BytesToStream(new byte[] {
+                                                        0x28,                       // ( 
+                                                        0xFF,  0xFE,                // UTF16 Byte Order Mark
+                                                        0x52,  0xD8, 0x62,  0xDF,   // 𤭢
+                                                        0x29                        // )
+                                                      }));
+
+            TokenLiteralString s = t.GetToken() as TokenLiteralString;
+            Assert.NotNull(s);
+            Assert.True(s.Position == 0);
+            Assert.True(s.ActualString == "𤭢");
+            Assert.True(t.GetToken() is TokenEmpty);
+        }
+
+        [Fact]
+        public void UTF16LittleEndianE()
+        {
+            Tokenizer t = new Tokenizer(BytesToStream(new byte[] {
+                                                        0x28,                       // ( 
+                                                        0xFF,  0xFE,                // UTF16 Byte Order Mark
+                                                        0x01,  0xD8, 0x37,  0xDC,   // 𐐷
+                                                        0x57,  0x00,                // W
+                                                        0xAC,  0x20,                // €
+                                                        0x52,  0xD8, 0x62,  0xDF,   // 𤭢
+                                                        0x29                        // )
+                                                      }));
+
+            TokenLiteralString s = t.GetToken() as TokenLiteralString;
+            Assert.NotNull(s);
+            Assert.True(s.Position == 0);
+            Assert.True(s.ActualString == "𐐷W€𤭢");
             Assert.True(t.GetToken() is TokenEmpty);
         }
     }

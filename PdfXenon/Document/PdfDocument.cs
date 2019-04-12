@@ -141,7 +141,10 @@ namespace PdfXenon.Standard
                 if (indirect.Child == null)
                 {
                     indirect.Child = _parser.ParseIndirectObject(indirect.Offset).Child;
+
+                    Console.WriteLine($"{indirect.Id} {indirect.Gen} {indirect.Offset} obj");
                     Console.WriteLine(indirect.Child);
+                    Console.WriteLine($"endobj");
                 }
 
                 return indirect.Child;

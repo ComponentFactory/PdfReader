@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace PdfXenon.Standard
@@ -38,6 +39,34 @@ namespace PdfXenon.Standard
         {
             get { return _entries[name]; }
             set { _entries[name] = value; }
+        }
+
+        public T OptionalValue<T>(string name) where T : ParseObject
+        {
+            ParseDictEntry entry;
+            if (_entries.TryGetValue(name, out entry))
+            {
+                if (entry.Object is T)
+                    return entry.Object as T;
+                else
+                    throw new ApplicationException($"Dictionary entry is type '{entry.Object.GetType().Name}' instead of mandatory type of '{typeof(T).Name}'.");
+            }
+
+            return null;
+        }
+
+        public T MandatoryValue<T>(string name) where T : ParseObject
+        {
+            ParseDictEntry entry;
+            if (_entries.TryGetValue(name, out entry))
+            {
+                if (entry.Object is T)
+                    return entry.Object as T;
+                else
+                    throw new ApplicationException($"Dictionary entry is type '{entry.Object.GetType().Name}' instead of mandatory type of '{typeof(T).Name}'.");
+            }
+            else
+                throw new ApplicationException($"Dictionary is missing mandatory name '{name}'.");
         }
 
         public bool TryGetValue(string name, out ParseObject obj)

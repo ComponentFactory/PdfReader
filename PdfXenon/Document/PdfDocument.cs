@@ -7,10 +7,12 @@ namespace PdfXenon.Standard
 {
     public class PdfDocument
     {
+        private bool _open;
         private Stream _stream;
         private StreamReader _reader;
         private Parser _parser;
-        private bool _open;
+        private ParseObjectReference _catalog;
+        private ParseObjectReference _info;
 
         public PdfDocument()
         {
@@ -38,8 +40,7 @@ namespace PdfXenon.Standard
             try
             {
                 _stream = stream;
-
-                _parser = new Parser(stream);
+                _parser = new Parser(_stream);
                 _parser.ResolveReference += Parser_ResolveReference;
 
                 // PDF file should have a well known marker at top of file
@@ -52,25 +53,38 @@ namespace PdfXenon.Standard
                 // Find stream position of the last cross-reference table
                 long xRefPosition = _parser.ParseXRefOffset();
 
+                bool lastHeader = true;
+
                 do
                 {
                     // Get the aggregated set of entries from all the cross-reference table sections
-                    foreach (TokenXRefEntry xref in _parser.ParseXRef(xRefPosition))
-                        if (xref.Used)
+                    List<TokenXRefEntry> xrefs = _parser.ParseXRef(xRefPosition);
+
+                    ParseDictionary trailer = _parser.ParseTrailer();
+                    ParseInteger size = trailer.MandatoryValue<ParseInteger>("Size");
+                    ParseInteger prev = trailer.OptionalValue<ParseInteger>("Prev");
+
+                    if (lastHeader)
+                    {
+                        // We only care about the latest defined catalog and information dictionary
+                        _catalog = trailer.MandatoryValue<ParseObjectReference>("Root");
+                        _info = trailer.OptionalValue<ParseObjectReference>("Info");
+                    }
+
+                    foreach (TokenXRefEntry xref in xrefs)
+                    {
+                        // Ignore unused entries and entries smaller than the defined size from the trailer dictionary
+                        if (xref.Used && (xref.Id < size.Integer))
                             IndirectObjects.AddXRef(xref);
+                    }
 
                     // If there is a previous cross-reference table, then we want to process that as well
-                    ParseDictionary trailer = _parser.ParseTrailer();
-                    if (trailer.TryGetValue("Prev", out ParseObject obj))
-                    {
-                        ParseInteger prev = obj as ParseInteger;
-                        if (prev == null)
-                            throw new ApplicationException($"Trailer 'Prev' entry must be an integer value at position {prev.Position}.");
-
+                    if (prev != null)
                         xRefPosition = prev.Integer;
-                    }
                     else
                         xRefPosition = 0;
+
+                    lastHeader = false;
 
                 } while (xRefPosition > 0);
 

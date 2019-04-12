@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
-
-namespace PdfXenon.Standard
+﻿namespace PdfXenon.Standard
 {
-    public class PdfName : PdfObject
+    public class ParseName : ParseObject
     {
-        public PdfName(TokenName token)
+        public ParseName(TokenName token)
         {
             Token = token;
         }
 
         public override string ToString()
         {
-            return $"PdfName: {Name}";
+            return $"ParseName ({Position}): {Name}";
         }
 
         public string Name { get => Token.Name; }

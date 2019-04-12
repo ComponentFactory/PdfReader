@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PdfXenon.Standard
+﻿namespace PdfXenon.Standard
 {
-    public class TokenError : TokenBase
+    public class TokenError : TokenObject
     {
         public TokenError(long position, string message)
             : base(position)
@@ -14,7 +10,7 @@ namespace PdfXenon.Standard
 
         public override string ToString()
         {
-            return $"Error: {Message}, Pos: {Position}";
+            return $"Error ({Position}): {Message}";
         }
 
         public string Message { get; private set; }

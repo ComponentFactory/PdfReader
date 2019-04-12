@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
+﻿using System.ComponentModel;
 
 namespace PdfXenon.Standard
 {
-    public enum PdfKeyword
+    public enum ParseKeyword
     {
         [Description("endobj")]     EndObj,
         [Description("endstream")]  EndStream,

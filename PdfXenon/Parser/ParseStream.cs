@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class PdfStream : PdfObject
+    public class ParseStream : ParseObject
     {
-        private string _stringContent;
         private byte[] _byteContent;
+        private string _stringContent;
 
-        public PdfStream(PdfDictionary dictionary, byte[] bytes)
+        public ParseStream(ParseDictionary dictionary, byte[] bytes)
         {
             Dictionary = dictionary;
             Bytes = bytes;
@@ -20,12 +19,12 @@ namespace PdfXenon.Standard
 
         public override string ToString()
         {
-            return $"PdfStream: Bytes:{Bytes.Length}";
+            return $"ParseStream ({Position}): Len:{Bytes.Length}";
         }
 
         public override long Position { get => Dictionary.Position; }
 
-        public string StringContent
+        public string ContentAsString
         {
             get
             {
@@ -36,7 +35,7 @@ namespace PdfXenon.Standard
             }
         }
 
-        public byte[] ByteContent
+        public byte[] ContentAsBytes
         {
             get
             {
@@ -47,25 +46,25 @@ namespace PdfXenon.Standard
             }
         }
 
-        private PdfDictionary Dictionary { get; set; }
+        private ParseDictionary Dictionary { get; set; }
         private byte[] Bytes { get; set; }
 
         private byte[] DecodeContent()
         {
-            if (Dictionary.ContainsKey("Filter"))
+            if (Dictionary.ContainsName("Filter"))
             {
-                PdfDictEntry entry = Dictionary["Filter"];
+                ParseDictEntry entry = Dictionary["Filter"];
 
                 // Get the array of filers that need applying (if a single filter then convert to array of one entry)
-                PdfArray filters = entry.Object as PdfArray;
+                ParseArray filters = entry.Object as ParseArray;
                 if (filters == null)
-                    filters = new PdfArray(entry.Object.Position, new List<PdfObject> { entry.Object });
+                    filters = new ParseArray(entry.Object.Position, new List<ParseObject> { entry.Object });
 
                 // Apply each filter in turn
                 byte[] bytes = Bytes;
-                foreach (PdfObject filter in filters.Objects)
+                foreach (ParseObject filter in filters.Objects)
                 {
-                    PdfName name = filter as PdfName;
+                    ParseName name = filter as ParseName;
                     if (name == null)
                         throw new ApplicationException($"Stream filter is type {name.GetType().Name} instead of a name, at position {name.Position}.");
 

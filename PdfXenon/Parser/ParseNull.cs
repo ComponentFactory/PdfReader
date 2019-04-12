@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
-
-namespace PdfXenon.Standard
+﻿namespace PdfXenon.Standard
 {
-    public class PdfNull : PdfObject
+    public class ParseNull : ParseObject
     {
-        public PdfNull(TokenKeyword token)
+        public ParseNull(TokenKeyword token)
         {
             Token = token;
         }
 
         public override string ToString()
         {
-            return $"PdfNull";
+            return $"ParseNull ({Position})";
         }
 
         public override long Position { get => Token.Position; }

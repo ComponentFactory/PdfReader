@@ -8,11 +8,11 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            Document document = new Document();
-            document.Load(@"d:\Blank.pdf");
+            PdfDocument document = new PdfDocument();
+            document.Load(@"d:\Blank.pdf", true);
+            document.Close();
 
             Console.ReadLine();
         }
-
     }
 }

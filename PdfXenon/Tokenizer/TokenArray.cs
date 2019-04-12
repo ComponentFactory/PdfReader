@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PdfXenon.Standard
+﻿namespace PdfXenon.Standard
 {
-    public class TokenArrayOpen : TokenBase
+    public class TokenArrayOpen : TokenObject
     {
         public TokenArrayOpen(long position)
             : base(position)
@@ -13,11 +9,11 @@ namespace PdfXenon.Standard
 
         public override string ToString()
         {
-            return $"Array: Open, Pos: {Position}";
+            return $"ArrayOpen ({Position})";
         }
     }
 
-    public class TokenArrayClose : TokenBase
+    public class TokenArrayClose : TokenObject
     {
         public TokenArrayClose(long position)
             : base(position)
@@ -26,7 +22,7 @@ namespace PdfXenon.Standard
 
         public override string ToString()
         {
-            return $"Array: Close, Pos: {Position}";
+            return $"ArrayClose ({Position})";
         }
     }
 }

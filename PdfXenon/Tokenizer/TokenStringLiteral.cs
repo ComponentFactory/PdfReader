@@ -1,27 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class TokenLiteralString : TokenString
+    public class TokenStringLiteral : TokenString
     {
         private string _actual;
 
-        public TokenLiteralString(long position, string str)
-            : base(position)
+        public TokenStringLiteral(long position, string rawString)
+            : base(position, rawString)
         {
-            LiteralString = str;
         }
 
         public override string ToString()
         {
-            return $"LiteralString: Len:{LiteralString.Length}, Pos: {Position}";
+            return $"String ({Position}): Literal Len:{RawString.Length}";
         }
 
-        public string LiteralString { get; private set; }
-
-        public override string ActualString
+        public override string ResolvedString
         {
             get
             {
@@ -29,7 +24,7 @@ namespace PdfXenon.Standard
                 {
                     StringBuilder sb = new StringBuilder();
 
-                    string line = LiteralString;
+                    string line = RawString;
                     int last = line.Length;
                     int first = 0;
 

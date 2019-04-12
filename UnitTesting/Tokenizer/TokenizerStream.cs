@@ -28,9 +28,9 @@ namespace TokenizerUnitTesting
             Assert.NotNull(a1);
             Assert.True(a1.Position == 0);
 
-            TokenHexString a2 = t.GetToken() as TokenHexString;
+            TokenStringHex a2 = t.GetToken() as TokenStringHex;
             Assert.NotNull(a2);
-            Assert.True(a2.HexString == "6465");
+            Assert.True(a2.RawString == "6465");
             Assert.True(a2.Position == 1);
 
             TokenDictionaryOpen a3 = t.GetToken() as TokenDictionaryOpen;
@@ -39,7 +39,7 @@ namespace TokenizerUnitTesting
 
             TokenKeyword a4 = t.GetToken() as TokenKeyword;
             Assert.NotNull(a4);
-            Assert.True(a4.Keyword == PdfKeyword.True);
+            Assert.True(a4.Keyword == ParseKeyword.True);
             Assert.True(a4.Position == 9);
 
             TokenName a5 = t.GetToken() as TokenName;
@@ -47,16 +47,14 @@ namespace TokenizerUnitTesting
             Assert.True(a5.Name == "Name");
             Assert.True(a5.Position == 13);
 
-            TokenNumeric a6 = t.GetToken() as TokenNumeric;
+            TokenInteger a6 = t.GetToken() as TokenInteger;
             Assert.NotNull(a6);
-            Assert.True(a6.Integer.HasValue);
-            Assert.True(a6.Integer.Value == 1);
+            Assert.True(a6.Integer == 1);
             Assert.True(a6.Position == 19);
 
-            TokenNumeric a7 = t.GetToken() as TokenNumeric;
+            TokenReal a7 = t.GetToken() as TokenReal;
             Assert.NotNull(a7);
-            Assert.True(a7.Real.HasValue);
-            Assert.True(a7.Real.Value == 3.14);
+            Assert.True(a7.Real == 3.14f);
             Assert.True(a7.Position == 21);
 
             TokenDictionaryClose a8 = t.GetToken() as TokenDictionaryClose;
@@ -83,30 +81,28 @@ namespace TokenizerUnitTesting
             TokenArrayOpen a1 = t.GetToken() as TokenArrayOpen;
             Assert.NotNull(a1);
 
-            TokenHexString a2 = t.GetToken() as TokenHexString;
+            TokenStringHex a2 = t.GetToken() as TokenStringHex;
             Assert.NotNull(a2);
-            Assert.True(a2.HexString == "64 65");
+            Assert.True(a2.RawString == "64 65");
 
             TokenDictionaryOpen a3 = t.GetToken() as TokenDictionaryOpen;
             Assert.NotNull(a3);
 
             TokenKeyword a4 = t.GetToken() as TokenKeyword;
             Assert.NotNull(a4);
-            Assert.True(a4.Keyword == PdfKeyword.True);
+            Assert.True(a4.Keyword == ParseKeyword.True);
 
             TokenName a5 = t.GetToken() as TokenName;
             Assert.NotNull(a5);
             Assert.True(a5.Name == "Name");
 
-            TokenNumeric a6 = t.GetToken() as TokenNumeric;
+            TokenInteger a6 = t.GetToken() as TokenInteger;
             Assert.NotNull(a6);
-            Assert.True(a6.Integer.HasValue);
-            Assert.True(a6.Integer.Value == 1);
+            Assert.True(a6.Integer == 1);
 
-            TokenNumeric a7 = t.GetToken() as TokenNumeric;
+            TokenReal a7 = t.GetToken() as TokenReal;
             Assert.NotNull(a7);
-            Assert.True(a7.Real.HasValue);
-            Assert.True(a7.Real.Value == 3.14);
+            Assert.True(a7.Real == 3.14f);
 
             TokenDictionaryClose a8 = t.GetToken() as TokenDictionaryClose;
             Assert.NotNull(a8);

@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class PdfArray : PdfObject
+    public class ParseArray : ParseObject
     {
-        public PdfArray(long position, List<PdfObject> objects)
+        public ParseArray(long position, List<ParseObject> objects)
         {
             ArrayOpenPosition = position;
             Objects = objects;
@@ -17,9 +15,9 @@ namespace PdfXenon.Standard
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine($"PdfArray: Length:{Objects.Count} (");
+            sb.AppendLine($"ParseArray ({Position}): Count:{Objects.Count} (");
 
-            foreach (PdfObject obj in Objects)
+            foreach (ParseObject obj in Objects)
                 sb.AppendLine($"    {obj.ToString()}");
 
             sb.AppendLine(")");
@@ -28,7 +26,7 @@ namespace PdfXenon.Standard
         }
 
         public override long Position { get => ArrayOpenPosition; }
-        public List<PdfObject> Objects { get; set; }
+        public List<ParseObject> Objects { get; set; }
 
         private long ArrayOpenPosition { get; set; }
     }

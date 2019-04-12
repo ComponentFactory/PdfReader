@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PdfXenon.Standard
+﻿namespace PdfXenon.Standard
 {
-    public class TokenEmpty : TokenBase
+    public class TokenEmpty : TokenObject
     {
         public TokenEmpty(long position)
             : base(position)
@@ -13,7 +9,7 @@ namespace PdfXenon.Standard
 
         public override string ToString()
         {
-            return $"(Empty), Pos: {Position}";
+            return $"Empty ({Position})";
         }
     }
 }

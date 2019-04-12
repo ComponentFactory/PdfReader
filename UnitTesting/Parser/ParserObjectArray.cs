@@ -12,8 +12,8 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayEmpty()
         {
-            PdfParser p = new PdfParser(StringToStream("[]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 0);
@@ -22,290 +22,280 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayName()
         {
-            PdfParser p = new PdfParser(StringToStream("[/Example]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[/Example]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 1);
-            Assert.True(o.Objects[0] is PdfName);
-            Assert.True((o.Objects[0] as PdfName).Name == "Example");
+            Assert.True(o.Objects[0] is ParseName);
+            Assert.True((o.Objects[0] as ParseName).Name == "Example");
         }
 
         [Fact]
         public void ArrayNumericInteger()
         {
-            PdfParser p = new PdfParser(StringToStream("[42]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[42]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 1);
-            Assert.True(o.Objects[0] is PdfNumeric);
-            Assert.True((o.Objects[0] as PdfNumeric).IsInteger);
-            Assert.True((o.Objects[0] as PdfNumeric).Integer == 42);
+            Assert.True(o.Objects[0] is ParseInteger);
+            Assert.True((o.Objects[0] as ParseInteger).Integer == 42);
         }
 
         [Fact]
         public void ArrayNumericReal()
         {
-            PdfParser p = new PdfParser(StringToStream("[3.14]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[3.14]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 1);
-            Assert.True(o.Objects[0] is PdfNumeric);
-            Assert.True((o.Objects[0] as PdfNumeric).IsReal);
-            Assert.True((o.Objects[0] as PdfNumeric).Real == 3.14);
+            Assert.True(o.Objects[0] is ParseReal);
+            Assert.True((o.Objects[0] as ParseReal).Real == 3.14f);
         }
 
         [Fact]
         public void ArrayStringHex()
         {
-            PdfParser p = new PdfParser(StringToStream("[<6465>]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[<6465>]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 1);
-            Assert.True(o.Objects[0] is PdfString);
-            Assert.True((o.Objects[0] as PdfString).String == "de");
+            Assert.True(o.Objects[0] is ParseString);
+            Assert.True((o.Objects[0] as ParseString).String == "de");
         }
 
         [Fact]
         public void ArrayStringLiteral()
         {
-            PdfParser p = new PdfParser(StringToStream("[(de)]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[(de)]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 1);
-            Assert.True(o.Objects[0] is PdfString);
-            Assert.True((o.Objects[0] as PdfString).String == "de");
+            Assert.True(o.Objects[0] is ParseString);
+            Assert.True((o.Objects[0] as ParseString).String == "de");
         }
 
         [Fact]
         public void ArrayBooleanTrue()
         {
-            PdfParser p = new PdfParser(StringToStream("[true]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[true]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 1);
-            Assert.True(o.Objects[0] is PdfBoolean);
-            Assert.True((o.Objects[0] as PdfBoolean).Value);
+            Assert.True(o.Objects[0] is ParseBoolean);
+            Assert.True((o.Objects[0] as ParseBoolean).Value);
         }
 
         [Fact]
         public void ArrayNull()
         {
-            PdfParser p = new PdfParser(StringToStream("[null]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[null]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 1);
-            Assert.True(o.Objects[0] is PdfNull);
+            Assert.True(o.Objects[0] is ParseNull);
         }
 
         [Fact]
         public void ArrayObjectReference1()
         {
-            PdfParser p = new PdfParser(StringToStream("[1 99 R]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[1 99 R]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 1);
-            Assert.True(o.Objects[0] is PdfObjectReference);
-            Assert.True((o.Objects[0] as PdfObjectReference).Id == 1);
-            Assert.True((o.Objects[0] as PdfObjectReference).Gen == 99);
+            Assert.True(o.Objects[0] is ParseObjectReference);
+            Assert.True((o.Objects[0] as ParseObjectReference).Id == 1);
+            Assert.True((o.Objects[0] as ParseObjectReference).Gen == 99);
         }
 
         [Fact]
         public void ArrayObjectReference2()
         {
-            PdfParser p = new PdfParser(StringToStream("[42 1 99 R]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[42 1 99 R]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 2);
-            Assert.True(o.Objects[0] is PdfNumeric);
-            Assert.True((o.Objects[0] as PdfNumeric).IsInteger);
-            Assert.True((o.Objects[0] as PdfNumeric).Integer == 42);
-            Assert.True(o.Objects[1] is PdfObjectReference);
-            Assert.True((o.Objects[1] as PdfObjectReference).Id == 1);
-            Assert.True((o.Objects[1] as PdfObjectReference).Gen == 99);
+            Assert.True(o.Objects[0] is ParseInteger);
+            Assert.True((o.Objects[0] as ParseInteger).Integer == 42);
+            Assert.True(o.Objects[1] is ParseObjectReference);
+            Assert.True((o.Objects[1] as ParseObjectReference).Id == 1);
+            Assert.True((o.Objects[1] as ParseObjectReference).Gen == 99);
         }
 
         [Fact]
         public void ArrayObjectReference3()
         {
-            PdfParser p = new PdfParser(StringToStream("[42 2 1 99 R]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[42 2 1 99 R]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 3);
-            Assert.True(o.Objects[0] is PdfNumeric);
-            Assert.True((o.Objects[0] as PdfNumeric).IsInteger);
-            Assert.True((o.Objects[0] as PdfNumeric).Integer == 42);
-            Assert.True(o.Objects[1] is PdfNumeric);
-            Assert.True((o.Objects[1] as PdfNumeric).IsInteger);
-            Assert.True((o.Objects[1] as PdfNumeric).Integer == 2);
-            Assert.True(o.Objects[2] is PdfObjectReference);
-            Assert.True((o.Objects[2] as PdfObjectReference).Id == 1);
-            Assert.True((o.Objects[2] as PdfObjectReference).Gen == 99);
+            Assert.True(o.Objects[0] is ParseInteger);
+            Assert.True((o.Objects[0] as ParseInteger).Integer == 42);
+            Assert.True(o.Objects[1] is ParseInteger);
+            Assert.True((o.Objects[1] as ParseInteger).Integer == 2);
+            Assert.True(o.Objects[2] is ParseObjectReference);
+            Assert.True((o.Objects[2] as ParseObjectReference).Id == 1);
+            Assert.True((o.Objects[2] as ParseObjectReference).Gen == 99);
         }
 
         [Fact]
         public void ArrayObjectReference4()
         {
-            PdfParser p = new PdfParser(StringToStream("[42 2 null 1 99 R]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[42 2 null 1 99 R]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 4);
-            Assert.True(o.Objects[0] is PdfNumeric);
-            Assert.True((o.Objects[0] as PdfNumeric).IsInteger);
-            Assert.True((o.Objects[0] as PdfNumeric).Integer == 42);
-            Assert.True(o.Objects[1] is PdfNumeric);
-            Assert.True((o.Objects[1] as PdfNumeric).IsInteger);
-            Assert.True((o.Objects[1] as PdfNumeric).Integer == 2);
-            Assert.True(o.Objects[2] is PdfNull);
-            Assert.True(o.Objects[3] is PdfObjectReference);
-            Assert.True((o.Objects[3] as PdfObjectReference).Id == 1);
-            Assert.True((o.Objects[3] as PdfObjectReference).Gen == 99);
+            Assert.True(o.Objects[0] is ParseInteger);
+            Assert.True((o.Objects[0] as ParseInteger).Integer == 42);
+            Assert.True(o.Objects[1] is ParseInteger);
+            Assert.True((o.Objects[1] as ParseInteger).Integer == 2);
+            Assert.True(o.Objects[2] is ParseNull);
+            Assert.True(o.Objects[3] is ParseObjectReference);
+            Assert.True((o.Objects[3] as ParseObjectReference).Id == 1);
+            Assert.True((o.Objects[3] as ParseObjectReference).Gen == 99);
         }
 
         [Fact]
         public void ArrayMultiple()
         {
-            PdfParser p = new PdfParser(StringToStream("[/Example (de) 3.14 1 99 R null]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[/Example (de) 3.14 1 99 R null]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 5);
-            Assert.True(o.Objects[0] is PdfName);
-            Assert.True((o.Objects[0] as PdfName).Name == "Example");
-            Assert.True(o.Objects[1] is PdfString);
-            Assert.True((o.Objects[1] as PdfString).String == "de");
-            Assert.True(o.Objects[2] is PdfNumeric);
-            Assert.True((o.Objects[2] as PdfNumeric).IsReal);
-            Assert.True((o.Objects[2] as PdfNumeric).Real == 3.14);
-            Assert.True(o.Objects[3] is PdfObjectReference);
-            Assert.True((o.Objects[3] as PdfObjectReference).Id == 1);
-            Assert.True((o.Objects[3] as PdfObjectReference).Gen == 99);
-            Assert.True(o.Objects[4] is PdfNull);
+            Assert.True(o.Objects[0] is ParseName);
+            Assert.True((o.Objects[0] as ParseName).Name == "Example");
+            Assert.True(o.Objects[1] is ParseString);
+            Assert.True((o.Objects[1] as ParseString).String == "de");
+            Assert.True(o.Objects[2] is ParseReal);
+            Assert.True((o.Objects[2] as ParseReal).Real == 3.14f);
+            Assert.True(o.Objects[3] is ParseObjectReference);
+            Assert.True((o.Objects[3] as ParseObjectReference).Id == 1);
+            Assert.True((o.Objects[3] as ParseObjectReference).Gen == 99);
+            Assert.True(o.Objects[4] is ParseNull);
         }
 
         [Fact]
         public void ArrayInArray1()
         {
-            PdfParser p = new PdfParser(StringToStream("[[/Example]]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[[/Example]]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 1);
-            Assert.True(o.Objects[0] is PdfArray);
+            Assert.True(o.Objects[0] is ParseArray);
 
-            o = o.Objects[0] as PdfArray;
-            Assert.True(o.Objects[0] is PdfName);
-            Assert.True((o.Objects[0] as PdfName).Name == "Example");
+            o = o.Objects[0] as ParseArray;
+            Assert.True(o.Objects[0] is ParseName);
+            Assert.True((o.Objects[0] as ParseName).Name == "Example");
         }
 
         [Fact]
         public void ArrayInArray2()
         {
-            PdfParser p = new PdfParser(StringToStream("[[/Example] null]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[[/Example] null]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 2);
-            Assert.True(o.Objects[0] is PdfArray);
-            Assert.True(o.Objects[1] is PdfNull);
+            Assert.True(o.Objects[0] is ParseArray);
+            Assert.True(o.Objects[1] is ParseNull);
 
-            o = o.Objects[0] as PdfArray;
+            o = o.Objects[0] as ParseArray;
             Assert.True(o.Objects.Count == 1);
-            Assert.True(o.Objects[0] is PdfName);
-            Assert.True((o.Objects[0] as PdfName).Name == "Example");
+            Assert.True(o.Objects[0] is ParseName);
+            Assert.True((o.Objects[0] as ParseName).Name == "Example");
         }
 
         [Fact]
         public void ArrayInArray3()
         {
-            PdfParser p = new PdfParser(StringToStream("[null [/Example]]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[null [/Example]]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 2);
-            Assert.True(o.Objects[0] is PdfNull);
-            Assert.True(o.Objects[1] is PdfArray);
+            Assert.True(o.Objects[0] is ParseNull);
+            Assert.True(o.Objects[1] is ParseArray);
 
-            o = o.Objects[1] as PdfArray;
+            o = o.Objects[1] as ParseArray;
             Assert.True(o.Objects.Count == 1);
-            Assert.True(o.Objects[0] is PdfName);
-            Assert.True((o.Objects[0] as PdfName).Name == "Example");
+            Assert.True(o.Objects[0] is ParseName);
+            Assert.True((o.Objects[0] as ParseName).Name == "Example");
         }
 
         [Fact]
         public void ArrayInArray4()
         {
-            PdfParser p = new PdfParser(StringToStream("[null [/Example] 42]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[null [/Example] 42]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 3);
-            Assert.True(o.Objects[0] is PdfNull);
-            Assert.True(o.Objects[1] is PdfArray);
-            Assert.True(o.Objects[2] is PdfNumeric);
-            Assert.True((o.Objects[2] as PdfNumeric).IsInteger);
-            Assert.True((o.Objects[2] as PdfNumeric).Integer == 42);
+            Assert.True(o.Objects[0] is ParseNull);
+            Assert.True(o.Objects[1] is ParseArray);
+            Assert.True(o.Objects[2] is ParseInteger);
+            Assert.True((o.Objects[2] as ParseInteger).Integer == 42);
 
-            o = o.Objects[1] as PdfArray;
+            o = o.Objects[1] as ParseArray;
             Assert.True(o.Objects.Count == 1);
-            Assert.True(o.Objects[0] is PdfName);
-            Assert.True((o.Objects[0] as PdfName).Name == "Example");
+            Assert.True(o.Objects[0] is ParseName);
+            Assert.True((o.Objects[0] as ParseName).Name == "Example");
         }
 
         [Fact]
         public void ArrayInArray5()
         {
-            PdfParser p = new PdfParser(StringToStream("[null [/Example] [null] 42]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[null [/Example] [null] 42]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 4);
-            Assert.True(o.Objects[0] is PdfNull);
-            Assert.True(o.Objects[1] is PdfArray);
-            Assert.True(o.Objects[2] is PdfArray);
-            Assert.True(o.Objects[3] is PdfNumeric);
-            Assert.True((o.Objects[3] as PdfNumeric).IsInteger);
-            Assert.True((o.Objects[3] as PdfNumeric).Integer == 42);
+            Assert.True(o.Objects[0] is ParseNull);
+            Assert.True(o.Objects[1] is ParseArray);
+            Assert.True(o.Objects[2] is ParseArray);
+            Assert.True(o.Objects[3] is ParseInteger);
+            Assert.True((o.Objects[3] as ParseInteger).Integer == 42);
 
-            PdfArray o1 = o.Objects[1] as PdfArray;
+            ParseArray o1 = o.Objects[1] as ParseArray;
             Assert.True(o1.Objects.Count == 1);
-            Assert.True(o1.Objects[0] is PdfName);
-            Assert.True((o1.Objects[0] as PdfName).Name == "Example");
+            Assert.True(o1.Objects[0] is ParseName);
+            Assert.True((o1.Objects[0] as ParseName).Name == "Example");
 
-            PdfArray o2 = o.Objects[2] as PdfArray;
+            ParseArray o2 = o.Objects[2] as ParseArray;
             Assert.True(o2.Objects.Count == 1);
-            Assert.True(o2.Objects[0] is PdfNull);
+            Assert.True(o2.Objects[0] is ParseNull);
         }
 
         [Fact]
         public void ArrayDict()
         {
-            PdfParser p = new PdfParser(StringToStream("[<</Example (de)>>]"));
-            PdfArray o = p.ParseObject() as PdfArray;
+            Parser p = new Parser(StringToStream("[<</Example (de)>>]"));
+            ParseArray o = p.ParseObject() as ParseArray;
 
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 1);
-            Assert.True(o.Objects[0] is PdfDictionary);
+            Assert.True(o.Objects[0] is ParseDictionary);
 
-            PdfDictionary d = o.Objects[0] as PdfDictionary;
+            ParseDictionary d = o.Objects[0] as ParseDictionary;
             Assert.NotNull(d);
             Assert.True(d.Count == 1);
 
-            PdfDictEntry entry = d["Example"];
+            ParseDictEntry entry = d["Example"];
             Assert.NotNull(entry);
             Assert.True(entry.Name.Name == "Example");
-            Assert.True(entry.Object is PdfString);
-            Assert.True((entry.Object as PdfString).String == "de");
+            Assert.True(entry.Object is ParseString);
+            Assert.True((entry.Object as ParseString).String == "de");
         }
     }
 }

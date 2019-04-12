@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class PdfDictionary : PdfObject
+    public class ParseDictionary : ParseObject
     {
-        private Dictionary<string, PdfDictEntry> _entries;
+        private Dictionary<string, ParseDictEntry> _entries;
 
-        public PdfDictionary(long position, Dictionary<string, PdfDictEntry> entries)
+        public ParseDictionary(long position, Dictionary<string, ParseDictEntry> entries)
         {
             DictionaryOpenPosition = position;
             _entries = entries;
@@ -19,9 +17,9 @@ namespace PdfXenon.Standard
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine($"PdfDictionary: Count:{Count} (");
+            sb.AppendLine($"ParseDictionary ({Position}): Count:{Count} (");
 
-            foreach (PdfDictEntry entry in _entries.Values)
+            foreach (ParseDictEntry entry in _entries.Values)
                 sb.AppendLine($"    {entry.Name.Name} = {entry.Object.ToString()}");
 
             sb.AppendLine(")");
@@ -31,21 +29,21 @@ namespace PdfXenon.Standard
 
         public int Count { get => _entries.Count; }
 
-        public PdfDictEntry this[string key]
+        public bool ContainsName(string name)
         {
-            get { return _entries[key]; }
-            set { _entries[key] = value; }
+            return _entries.ContainsKey(name);
         }
 
-        public bool ContainsKey(string key)
+        public ParseDictEntry this[string name]
         {
-            return _entries.ContainsKey(key);
+            get { return _entries[name]; }
+            set { _entries[name] = value; }
         }
 
-        public bool TryGetValue(string key, out PdfObject obj)
+        public bool TryGetValue(string name, out ParseObject obj)
         {
-            PdfDictEntry entry;
-            if (_entries.TryGetValue(key, out entry))
+            ParseDictEntry entry;
+            if (_entries.TryGetValue(name, out entry))
             {
                 obj = entry.Object;
                 return true;
@@ -62,9 +60,9 @@ namespace PdfXenon.Standard
         private long DictionaryOpenPosition { get; set; }
     }
 
-    public class PdfDictEntry
+    public class ParseDictEntry
     {
-        public PdfName Name { get; set; }
-        public PdfObject Object { get; set; }
+        public ParseName Name { get; set; }
+        public ParseObject Object { get; set; }
     }
 }

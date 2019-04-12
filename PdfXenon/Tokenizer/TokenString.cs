@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PdfXenon.Standard
+﻿namespace PdfXenon.Standard
 {
-    public abstract class TokenString : TokenBase
+    public abstract class TokenString : TokenObject
     {
-        public TokenString(long position)
+        public TokenString(long position, string rawString)
             : base(position)
         {
+            RawString = rawString;
         }
 
-        public abstract string ActualString { get; }
+        public string RawString { get; private set; }
+        public abstract string ResolvedString { get; }
     }
 }

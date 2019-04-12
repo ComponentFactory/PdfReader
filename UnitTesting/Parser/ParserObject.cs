@@ -12,8 +12,8 @@ namespace ParserUnitTesting
         [Fact]
         public void Name()
         {
-            PdfParser p = new PdfParser(StringToStream("/Example"));
-            PdfName o = p.ParseObject() as PdfName;
+            Parser p = new Parser(StringToStream("/Example"));
+            ParseName o = p.ParseObject() as ParseName;
 
             Assert.NotNull(o);
             Assert.True(o.Name == "Example");
@@ -22,30 +22,28 @@ namespace ParserUnitTesting
         [Fact]
         public void NumericInteger()
         {
-            PdfParser p = new PdfParser(StringToStream("42"));
-            PdfNumeric o = p.ParseObject() as PdfNumeric;
+            Parser p = new Parser(StringToStream("42"));
+            ParseInteger o = p.ParseObject() as ParseInteger;
 
             Assert.NotNull(o);
-            Assert.True(o.IsInteger);
             Assert.True(o.Integer == 42);
         }
 
         [Fact]
         public void NumericReal()
         {
-            PdfParser p = new PdfParser(StringToStream("3.14"));
-            PdfNumeric o = p.ParseObject() as PdfNumeric;
+            Parser p = new Parser(StringToStream("3.14"));
+            ParseReal o = p.ParseObject() as ParseReal;
 
             Assert.NotNull(o);
-            Assert.True(o.IsReal);
-            Assert.True(o.Real == 3.14);
+            Assert.True(o.Real == 3.14f);
         }
 
         [Fact]
         public void StringHex()
         {
-            PdfParser p = new PdfParser(StringToStream("<6465>"));
-            PdfString o = p.ParseObject() as PdfString;
+            Parser p = new Parser(StringToStream("<6465>"));
+            ParseString o = p.ParseObject() as ParseString;
 
             Assert.NotNull(o);
             Assert.True(o.String == "de");
@@ -54,8 +52,8 @@ namespace ParserUnitTesting
         [Fact]
         public void StringLiteral()
         {
-            PdfParser p = new PdfParser(StringToStream("(de)"));
-            PdfString o = p.ParseObject() as PdfString;
+            Parser p = new Parser(StringToStream("(de)"));
+            ParseString o = p.ParseObject() as ParseString;
 
             Assert.NotNull(o);
             Assert.True(o.String == "de");
@@ -64,8 +62,8 @@ namespace ParserUnitTesting
         [Fact]
         public void BooleanTrue()
         {
-            PdfParser p = new PdfParser(StringToStream("true"));
-            PdfBoolean o = p.ParseObject() as PdfBoolean;
+            Parser p = new Parser(StringToStream("true"));
+            ParseBoolean o = p.ParseObject() as ParseBoolean;
 
             Assert.NotNull(o);
             Assert.True(o.Value);
@@ -74,8 +72,8 @@ namespace ParserUnitTesting
         [Fact]
         public void BooleanFalse()
         {
-            PdfParser p = new PdfParser(StringToStream("false"));
-            PdfBoolean o = p.ParseObject() as PdfBoolean;
+            Parser p = new Parser(StringToStream("false"));
+            ParseBoolean o = p.ParseObject() as ParseBoolean;
 
             Assert.NotNull(o);
             Assert.False(o.Value);
@@ -84,8 +82,8 @@ namespace ParserUnitTesting
         [Fact]
         public void Null()
         {
-            PdfParser p = new PdfParser(StringToStream("null"));
-            PdfNull o = p.ParseObject() as PdfNull;
+            Parser p = new Parser(StringToStream("null"));
+            ParseNull o = p.ParseObject() as ParseNull;
 
             Assert.NotNull(o);
         }
@@ -93,8 +91,8 @@ namespace ParserUnitTesting
         [Fact]
         public void ObjectReference()
         {
-            PdfParser p = new PdfParser(StringToStream("2 0 R"));
-            PdfObjectReference o = p.ParseObject() as PdfObjectReference;
+            Parser p = new Parser(StringToStream("2 0 R"));
+            ParseObjectReference o = p.ParseObject() as ParseObjectReference;
 
             Assert.NotNull(o);
             Assert.True(o.Id == 2);

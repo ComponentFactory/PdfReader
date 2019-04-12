@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace PdfXenon.Standard
 {
@@ -110,6 +108,14 @@ namespace PdfXenon.Standard
             return ret;
         }
 
+        private int ReadBytes()
+        {
+            // Read in a buffer of ASCII characters
+            _start = 0;
+            _end = _stream.Read(_bytes, 0, _bytes.Length);
+            return _end;
+        }
+
         private byte[] AppendBytes(byte[] bytes, int start, int length, byte[] existing)
         {
             if (existing == null)
@@ -127,12 +133,5 @@ namespace PdfXenon.Standard
             }
         }
 
-        private int ReadBytes()
-        {
-            // Read in a buffer of ASCII characters
-            _start = 0;
-            _end = _stream.Read(_bytes, 0, _bytes.Length);
-            return _end;
-        }
     }
 }

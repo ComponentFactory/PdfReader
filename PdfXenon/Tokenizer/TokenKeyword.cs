@@ -1,50 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class TokenKeyword : TokenBase
+    public class TokenKeyword : TokenObject
     {
-        private static Dictionary<string, PdfKeyword> _lookup;
+        private static Dictionary<string, ParseKeyword> _lookup;
 
         static TokenKeyword()
         {
-            _lookup = new Dictionary<string, PdfKeyword>();
+            _lookup = new Dictionary<string, ParseKeyword>();
 
-            foreach (object val in Enum.GetValues(typeof(PdfKeyword)))
+            foreach (object val in Enum.GetValues(typeof(ParseKeyword)))
             {
-                string name = Enum.GetName(typeof(PdfKeyword), val);
+                string name = Enum.GetName(typeof(ParseKeyword), val);
                 string keyword = name;
 
-                object[] attrs = typeof(PdfKeyword).GetMember(name)[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
+                object[] attrs = typeof(ParseKeyword).GetMember(name)[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
                 if ((attrs != null) && (attrs.Length > 0))
                     keyword = ((DescriptionAttribute)attrs[0]).Description;
 
-                _lookup.Add(keyword, (PdfKeyword)val);
+                _lookup.Add(keyword, (ParseKeyword)val);
             }
         }
 
-        public static TokenKeyword CheckKeywords(long position, string keyword)
-        {
-            if (_lookup.TryGetValue(keyword, out PdfKeyword pdfKeyword))
-                return new TokenKeyword(position, pdfKeyword);
-
-            return null;
-        }
-
-        public TokenKeyword(long position, PdfKeyword keyword)
+        public TokenKeyword(long position, ParseKeyword keyword)
             : base(position)
         {
             Keyword = keyword;
         }
 
-        public override string ToString()
+        public static TokenKeyword CheckKeywords(long position, string keyword)
         {
-            return $"Keyword: {Keyword}, Pos: {Position}";
+            if (_lookup.TryGetValue(keyword, out ParseKeyword pdfKeyword))
+                return new TokenKeyword(position, pdfKeyword);
+
+            return null;
         }
 
-        public PdfKeyword Keyword { get; private set; }
+        public override string ToString()
+        {
+            return $"Keyword ({Position}): {Keyword}";
+        }
+
+        public ParseKeyword Keyword { get; private set; }
     }
 }

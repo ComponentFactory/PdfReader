@@ -1,1 +1,1 @@
-﻿Document resolve recursively
+﻿Split numeric into integer and real

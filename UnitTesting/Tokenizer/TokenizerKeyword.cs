@@ -13,7 +13,7 @@ namespace TokenizerUnitTesting
         public void KeywordFail()
         {
             Tokenizer t = new Tokenizer(StringToStream("random"));
-            TokenBase k = t.GetToken();
+            TokenObject k = t.GetToken();
             Assert.NotNull(k);
             Assert.True(k is TokenError);
             Assert.True(k.Position == 0);
@@ -27,7 +27,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == PdfKeyword.True);
+            Assert.True(k.Keyword == ParseKeyword.True);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -48,7 +48,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == PdfKeyword.False);
+            Assert.True(k.Keyword == ParseKeyword.False);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -69,7 +69,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == PdfKeyword.Null);
+            Assert.True(k.Keyword == ParseKeyword.Null);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -90,7 +90,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == PdfKeyword.Stream);
+            Assert.True(k.Keyword == ParseKeyword.Stream);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -101,7 +101,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == PdfKeyword.EndStream);
+            Assert.True(k.Keyword == ParseKeyword.EndStream);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -112,7 +112,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == PdfKeyword.Obj);
+            Assert.True(k.Keyword == ParseKeyword.Obj);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -123,7 +123,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == PdfKeyword.EndObj);
+            Assert.True(k.Keyword == ParseKeyword.EndObj);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -134,7 +134,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == PdfKeyword.R);
+            Assert.True(k.Keyword == ParseKeyword.R);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -145,7 +145,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == PdfKeyword.XRef);
+            Assert.True(k.Keyword == ParseKeyword.XRef);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -156,7 +156,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == PdfKeyword.Trailer);
+            Assert.True(k.Keyword == ParseKeyword.Trailer);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -167,7 +167,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == PdfKeyword.StartXRef);
+            Assert.True(k.Keyword == ParseKeyword.StartXRef);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -180,58 +180,58 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == PdfKeyword.True);
+            Assert.True(k.Keyword == ParseKeyword.True);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 5);
-            Assert.True(k.Keyword == PdfKeyword.False);
+            Assert.True(k.Keyword == ParseKeyword.False);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 11);
-            Assert.True(k.Keyword == PdfKeyword.True);
+            Assert.True(k.Keyword == ParseKeyword.True);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 16);
-            Assert.True(k.Keyword == PdfKeyword.False);
+            Assert.True(k.Keyword == ParseKeyword.False);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == PdfKeyword.Null);
+            Assert.True(k.Keyword == ParseKeyword.Null);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == PdfKeyword.Stream);
+            Assert.True(k.Keyword == ParseKeyword.Stream);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == PdfKeyword.EndStream);
+            Assert.True(k.Keyword == ParseKeyword.EndStream);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == PdfKeyword.Obj);
+            Assert.True(k.Keyword == ParseKeyword.Obj);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == PdfKeyword.EndObj);
+            Assert.True(k.Keyword == ParseKeyword.EndObj);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == PdfKeyword.R);
+            Assert.True(k.Keyword == ParseKeyword.R);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == PdfKeyword.XRef);
+            Assert.True(k.Keyword == ParseKeyword.XRef);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == PdfKeyword.Trailer);
+            Assert.True(k.Keyword == ParseKeyword.Trailer);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == PdfKeyword.StartXRef);
+            Assert.True(k.Keyword == ParseKeyword.StartXRef);
 
             Assert.True(t.GetToken() is TokenEmpty);
         }

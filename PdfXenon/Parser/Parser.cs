@@ -1,24 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class PdfParser
+    public class Parser : IDisposable
     {
-        public event EventHandler<PdfResolveEventArgs> ResolveReference;
+        private bool _disposed;
 
-        public PdfParser(Stream stream)
+        public event EventHandler<ParseResolveEventArgs> ResolveReference;
+
+        public Parser(Stream stream)
         {
             Tokenizer = new Tokenizer(stream);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
         }
 
         public void ParseHeader(out int major, out int minor)
         {
             // The header is a comment token
             Tokenizer.IgnoreComments = false;
-            TokenBase t = Tokenizer.GetToken();
+            TokenObject t = Tokenizer.GetToken();
             if (!(t is TokenComment))
                 throw new ApplicationException("Missing PDF header.");
 
@@ -53,11 +59,11 @@ namespace PdfXenon.Standard
         public List<TokenXRefEntry> ParseXRef()
         {
             Tokenizer.IgnoreComments = true;
-            TokenBase t = Tokenizer.GetToken();
+            TokenObject t = Tokenizer.GetToken();
             ThrowIfNot<TokenKeyword>(t);
 
             TokenKeyword keyword = (TokenKeyword)t;
-            if (keyword.Keyword != PdfKeyword.XRef)
+            if (keyword.Keyword != ParseKeyword.XRef)
                 throw new ApplicationException($"Cross-reference table has keyword {keyword.Keyword.ToString()} instead of 'xref' at position {t.Position}.");
 
             List<TokenXRefEntry> entries = new List<TokenXRefEntry>();
@@ -69,63 +75,63 @@ namespace PdfXenon.Standard
         {
             while (true)
             {
-                TokenBase t = Tokenizer.GetToken();
+                TokenObject t = Tokenizer.GetToken();
                 ThrowOnError(t);
 
                 // Cross-reference table ends when we find a 'trailer' keyword instead of another section
-                if ((t is TokenKeyword) && (((TokenKeyword)t).Keyword == PdfKeyword.Trailer))
+                if ((t is TokenKeyword) && (((TokenKeyword)t).Keyword == ParseKeyword.Trailer))
                 {
                     Tokenizer.PushToken(t);
                     return;
                 }
 
                 // Section starts with an integer object number
-                TokenNumeric start = t as TokenNumeric;
-                if ((start == null) || !start.IsInteger)
+                TokenInteger start = t as TokenInteger;
+                if (start == null)
                     throw new ApplicationException($"Cross-reference section number must be an integer at position {t.Position}.");
 
                 t = Tokenizer.GetToken();
                 ThrowOnError(t);
 
                 // Section then has an integer length number
-                TokenNumeric length = t as TokenNumeric;
-                if ((length == null) || !length.IsInteger)
+                TokenInteger length = t as TokenInteger;
+                if (length == null)
                     throw new ApplicationException($"Cross-reference section length must be an integer at position {t.Position}.");
 
                 // Load each line in the section
-                for (int i = 0, id = start.Integer.Value; i < length.Integer; i++, id++)
+                for (int i = 0, id = start.Integer; i < length.Integer; i++, id++)
                 {
-                    TokenBase entry = Tokenizer.GetXRefEntry(id);
+                    TokenObject entry = Tokenizer.GetXRefEntry(id);
                     ThrowOnError(entry);
                     entries.Add((TokenXRefEntry)entry);
                 }
             }
         }
 
-        public PdfDictionary ParseTrailer()
+        public ParseDictionary ParseTrailer()
         {
             Tokenizer.IgnoreComments = true;
-            TokenBase t = Tokenizer.GetToken();
+            TokenObject t = Tokenizer.GetToken();
             ThrowOnError(t);
 
             // Cross-reference table ends when we find a 'trailer' keyword instead of another section
-            if (!(t is TokenKeyword) || (((TokenKeyword)t).Keyword != PdfKeyword.Trailer))
+            if (!(t is TokenKeyword) || (((TokenKeyword)t).Keyword != ParseKeyword.Trailer))
                 throw new ApplicationException($"Trailer section must start with the 'trailer' keyword at position {t.Position}.");
 
-            PdfObject obj = ParseObject();
-            if ((obj == null) || !(obj is PdfDictionary))
+            ParseObject obj = ParseObject();
+            if ((obj == null) || !(obj is ParseDictionary))
                 throw new ApplicationException($"Trailer section must contain a dictionary at position {t.Position}.");
 
-            return (PdfDictionary)obj;
+            return (ParseDictionary)obj;
         }
 
-        public PdfIndirectObject ParseIndirectObject(long position)
+        public ParseIndirectObject ParseIndirectObject(long position)
         {
             long restore = Tokenizer.Position;
 
             // Set correct position for parsing the randomly positioned object
             Tokenizer.Position = position;
-            PdfIndirectObject ret = ParseIndirectObject();
+            ParseIndirectObject ret = ParseIndirectObject();
 
             // Must restore original position so caller can continue from where they left off
             Tokenizer.Position = restore;
@@ -133,49 +139,34 @@ namespace PdfXenon.Standard
             return ret;
         }
 
-        public PdfIndirectObject ParseIndirectObject()
+        public ParseIndirectObject ParseIndirectObject()
         {
             Tokenizer.IgnoreComments = true;
-            TokenBase t = Tokenizer.GetToken();
+            TokenObject t = Tokenizer.GetToken();
             ThrowOnEmptyOrError(t);
 
-            // Indirect object starts with an identifier number
-            if (!(t is TokenNumeric))
+            // Indirect object starts with an integer, the object identifier
+            if (!(t is TokenInteger))
             {
                 Tokenizer.PushToken(t);
                 return null;
             }
 
-            TokenNumeric id = (TokenNumeric)t;
-            if (id.IsReal)
-            {
-                Tokenizer.PushToken(t);
-                return null;
-            }
-
-            // Indirect object then has a generation number
-            TokenBase u = Tokenizer.GetToken();
+            // Second is another integer, the generation number
+            TokenObject u = Tokenizer.GetToken();
             ThrowOnEmptyOrError(u);
 
-            if (!(u is TokenNumeric))
+            if (!(u is TokenInteger))
             {
                 Tokenizer.PushToken(t);
                 Tokenizer.PushToken(u);
                 return null;
             }
 
-            TokenNumeric gen = (TokenNumeric)u;
-            if (gen.IsReal)
-            {
-                Tokenizer.PushToken(t);
-                Tokenizer.PushToken(u);
-                return null;
-            }
-
-            // Indirect object then has the keyword 'obj'
-            TokenBase v = Tokenizer.GetToken();
+            // This is the keyword 'obj'
+            TokenObject v = Tokenizer.GetToken();
             ThrowOnEmptyOrError(v);
-            if (!(v is TokenKeyword) || ((v as TokenKeyword).Keyword != PdfKeyword.Obj))
+            if (!(v is TokenKeyword) || ((v as TokenKeyword).Keyword != ParseKeyword.Obj))
             {
                 Tokenizer.PushToken(t);
                 Tokenizer.PushToken(u);
@@ -184,11 +175,11 @@ namespace PdfXenon.Standard
             }
 
             // Get actual object that is the content
-            PdfObject obj = ParseObject();
+            ParseObject obj = ParseObject();
             if (obj == null)
                 throw new ApplicationException($"Indirect object has missing content at position {t.Position}.");
 
-            // Must be followed by either a 'endobj' or a 'stream'
+            // Must be followed by either 'endobj' or 'stream'
             v = Tokenizer.GetToken();
             ThrowOnEmptyOrError(v);
 
@@ -196,27 +187,27 @@ namespace PdfXenon.Standard
             if (keyword == null)
                 throw new ApplicationException($"Indirect object has missing 'endobj or 'stream' at position {v.Position}.");
 
-            if (keyword.Keyword == PdfKeyword.EndObj)
-                return new PdfIndirectObject(id, gen, obj);
-            else if (keyword.Keyword == PdfKeyword.Stream)
+            if (keyword.Keyword == ParseKeyword.EndObj)
+                return new ParseIndirectObject(t as TokenInteger, u as TokenInteger, obj);
+            else if (keyword.Keyword == ParseKeyword.Stream)
             {
-                PdfDictionary dictionary = obj as PdfDictionary;
+                ParseDictionary dictionary = obj as ParseDictionary;
                 if (dictionary == null)
                     throw new ApplicationException($"Stream must be preceded by a dictionary at position {v.Position}.");
 
-                if (!dictionary.ContainsKey("Length"))
+                if (!dictionary.ContainsName("Length"))
                     throw new ApplicationException($"Stream dictionary must contain a 'Length' entry at position {v.Position}.");
 
-                PdfDictEntry entry = dictionary["Length"];
-                PdfObject lengthObj = entry.Object;
+                ParseDictEntry entry = dictionary["Length"];
+                ParseObject lengthObj = entry.Object;
 
                 // Resolve any object reference
-                PdfObjectReference reference = lengthObj as PdfObjectReference;
+                ParseObjectReference reference = lengthObj as ParseObjectReference;
                 if (reference != null)
                     lengthObj = OnResolveReference(reference);
 
-                PdfNumeric length = lengthObj as PdfNumeric;
-                if ((length == null) || length.IsReal)
+                ParseInteger length = lengthObj as ParseInteger;
+                if (length == null)
                     throw new ApplicationException($"Stream dictionary has a 'Length' entry that is not an integer entry at position {v.Position}.");
 
                 if (length.Integer < 0)
@@ -234,7 +225,7 @@ namespace PdfXenon.Standard
                 if (keyword == null)
                     throw new ApplicationException($"Stream has missing 'endstream' after content at at position {v.Position}.");
 
-                if (keyword.Keyword != PdfKeyword.EndStream)
+                if (keyword.Keyword != ParseKeyword.EndStream)
                     throw new ApplicationException($"Stream has unexpected keyword {keyword.Keyword} instead of 'endstream' at position {v.Position}.");
 
                 // Stream contents must be followed by 'endobj'
@@ -245,67 +236,56 @@ namespace PdfXenon.Standard
                 if (keyword == null)
                     throw new ApplicationException($"Indirect object has missing 'endobj' at position { v.Position }.");
 
-                if (keyword.Keyword != PdfKeyword.EndObj)
+                if (keyword.Keyword != ParseKeyword.EndObj)
                     throw new ApplicationException($"Indirect object has unexpected keyword {keyword.Keyword} instead of 'endobj' at position {v.Position}.");
 
-                return new PdfIndirectObject(id, gen, new PdfStream(dictionary, bytes));
+                return new ParseIndirectObject(t as TokenInteger, u as TokenInteger, new ParseStream(dictionary, bytes));
             }
             else
                 throw new ApplicationException($"Indirect object has unexpected keyword {keyword.Keyword} at position {v.Position}.");
         }
 
-        public PdfObject ParseObject()
+        public ParseObject ParseObject()
         {
             Tokenizer.IgnoreComments = true;
-            TokenBase t = Tokenizer.GetToken();
+            TokenObject t = Tokenizer.GetToken();
             ThrowOnEmptyOrError(t);
 
             if (t is TokenName)
-                return new PdfName(t as TokenName);
-            else if (t is TokenNumeric)
+                return new ParseName(t as TokenName);
+            else if (t is TokenInteger)
             {
-                // An object reference starts with an integer number (the object identifier)
-                TokenNumeric n = t as TokenNumeric;
-                if (n.IsInteger)
+                TokenObject t2 = Tokenizer.GetToken();
+                ThrowOnError(t2);
+
+                // An object reference has a second integer, the generation number
+                if (t2 is TokenInteger)
                 {
-                    TokenBase t2 = Tokenizer.GetToken();
-                    ThrowOnError(t2);
+                    TokenObject t3 = Tokenizer.GetToken();
+                    ThrowOnError(t3);
 
-                    if (t2 is TokenNumeric)
-                    {
-                        // An object reference then has another integer number (the object generation)
-                        TokenNumeric n2 = t2 as TokenNumeric;
-                        if (n2.IsInteger)
-                        {
-                            TokenBase t3 = Tokenizer.GetToken();
-                            ThrowOnError(t3);
+                    // An object reference has a third value which is the 'R' keyword
+                    if ((t3 is TokenKeyword) && (((TokenKeyword)t3).Keyword == ParseKeyword.R))
+                        return new ParseObjectReference(t as TokenInteger, t2 as TokenInteger);
 
-                            if (t3 is TokenKeyword)
-                            {
-                                // An object reference finally has the R keyword
-                                TokenKeyword k = t3 as TokenKeyword;
-                                if (k.Keyword == PdfKeyword.R)
-                                    return new PdfObjectReference(n, n2);
-                            }
-
-                            Tokenizer.PushToken(t3);
-                        }
-                    }
-
-                    Tokenizer.PushToken(t2);
+                    Tokenizer.PushToken(t3);
                 }
 
-                return new PdfNumeric(t as TokenNumeric);
+                Tokenizer.PushToken(t2);
+
+                return new ParseInteger(t as TokenInteger);
             }
-            else if (t is TokenHexString)
-                return new PdfString(t as TokenHexString);
-            else if (t is TokenLiteralString)
-                return new PdfString(t as TokenLiteralString);
+            else if (t is TokenReal)
+                return new ParseReal(t as TokenReal);
+            else if (t is TokenStringHex)
+                return new ParseString(t as TokenStringHex);
+            else if (t is TokenStringLiteral)
+                return new ParseString(t as TokenStringLiteral);
             else if (t is TokenArrayOpen)
             {
-                List<PdfObject> objects = new List<PdfObject>();
+                List<ParseObject> objects = new List<ParseObject>();
 
-                PdfObject entry = null;
+                ParseObject entry = null;
                 while (true)
                 {
                     entry = ParseObject();
@@ -318,14 +298,14 @@ namespace PdfXenon.Standard
                 }
 
                 ThrowIfNot<TokenArrayClose>(Tokenizer.GetToken());
-                return new PdfArray(t.Position, objects);
+                return new ParseArray(t.Position, objects);
             }
             else if (t is TokenDictionaryOpen)
             {
-                Dictionary<string, PdfDictEntry> entries = new Dictionary<string, PdfDictEntry>();
+                Dictionary<string, ParseDictEntry> entries = new Dictionary<string, ParseDictEntry>();
 
-                PdfObject value1 = null;
-                PdfObject value2 = null;
+                ParseObject value1 = null;
+                ParseObject value2 = null;
                 while (true)
                 {
                     value1 = ParseObject();
@@ -335,7 +315,7 @@ namespace PdfXenon.Standard
                         ThrowOnEmptyOrError(t);
 
                     // Key value must be a Name
-                    PdfName name = value1 as PdfName;
+                    ParseName name = value1 as ParseName;
                     if (name == null)
                         throw new ApplicationException($"Dictionary key must be a name instead of {name.GetType().Name} at position {name.Position}.");
 
@@ -346,21 +326,21 @@ namespace PdfXenon.Standard
                         ThrowOnEmptyOrError(t);
 
                     // If key already exists then simply overwrite it with latest value
-                    entries[name.Name] = new PdfDictEntry() { Name = name, Object = value2 };
+                    entries[name.Name] = new ParseDictEntry() { Name = name, Object = value2 };
                 }
 
                 ThrowIfNot<TokenDictionaryClose>(Tokenizer.GetToken());
-                return new PdfDictionary(t.Position, entries);
+                return new ParseDictionary(t.Position, entries);
             }
             else if (t is TokenKeyword)
             {
                 switch ((t as TokenKeyword).Keyword)
                 {
-                    case PdfKeyword.True:
-                    case PdfKeyword.False:
-                        return new PdfBoolean(t as TokenKeyword);
-                    case PdfKeyword.Null:
-                        return new PdfNull(t as TokenKeyword);
+                    case ParseKeyword.True:
+                    case ParseKeyword.False:
+                        return new ParseBoolean(t as TokenKeyword);
+                    case ParseKeyword.Null:
+                        return new ParseNull(t as TokenKeyword);
                 }
             }
 
@@ -369,14 +349,28 @@ namespace PdfXenon.Standard
             return null;
         }
 
-        protected virtual PdfObject OnResolveReference(PdfObjectReference reference)
+        protected virtual ParseObject OnResolveReference(ParseObjectReference reference)
         {
-            PdfResolveEventArgs args = new PdfResolveEventArgs() { Id = reference.Id, Gen = reference.Gen };
+            ParseResolveEventArgs args = new ParseResolveEventArgs() { Id = reference.Id, Gen = reference.Gen };
             ResolveReference?.Invoke(this, args);
             return args.Object;
         }
 
-        private T ThrowIfNot<T>(TokenBase t) where T : TokenBase
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    Tokenizer.Dispose();
+                    Tokenizer = null;
+                }
+
+                _disposed = true;
+            }
+        }
+
+        private T ThrowIfNot<T>(TokenObject t) where T : TokenObject
         {
             if (t is TokenError)
                 throw new ApplicationException(t.ToString());
@@ -388,13 +382,13 @@ namespace PdfXenon.Standard
             return (T)t;
         }
 
-        private void ThrowOnError(TokenBase t)
+        private void ThrowOnError(TokenObject t)
         {
             if (t is TokenError)
                 throw new ApplicationException(t.ToString());
         }
 
-        private void ThrowOnEmptyOrError(TokenBase t)
+        private void ThrowOnEmptyOrError(TokenObject t)
         {
             if (t is TokenError)
                 throw new ApplicationException(t.ToString());

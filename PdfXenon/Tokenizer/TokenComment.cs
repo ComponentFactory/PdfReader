@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PdfXenon.Standard
+﻿namespace PdfXenon.Standard
 {
-    public class TokenComment : TokenBase
+    public class TokenComment : TokenObject
     {
         public TokenComment(long position, string comment)
             : base(position)
@@ -14,7 +10,7 @@ namespace PdfXenon.Standard
 
         public override string ToString()
         {
-            return $"Comment: {Comment}, Pos: {Position}";
+            return $"Comment ({Position}): {Comment} ";
         }
 
         public string Comment { get; private set; }

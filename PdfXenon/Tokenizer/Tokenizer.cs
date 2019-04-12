@@ -28,8 +28,9 @@ namespace PdfXenon.Standard
         private int _length;
         private long _position;
         private byte[] _line;
+        private bool _disposed;
         private TokenReader _reader;
-        private Stack<TokenBase> _stack = new Stack<TokenBase>();
+        private Stack<TokenObject> _stack = new Stack<TokenObject>();
 
         static Tokenizer()
         {
@@ -91,6 +92,11 @@ namespace PdfXenon.Standard
                 throw new ApplicationException("Cannot seek within stream.");
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
         public bool IgnoreComments { get; set; } = true;
 
         public long Position
@@ -115,14 +121,14 @@ namespace PdfXenon.Standard
             }
         }
 
-        public void PushToken(TokenBase token)
+        public void PushToken(TokenObject token)
         {
             _stack.Push(token);
         }
 
-        public TokenBase GetToken()
+        public TokenObject GetToken()
         {
-            TokenBase t = _stack.Count > 0 ? _stack.Pop() : GetAnyToken();
+            TokenObject t = _stack.Count > 0 ? _stack.Pop() : GetAnyToken();
 
             if (IgnoreComments)
                 while (t is TokenComment)
@@ -136,7 +142,7 @@ namespace PdfXenon.Standard
             return Reader.GetBytes(length);
         }
 
-        public TokenBase GetXRefEntry(int id)
+        public TokenObject GetXRefEntry(int id)
         {
             // Ignore zero or more whitespace characters
             SkipWhitespace();
@@ -209,7 +215,20 @@ namespace PdfXenon.Standard
             return ConvertDecimalToLong(bytes, end + 1, index - end);
         }
 
-        private Stream Stream { get; set; }
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _reader = null;
+                    Stream.Dispose();
+                    Stream = null;
+                }
+
+                _disposed = true;
+            }
+        }
 
         private TokenReader Reader
         {
@@ -323,7 +342,7 @@ namespace PdfXenon.Standard
             }
         }
 
-        private TokenBase GetAnyToken()
+        private TokenObject GetAnyToken()
         {
             // Ignore zero or more whitespace characters
             SkipWhitespace();
@@ -380,7 +399,7 @@ namespace PdfXenon.Standard
             }
         }
 
-        private TokenBase GetNumber(int end)
+        private TokenObject GetNumber(int end)
         {
             long position = _position + _index;
 
@@ -393,11 +412,11 @@ namespace PdfXenon.Standard
             _index = key;
 
             if (int.TryParse(text, out int integer))
-                return new TokenNumeric(position, integer);
+                return new TokenInteger(position, integer);
             else
             {
-                if (double.TryParse(text, out double real))
-                    return new TokenNumeric(position, real);
+                if (float.TryParse(text, out float real))
+                    return new TokenReal(position, real);
                 else
                 {
                     // String is not a recognized number format
@@ -406,7 +425,7 @@ namespace PdfXenon.Standard
             }
         }
 
-        private TokenBase GetKeyword(int end)
+        private TokenObject GetKeyword(int end)
         {
             long position = _position + _index;
 
@@ -426,7 +445,7 @@ namespace PdfXenon.Standard
             return new TokenError(position, $"Cannot parse '{text}' as a keyword.");
         }
 
-        private TokenBase GetComment()
+        private TokenObject GetComment()
         {
             long position = _position + _index;
 
@@ -439,7 +458,7 @@ namespace PdfXenon.Standard
             return new TokenComment(position, comment);
         }
 
-        private TokenBase GetName()
+        private TokenObject GetName()
         {
             long position = _position + _index;
 
@@ -469,7 +488,7 @@ namespace PdfXenon.Standard
             return new TokenName(position, name);
         }
 
-        private TokenBase GetDictionaryOpenOrHexString()
+        private TokenObject GetDictionaryOpenOrHexString()
         {
             long position = _position + _index;
 
@@ -499,11 +518,11 @@ namespace PdfXenon.Standard
                 string str = new string(Encoding.ASCII.GetChars(_line, _index, end - _index));
                 _index = end + 1;
 
-                return new TokenHexString(position, str);
+                return new TokenStringHex(position, str);
             }
         }
 
-        private TokenBase GetDictionaryClose()
+        private TokenObject GetDictionaryClose()
         {
             long position = _position + _index;
 
@@ -520,7 +539,7 @@ namespace PdfXenon.Standard
             }
         }
 
-        private TokenBase GetStringLiteral()
+        private TokenObject GetStringLiteral()
         {
             long position = _position + _index;
 
@@ -563,7 +582,7 @@ namespace PdfXenon.Standard
                             // Move past the ')' marker
                             _index++;
 
-                            return new TokenLiteralString(position, sb.ToString());
+                            return new TokenStringLiteral(position, sb.ToString());
                         }
                         else
                             nesting--;
@@ -614,7 +633,7 @@ namespace PdfXenon.Standard
             }
         }
 
-        private TokenBase GetStringLiteralUTF16(long position, bool bigEndian)
+        private TokenObject GetStringLiteralUTF16(long position, bool bigEndian)
         {
             int first = _index;
             byte temp;
@@ -630,7 +649,7 @@ namespace PdfXenon.Standard
                     // Move past the ')' marker
                     _index++;
 
-                    return new TokenLiteralString(position, literal);
+                    return new TokenStringLiteral(position, literal);
                 }
 
                 _index += 2;
@@ -647,5 +666,7 @@ namespace PdfXenon.Standard
             // End of content before end of string literal
             return new TokenError(position, $"End of content before end of UTF16 literal string character.");
         }
+
+        private Stream Stream { get; set; }
     }
 }

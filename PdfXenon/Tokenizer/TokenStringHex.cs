@@ -1,34 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class TokenHexString : TokenString
+    public class TokenStringHex : TokenString
     {
         private string _actual;
 
-        public TokenHexString(long position, string str)
-            : base(position)
+        public TokenStringHex(long position, string rawString)
+            : base(position, rawString)
         {
-            HexString = str;
         }
 
         public override string ToString()
         {
-            return $"HexString: Len:{HexString.Length}, Pos: {Position}";
+            return $"String ({Position}): Hex Len:{RawString.Length}";
         }
 
-        public string HexString { get; private set; }
-
-        public override string ActualString
+        public override string ResolvedString
         {
             get
             {
                 if (_actual == null)
                 {
                     // Remove all whitespace from the hex string
-                    string[] sections = HexString.Split(new char[] { '\0', '\t', '\n', '\f', '\r', ' ' });
+                    string[] sections = RawString.Split(new char[] { '\0', '\t', '\n', '\f', '\r', ' ' });
                     string hex = string.Join(string.Empty, sections);
 
                     // If a missing character from last hex pair, then default to 0, as per the spec

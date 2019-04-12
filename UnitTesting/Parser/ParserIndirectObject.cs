@@ -12,117 +12,111 @@ namespace ParserUnitTesting
         [Fact]
         public void NumericInteger1()
         {
-            PdfParser p = new PdfParser(StringToStream("1 0 obj 42 endobj"));
-            PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
+            Parser p = new Parser(StringToStream("1 0 obj 42 endobj"));
+            ParseIndirectObject i = p.ParseIndirectObject() as ParseIndirectObject;
 
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Obj);
+            Assert.NotNull(i.Child);
 
-            PdfNumeric o = i.Obj as PdfNumeric;
+            ParseInteger o = i.Child as ParseInteger;
             Assert.NotNull(o);
-            Assert.True(o.IsInteger);
             Assert.True(o.Integer == 42);
         }
 
         [Fact]
         public void NumericInteger2()
         {
-            PdfParser p = new PdfParser(StringToStream("99 0 obj\n42\nendobj"));
-            PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
+            Parser p = new Parser(StringToStream("99 0 obj\n42\nendobj"));
+            ParseIndirectObject i = p.ParseIndirectObject() as ParseIndirectObject;
 
             Assert.NotNull(i);
             Assert.True(i.Id == 99);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Obj);
+            Assert.NotNull(i.Child);
 
-            PdfNumeric o = i.Obj as PdfNumeric;
+            ParseInteger o = i.Child as ParseInteger;
             Assert.NotNull(o);
-            Assert.True(o.IsInteger);
             Assert.True(o.Integer == 42);
         }
 
         [Fact]
         public void NumericInteger3()
         {
-            PdfParser p = new PdfParser(StringToStream("1 99 obj\n42 endobj"));
-            PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
+            Parser p = new Parser(StringToStream("1 99 obj\n42 endobj"));
+            ParseIndirectObject i = p.ParseIndirectObject() as ParseIndirectObject;
 
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 99);
-            Assert.NotNull(i.Obj);
+            Assert.NotNull(i.Child);
 
-            PdfNumeric o = i.Obj as PdfNumeric;
+            ParseInteger o = i.Child as ParseInteger;
             Assert.NotNull(o);
-            Assert.True(o.IsInteger);
             Assert.True(o.Integer == 42);
         }
 
         [Fact]
         public void NumericInteger4()
         {
-            PdfParser p = new PdfParser(StringToStream("101 102 obj 42\nendobj"));
-            PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
+            Parser p = new Parser(StringToStream("101 102 obj 42\nendobj"));
+            ParseIndirectObject i = p.ParseIndirectObject() as ParseIndirectObject;
 
             Assert.NotNull(i);
             Assert.True(i.Id == 101);
             Assert.True(i.Gen == 102);
-            Assert.NotNull(i.Obj);
+            Assert.NotNull(i.Child);
 
-            PdfNumeric o = i.Obj as PdfNumeric;
+            ParseInteger o = i.Child as ParseInteger;
             Assert.NotNull(o);
-            Assert.True(o.IsInteger);
             Assert.True(o.Integer == 42);
         }
 
         [Fact]
         public void NumericInteger5()
         {
-            PdfParser p = new PdfParser(StringToStream("1 0 obj42 endobj"));
-            PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
+            Parser p = new Parser(StringToStream("1 0 obj42 endobj"));
+            ParseIndirectObject i = p.ParseIndirectObject() as ParseIndirectObject;
 
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Obj);
+            Assert.NotNull(i.Child);
 
-            PdfNumeric o = i.Obj as PdfNumeric;
+            ParseInteger o = i.Child as ParseInteger;
             Assert.NotNull(o);
-            Assert.True(o.IsInteger);
             Assert.True(o.Integer == 42);
         }
 
         [Fact]
         public void NumericInteger6()
         {
-            PdfParser p = new PdfParser(StringToStream("1 0 obj42endobj"));
-            PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
+            Parser p = new Parser(StringToStream("1 0 obj42endobj"));
+            ParseIndirectObject i = p.ParseIndirectObject() as ParseIndirectObject;
 
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Obj);
+            Assert.NotNull(i.Child);
 
-            PdfNumeric o = i.Obj as PdfNumeric;
+            ParseInteger o = i.Child as ParseInteger;
             Assert.NotNull(o);
-            Assert.True(o.IsInteger);
             Assert.True(o.Integer == 42);
         }
 
         [Fact]
         public void StringLiteral()
         {
-            PdfParser p = new PdfParser(StringToStream("1 0 obj\n(de)\nendobj"));
-            PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
+            Parser p = new Parser(StringToStream("1 0 obj\n(de)\nendobj"));
+            ParseIndirectObject i = p.ParseIndirectObject() as ParseIndirectObject;
 
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Obj);
+            Assert.NotNull(i.Child);
 
-            PdfString o = i.Obj as PdfString;
+            ParseString o = i.Child as ParseString;
             Assert.NotNull(o);
             Assert.True(o.String == "de");
         }
@@ -130,15 +124,15 @@ namespace ParserUnitTesting
         [Fact]
         public void Name()
         {
-            PdfParser p = new PdfParser(StringToStream("1 0 obj\n/Example\nendobj"));
-            PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
+            Parser p = new Parser(StringToStream("1 0 obj\n/Example\nendobj"));
+            ParseIndirectObject i = p.ParseIndirectObject() as ParseIndirectObject;
 
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Obj);
+            Assert.NotNull(i.Child);
 
-            PdfName o = i.Obj as PdfName;
+            ParseName o = i.Child as ParseName;
             Assert.NotNull(o);
             Assert.True(o.Name == "Example");
         }
@@ -146,39 +140,38 @@ namespace ParserUnitTesting
         [Fact]
         public void Array()
         {
-            PdfParser p = new PdfParser(StringToStream("1 0 obj\n[42]\nendobj"));
-            PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
+            Parser p = new Parser(StringToStream("1 0 obj\n[42]\nendobj"));
+            ParseIndirectObject i = p.ParseIndirectObject() as ParseIndirectObject;
 
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Obj);
+            Assert.NotNull(i.Child);
 
-            PdfArray o = i.Obj as PdfArray;
+            ParseArray o = i.Child as ParseArray;
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 1);
-            Assert.True(o.Objects[0] is PdfNumeric);
-            Assert.True((o.Objects[0] as PdfNumeric).IsInteger);
-            Assert.True((o.Objects[0] as PdfNumeric).Integer == 42);
+            Assert.True(o.Objects[0] is ParseInteger);
+            Assert.True((o.Objects[0] as ParseInteger).Integer == 42);
         }
 
         [Fact]
         public void Dict()
         {
-            PdfParser p = new PdfParser(StringToStream("1 0 obj\n<</Type (Example)>>\nendobj"));
-            PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
+            Parser p = new Parser(StringToStream("1 0 obj\n<</Type (Example)>>\nendobj"));
+            ParseIndirectObject i = p.ParseIndirectObject() as ParseIndirectObject;
 
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Obj);
+            Assert.NotNull(i.Child);
 
-            PdfDictionary o = i.Obj as PdfDictionary;
+            ParseDictionary o = i.Child as ParseDictionary;
             Assert.NotNull(o);
             Assert.True(o.Count == 1);
             Assert.True(o["Type"].Name.Name == "Type");
-            Assert.True(o["Type"].Object is PdfString);
-            Assert.True((o["Type"].Object as PdfString).String == "Example");
+            Assert.True(o["Type"].Object is ParseString);
+            Assert.True((o["Type"].Object as ParseString).String == "Example");
         }
     }
 }

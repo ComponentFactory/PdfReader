@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PdfXenon.Standard
+﻿namespace PdfXenon.Standard
 {
-    public class TokenXRefEntry : TokenBase
+    public class TokenXRefEntry : TokenObject
     {
         public TokenXRefEntry(long position, int id, int gen, int offset, bool used)
             : base(position)
@@ -17,7 +13,7 @@ namespace PdfXenon.Standard
 
         public override string ToString()
         {
-            return $"XRef Entry: Id:{Id}, Gen:{Gen} Offset:{Offset} Used:{Used}";
+            return $"XRef ({Position}): Id:{Id} Gen:{Gen} Offset:{Offset} Used:{Used}";
         }
 
         public int Id { get; private set; }

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PdfXenon.Standard
+﻿namespace PdfXenon.Standard
 {
-    public class TokenName : TokenBase
+    public class TokenName : TokenObject
     {
         public TokenName(long position, string name)
             : base(position)
@@ -14,7 +10,7 @@ namespace PdfXenon.Standard
 
         public override string ToString()
         {
-            return $"Name: {Name}, Pos: {Position}";
+            return $"Name ({Position}): {Name}";
         }
 
         public string Name { get; private set; }

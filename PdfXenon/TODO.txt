@@ -1,3 +1,1 @@
-﻿Parser needs callback to resolve references
-Document resolve recursively
-Stream length needs to be resolvable
+﻿Document resolve recursively

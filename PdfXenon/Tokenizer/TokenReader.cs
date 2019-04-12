@@ -41,12 +41,15 @@ namespace PdfXenon.Standard
                 Array.Copy(_bytes, _start, ret, 0, copy);
                 index += copy;
                 _start += copy;
+                Position += copy;
             }
 
             // Read remaining bytes directly from the stream
             if (index < length)
             {
                 int copied = _stream.Read(ret, index, length - index);
+                Position += copied;
+
                 if (copied < (length - index))
                     return null;
             }

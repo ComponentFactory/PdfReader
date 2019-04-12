@@ -12,7 +12,7 @@ namespace ParserUnitTesting
         [Fact]
         public void NumericInteger1()
         {
-            Parser p = new Parser(StringToStream("1 0 obj 42 endobj"));
+            PdfParser p = new PdfParser(StringToStream("1 0 obj 42 endobj"));
             PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
 
             Assert.NotNull(i);
@@ -29,7 +29,7 @@ namespace ParserUnitTesting
         [Fact]
         public void NumericInteger2()
         {
-            Parser p = new Parser(StringToStream("99 0 obj\n42\nendobj"));
+            PdfParser p = new PdfParser(StringToStream("99 0 obj\n42\nendobj"));
             PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
 
             Assert.NotNull(i);
@@ -46,7 +46,7 @@ namespace ParserUnitTesting
         [Fact]
         public void NumericInteger3()
         {
-            Parser p = new Parser(StringToStream("1 99 obj\n42 endobj"));
+            PdfParser p = new PdfParser(StringToStream("1 99 obj\n42 endobj"));
             PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
 
             Assert.NotNull(i);
@@ -63,7 +63,7 @@ namespace ParserUnitTesting
         [Fact]
         public void NumericInteger4()
         {
-            Parser p = new Parser(StringToStream("101 102 obj 42\nendobj"));
+            PdfParser p = new PdfParser(StringToStream("101 102 obj 42\nendobj"));
             PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
 
             Assert.NotNull(i);
@@ -80,7 +80,7 @@ namespace ParserUnitTesting
         [Fact]
         public void NumericInteger5()
         {
-            Parser p = new Parser(StringToStream("1 0 obj42 endobj"));
+            PdfParser p = new PdfParser(StringToStream("1 0 obj42 endobj"));
             PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
 
             Assert.NotNull(i);
@@ -97,7 +97,7 @@ namespace ParserUnitTesting
         [Fact]
         public void NumericInteger6()
         {
-            Parser p = new Parser(StringToStream("1 0 obj42endobj"));
+            PdfParser p = new PdfParser(StringToStream("1 0 obj42endobj"));
             PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
 
             Assert.NotNull(i);
@@ -114,7 +114,7 @@ namespace ParserUnitTesting
         [Fact]
         public void StringLiteral()
         {
-            Parser p = new Parser(StringToStream("1 0 obj\n(de)\nendobj"));
+            PdfParser p = new PdfParser(StringToStream("1 0 obj\n(de)\nendobj"));
             PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
 
             Assert.NotNull(i);
@@ -130,7 +130,7 @@ namespace ParserUnitTesting
         [Fact]
         public void Name()
         {
-            Parser p = new Parser(StringToStream("1 0 obj\n/Example\nendobj"));
+            PdfParser p = new PdfParser(StringToStream("1 0 obj\n/Example\nendobj"));
             PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
 
             Assert.NotNull(i);
@@ -146,7 +146,7 @@ namespace ParserUnitTesting
         [Fact]
         public void Array()
         {
-            Parser p = new Parser(StringToStream("1 0 obj\n[42]\nendobj"));
+            PdfParser p = new PdfParser(StringToStream("1 0 obj\n[42]\nendobj"));
             PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
 
             Assert.NotNull(i);
@@ -165,7 +165,7 @@ namespace ParserUnitTesting
         [Fact]
         public void Dict()
         {
-            Parser p = new Parser(StringToStream("1 0 obj\n<</Type (Example)>>\nendobj"));
+            PdfParser p = new PdfParser(StringToStream("1 0 obj\n<</Type (Example)>>\nendobj"));
             PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
 
             Assert.NotNull(i);

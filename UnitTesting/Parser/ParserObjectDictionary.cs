@@ -12,7 +12,7 @@ namespace ParserUnitTesting
         [Fact]
         public void DictEmpty()
         {
-            Parser p = new Parser(StringToStream("<<>>"));
+            PdfParser p = new PdfParser(StringToStream("<<>>"));
             PdfDictionary d = p.ParseObject() as PdfDictionary;
 
             Assert.NotNull(d);
@@ -22,7 +22,7 @@ namespace ParserUnitTesting
         [Fact]
         public void DictStringLiteral()
         {
-            Parser p = new Parser(StringToStream("<</Example (de)>>"));
+            PdfParser p = new PdfParser(StringToStream("<</Example (de)>>"));
             PdfDictionary d = p.ParseObject() as PdfDictionary;
 
             Assert.NotNull(d);
@@ -38,7 +38,7 @@ namespace ParserUnitTesting
         [Fact]
         public void DictStringHex()
         {
-            Parser p = new Parser(StringToStream("<</Example <6465>>>"));
+            PdfParser p = new PdfParser(StringToStream("<</Example <6465>>>"));
             PdfDictionary d = p.ParseObject() as PdfDictionary;
 
             Assert.NotNull(d);
@@ -54,7 +54,7 @@ namespace ParserUnitTesting
         [Fact]
         public void DictNumericInteger()
         {
-            Parser p = new Parser(StringToStream("<</Example 42>>"));
+            PdfParser p = new PdfParser(StringToStream("<</Example 42>>"));
             PdfDictionary d = p.ParseObject() as PdfDictionary;
 
             Assert.NotNull(d);
@@ -71,7 +71,7 @@ namespace ParserUnitTesting
         [Fact]
         public void DictNumericReal()
         {
-            Parser p = new Parser(StringToStream("<</Example 3.14>>"));
+            PdfParser p = new PdfParser(StringToStream("<</Example 3.14>>"));
             PdfDictionary d = p.ParseObject() as PdfDictionary;
 
             Assert.NotNull(d);
@@ -88,7 +88,7 @@ namespace ParserUnitTesting
         [Fact]
         public void DictNull()
         {
-            Parser p = new Parser(StringToStream("<</Example null>>"));
+            PdfParser p = new PdfParser(StringToStream("<</Example null>>"));
             PdfDictionary d = p.ParseObject() as PdfDictionary;
 
             Assert.NotNull(d);
@@ -103,7 +103,7 @@ namespace ParserUnitTesting
         [Fact]
         public void DictName1()
         {
-            Parser p = new Parser(StringToStream("<</Example /Other>>"));
+            PdfParser p = new PdfParser(StringToStream("<</Example /Other>>"));
             PdfDictionary d = p.ParseObject() as PdfDictionary;
 
             Assert.NotNull(d);
@@ -119,7 +119,7 @@ namespace ParserUnitTesting
         [Fact]
         public void DictName2()
         {
-            Parser p = new Parser(StringToStream("<</Example/Other>>"));
+            PdfParser p = new PdfParser(StringToStream("<</Example/Other>>"));
             PdfDictionary d = p.ParseObject() as PdfDictionary;
 
             Assert.NotNull(d);
@@ -135,7 +135,7 @@ namespace ParserUnitTesting
         [Fact]
         public void DictBooleanTrue()
         {
-            Parser p = new Parser(StringToStream("<</Example true>>"));
+            PdfParser p = new PdfParser(StringToStream("<</Example true>>"));
             PdfDictionary d = p.ParseObject() as PdfDictionary;
 
             Assert.NotNull(d);
@@ -151,7 +151,7 @@ namespace ParserUnitTesting
         [Fact]
         public void DictObjectReference1()
         {
-            Parser p = new Parser(StringToStream("<</Example 99 1 R>>"));
+            PdfParser p = new PdfParser(StringToStream("<</Example 99 1 R>>"));
             PdfDictionary d = p.ParseObject() as PdfDictionary;
 
             Assert.NotNull(d);
@@ -168,7 +168,7 @@ namespace ParserUnitTesting
         [Fact]
         public void DictObjectReference2()
         {
-            Parser p = new Parser(StringToStream("<</Example 99 1 R /Other 2>>"));
+            PdfParser p = new PdfParser(StringToStream("<</Example 99 1 R /Other 2>>"));
             PdfDictionary d = p.ParseObject() as PdfDictionary;
 
             Assert.NotNull(d);
@@ -192,7 +192,7 @@ namespace ParserUnitTesting
         [Fact]
         public void DictMultiple()
         {
-            Parser p = new Parser(StringToStream("<</1 /Example /2 (de) /3 3.14 /4 null>>"));
+            PdfParser p = new PdfParser(StringToStream("<</1 /Example /2 (de) /3 3.14 /4 null>>"));
             PdfDictionary d = p.ParseObject() as PdfDictionary;
 
             Assert.NotNull(d);
@@ -226,7 +226,7 @@ namespace ParserUnitTesting
         [Fact]
         public void DictMultipleCompact()
         {
-            Parser p = new Parser(StringToStream("<</1/Example/2(de)/3 3.14/4 null>>"));
+            PdfParser p = new PdfParser(StringToStream("<</1/Example/2(de)/3 3.14/4 null>>"));
             PdfDictionary d = p.ParseObject() as PdfDictionary;
 
             Assert.NotNull(d);
@@ -260,7 +260,7 @@ namespace ParserUnitTesting
         [Fact]
         public void DictArray()
         {
-            Parser p = new Parser(StringToStream("<</1 [/Example (de) 3.14 null]>>"));
+            PdfParser p = new PdfParser(StringToStream("<</1 [/Example (de) 3.14 null]>>"));
             PdfDictionary d = p.ParseObject() as PdfDictionary;
 
             Assert.NotNull(d);
@@ -287,7 +287,7 @@ namespace ParserUnitTesting
         [Fact]
         public void DictInDict1()
         {
-            Parser p = new Parser(StringToStream("<</1 <</1 (de)>>>>"));
+            PdfParser p = new PdfParser(StringToStream("<</1 <</1 (de)>>>>"));
             PdfDictionary d = p.ParseObject() as PdfDictionary;
 
             Assert.NotNull(d);
@@ -311,7 +311,7 @@ namespace ParserUnitTesting
         [Fact]
         public void DictInDict2()
         {
-            Parser p = new Parser(StringToStream("<</1 <</A (de)>> /2 <</B (fg)>>>>"));
+            PdfParser p = new PdfParser(StringToStream("<</1 <</A (de)>> /2 <</B (fg)>>>>"));
             PdfDictionary d = p.ParseObject() as PdfDictionary;
 
             Assert.NotNull(d);

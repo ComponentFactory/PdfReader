@@ -95,6 +95,15 @@ namespace PdfXenon.Standard
 
         public long Position
         {
+            get
+            {
+                // The Reader class keeps track of the actual cursor position when buffering data
+                if (Reader != null)
+                    return Reader.Position;
+                else
+                    return Stream.Position;
+            }
+
             set
             {
                 // Clear any cached bytes

@@ -12,7 +12,7 @@ namespace ParserUnitTesting
         [Fact]
         public void Unfiltered1()
         {
-            Parser p = new Parser(StringToStream("1 0 obj<</Length 2>>stream\n\rdeendstream\nendobj"));
+            PdfParser p = new PdfParser(StringToStream("1 0 obj<</Length 2>>stream\n\rdeendstream\nendobj"));
             PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
 
             Assert.NotNull(i);
@@ -28,7 +28,7 @@ namespace ParserUnitTesting
         [Fact]
         public void Unfiltered2()
         {
-            Parser p = new Parser(StringToStream("1 0 obj<</Length 2>>stream\rde\nendstream\nendobj"));
+            PdfParser p = new PdfParser(StringToStream("1 0 obj<</Length 2>>stream\rde\nendstream\nendobj"));
             PdfIndirectObject i = p.ParseIndirectObject() as PdfIndirectObject;
 
             Assert.NotNull(i);

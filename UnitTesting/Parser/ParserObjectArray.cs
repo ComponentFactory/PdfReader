@@ -12,7 +12,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayEmpty()
         {
-            Parser p = new Parser(StringToStream("[]"));
+            PdfParser p = new PdfParser(StringToStream("[]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -22,7 +22,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayName()
         {
-            Parser p = new Parser(StringToStream("[/Example]"));
+            PdfParser p = new PdfParser(StringToStream("[/Example]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -34,7 +34,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayNumericInteger()
         {
-            Parser p = new Parser(StringToStream("[42]"));
+            PdfParser p = new PdfParser(StringToStream("[42]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -47,7 +47,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayNumericReal()
         {
-            Parser p = new Parser(StringToStream("[3.14]"));
+            PdfParser p = new PdfParser(StringToStream("[3.14]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -60,7 +60,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayStringHex()
         {
-            Parser p = new Parser(StringToStream("[<6465>]"));
+            PdfParser p = new PdfParser(StringToStream("[<6465>]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -72,7 +72,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayStringLiteral()
         {
-            Parser p = new Parser(StringToStream("[(de)]"));
+            PdfParser p = new PdfParser(StringToStream("[(de)]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -84,7 +84,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayBooleanTrue()
         {
-            Parser p = new Parser(StringToStream("[true]"));
+            PdfParser p = new PdfParser(StringToStream("[true]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -96,7 +96,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayNull()
         {
-            Parser p = new Parser(StringToStream("[null]"));
+            PdfParser p = new PdfParser(StringToStream("[null]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -107,7 +107,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayObjectReference1()
         {
-            Parser p = new Parser(StringToStream("[1 99 R]"));
+            PdfParser p = new PdfParser(StringToStream("[1 99 R]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -120,7 +120,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayObjectReference2()
         {
-            Parser p = new Parser(StringToStream("[42 1 99 R]"));
+            PdfParser p = new PdfParser(StringToStream("[42 1 99 R]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -136,7 +136,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayObjectReference3()
         {
-            Parser p = new Parser(StringToStream("[42 2 1 99 R]"));
+            PdfParser p = new PdfParser(StringToStream("[42 2 1 99 R]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -155,7 +155,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayObjectReference4()
         {
-            Parser p = new Parser(StringToStream("[42 2 null 1 99 R]"));
+            PdfParser p = new PdfParser(StringToStream("[42 2 null 1 99 R]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -175,7 +175,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayMultiple()
         {
-            Parser p = new Parser(StringToStream("[/Example (de) 3.14 1 99 R null]"));
+            PdfParser p = new PdfParser(StringToStream("[/Example (de) 3.14 1 99 R null]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -196,7 +196,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayInArray1()
         {
-            Parser p = new Parser(StringToStream("[[/Example]]"));
+            PdfParser p = new PdfParser(StringToStream("[[/Example]]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -211,7 +211,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayInArray2()
         {
-            Parser p = new Parser(StringToStream("[[/Example] null]"));
+            PdfParser p = new PdfParser(StringToStream("[[/Example] null]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -228,7 +228,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayInArray3()
         {
-            Parser p = new Parser(StringToStream("[null [/Example]]"));
+            PdfParser p = new PdfParser(StringToStream("[null [/Example]]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -245,7 +245,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayInArray4()
         {
-            Parser p = new Parser(StringToStream("[null [/Example] 42]"));
+            PdfParser p = new PdfParser(StringToStream("[null [/Example] 42]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -265,7 +265,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayInArray5()
         {
-            Parser p = new Parser(StringToStream("[null [/Example] [null] 42]"));
+            PdfParser p = new PdfParser(StringToStream("[null [/Example] [null] 42]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);
@@ -290,7 +290,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ArrayDict()
         {
-            Parser p = new Parser(StringToStream("[<</Example (de)>>]"));
+            PdfParser p = new PdfParser(StringToStream("[<</Example (de)>>]"));
             PdfArray o = p.ParseObject() as PdfArray;
 
             Assert.NotNull(o);

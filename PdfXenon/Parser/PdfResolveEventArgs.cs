@@ -4,9 +4,10 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class ResolveEventArgs : EventArgs
+    public class PdfResolveEventArgs : EventArgs
     {
-        public PdfObjectReference Reference { get; set; }
+        public int Id { get; set; }
+        public int Gen { get; set; }
         public PdfObject Object { get; set; }
     }
 }

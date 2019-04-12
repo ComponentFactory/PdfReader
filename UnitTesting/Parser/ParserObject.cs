@@ -12,7 +12,7 @@ namespace ParserUnitTesting
         [Fact]
         public void Name()
         {
-            Parser p = new Parser(StringToStream("/Example"));
+            PdfParser p = new PdfParser(StringToStream("/Example"));
             PdfName o = p.ParseObject() as PdfName;
 
             Assert.NotNull(o);
@@ -22,7 +22,7 @@ namespace ParserUnitTesting
         [Fact]
         public void NumericInteger()
         {
-            Parser p = new Parser(StringToStream("42"));
+            PdfParser p = new PdfParser(StringToStream("42"));
             PdfNumeric o = p.ParseObject() as PdfNumeric;
 
             Assert.NotNull(o);
@@ -33,7 +33,7 @@ namespace ParserUnitTesting
         [Fact]
         public void NumericReal()
         {
-            Parser p = new Parser(StringToStream("3.14"));
+            PdfParser p = new PdfParser(StringToStream("3.14"));
             PdfNumeric o = p.ParseObject() as PdfNumeric;
 
             Assert.NotNull(o);
@@ -44,7 +44,7 @@ namespace ParserUnitTesting
         [Fact]
         public void StringHex()
         {
-            Parser p = new Parser(StringToStream("<6465>"));
+            PdfParser p = new PdfParser(StringToStream("<6465>"));
             PdfString o = p.ParseObject() as PdfString;
 
             Assert.NotNull(o);
@@ -54,7 +54,7 @@ namespace ParserUnitTesting
         [Fact]
         public void StringLiteral()
         {
-            Parser p = new Parser(StringToStream("(de)"));
+            PdfParser p = new PdfParser(StringToStream("(de)"));
             PdfString o = p.ParseObject() as PdfString;
 
             Assert.NotNull(o);
@@ -64,7 +64,7 @@ namespace ParserUnitTesting
         [Fact]
         public void BooleanTrue()
         {
-            Parser p = new Parser(StringToStream("true"));
+            PdfParser p = new PdfParser(StringToStream("true"));
             PdfBoolean o = p.ParseObject() as PdfBoolean;
 
             Assert.NotNull(o);
@@ -74,7 +74,7 @@ namespace ParserUnitTesting
         [Fact]
         public void BooleanFalse()
         {
-            Parser p = new Parser(StringToStream("false"));
+            PdfParser p = new PdfParser(StringToStream("false"));
             PdfBoolean o = p.ParseObject() as PdfBoolean;
 
             Assert.NotNull(o);
@@ -84,7 +84,7 @@ namespace ParserUnitTesting
         [Fact]
         public void Null()
         {
-            Parser p = new Parser(StringToStream("null"));
+            PdfParser p = new PdfParser(StringToStream("null"));
             PdfNull o = p.ParseObject() as PdfNull;
 
             Assert.NotNull(o);
@@ -93,7 +93,7 @@ namespace ParserUnitTesting
         [Fact]
         public void ObjectReference()
         {
-            Parser p = new Parser(StringToStream("2 0 R"));
+            PdfParser p = new PdfParser(StringToStream("2 0 R"));
             PdfObjectReference o = p.ParseObject() as PdfObjectReference;
 
             Assert.NotNull(o);

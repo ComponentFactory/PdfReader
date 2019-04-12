@@ -5,11 +5,11 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class Parser
+    public class PdfParser
     {
-        public event EventHandler<ResolveEventArgs> ResolveReference;
+        public event EventHandler<PdfResolveEventArgs> ResolveReference;
 
-        public Parser(Stream stream)
+        public PdfParser(Stream stream)
         {
             Tokenizer = new Tokenizer(stream);
         }
@@ -121,8 +121,16 @@ namespace PdfXenon.Standard
 
         public PdfIndirectObject ParseIndirectObject(long position)
         {
+            long restore = Tokenizer.Position;
+
+            // Set correct position for parsing the randomly positioned object
             Tokenizer.Position = position;
-            return ParseIndirectObject();
+            PdfIndirectObject ret = ParseIndirectObject();
+
+            // Must restore original position so caller can continue from where they left off
+            Tokenizer.Position = restore;
+
+            return ret;
         }
 
         public PdfIndirectObject ParseIndirectObject()
@@ -363,7 +371,7 @@ namespace PdfXenon.Standard
 
         protected virtual PdfObject OnResolveReference(PdfObjectReference reference)
         {
-            ResolveEventArgs args = new ResolveEventArgs() { Reference = reference };
+            PdfResolveEventArgs args = new PdfResolveEventArgs() { Id = reference.Id, Gen = reference.Gen };
             ResolveReference?.Invoke(this, args);
             return args.Object;
         }

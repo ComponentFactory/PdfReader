@@ -9,9 +9,10 @@ namespace ConsoleApp
         static void Main(string[] args)
         {
             Document document = new Document();
-            document.Load(@"d:\Coffee.pdf");
+            document.Load(@"d:\Blank.pdf");
 
             Console.ReadLine();
         }
+
     }
 }

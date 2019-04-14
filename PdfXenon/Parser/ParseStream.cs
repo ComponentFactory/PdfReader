@@ -64,10 +64,39 @@ namespace PdfXenon.Standard
 
         private byte[] DecodedBytes()
         {
-            if (!HasFilter)
-                return _streamBytes;
+            byte[] bytes = _streamBytes;
 
-            using (MemoryStream inputStream = new MemoryStream(_streamBytes))
+            if (HasFilter)
+            {
+                // Get the filtering as an array to be applied in order (if a single filter then convert from Name to an Array of one entry)
+                ParseDictEntry entry = _dictionary["Filter"];
+                ParseArray filters = entry.Object as ParseArray;
+                if ((filters == null) && (entry.Object is ParseName))
+                    filters = new ParseArray(entry.Object.Position, new List<ParseObject>() { entry.Object });
+
+                foreach (ParseName filter in filters.Objects)
+                {
+                    switch (filter.Value)
+                    {
+                        case "FlateDecode":
+                            bytes = FlateDecode(bytes);
+                            break;
+                        // TODO
+                        //case "DCTDecode":
+                        //    bytes = DCTDecode(bytes);
+                        //    break;
+                        default:
+                            throw new ApplicationException($"Cannot process unrecognized stream filter '{filter.Value}' at {Position}.");
+                    }
+                }
+            }
+
+            return bytes;
+        }
+
+        private byte[] FlateDecode(byte[] bytes)
+        {
+            using (MemoryStream inputStream = new MemoryStream(bytes))
             {
                 using (MemoryStream outputStream = new MemoryStream())
                 {
@@ -76,10 +105,22 @@ namespace PdfXenon.Standard
                         // Skip the two byte zlib header
                         inputStream.Position = 2;
                         decodeStream.CopyTo(outputStream);
-                        return outputStream.GetBuffer();
+                        bytes = outputStream.GetBuffer();
                     }
                 }
             }
+
+            // TODO
+            if (_dictionary.ContainsName("Predictor"))
+                throw new ApplicationException($"Cannot process FlatDecode predictors at {Position}.");
+
+            return bytes;
+        }
+
+        private byte[] DCTDecode(byte[] bytes)
+        {
+            // TODO
+            return bytes;
         }
     }
 }

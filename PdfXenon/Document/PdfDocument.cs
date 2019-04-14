@@ -26,7 +26,7 @@ namespace PdfXenon.Standard
         public void Load(string filename, bool immediate = false)
         {
             if (_open)
-                throw new ApplicationException("Cannot load when document already has a stream open.");
+                throw new ApplicationException("Document already has a stream open.");
 
             _reader = new StreamReader(filename);
             Load(_reader.BaseStream, immediate);
@@ -35,7 +35,7 @@ namespace PdfXenon.Standard
         public void Load(Stream stream, bool immediate = false)
         {
             if (_open)
-                throw new ApplicationException("Cannot load when document already has a stream open.");
+                throw new ApplicationException("Document already has a stream open.");
 
             try
             {

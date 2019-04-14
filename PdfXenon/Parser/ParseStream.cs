@@ -10,6 +10,7 @@ namespace PdfXenon.Standard
     {
         private ParseDictionary _dictionary;
         private byte[] _streamBytes;
+        private byte[] _byteContent;
         private string _stringContent;
 
         public ParseStream(ParseDictionary dictionary, byte[] streamBytes)
@@ -21,15 +22,28 @@ namespace PdfXenon.Standard
 
         public override string ToString()
         {
-            if (HasFilter)
-                return $"ParseStream ({Position}): Filtered Len:{_streamBytes.Length}";
-            else
-                return $"ParseStream ({Position}): {ContentAsString}";
+            return $"ParseStream ({Position}): {ContentAsString}";
         }
 
         public bool HasFilter
         {
             get { return _dictionary.ContainsName("Filter"); }
+        }
+
+        public byte[] ContentAsBytes
+        {
+            get
+            {
+                if (_byteContent == null)
+                {
+                    if (_streamBytes == null)
+                        return null;
+                    else
+                        _byteContent = DecodedBytes();
+                }
+
+                return _byteContent;
+            }
         }
 
         public string ContentAsString
@@ -41,10 +55,30 @@ namespace PdfXenon.Standard
                     if (_streamBytes == null)
                         return string.Empty;
                     else
-                        _stringContent = Encoding.ASCII.GetString(_streamBytes);
+                        _stringContent = Encoding.ASCII.GetString(DecodedBytes());
                 }
 
                 return _stringContent;
+            }
+        }
+
+        private byte[] DecodedBytes()
+        {
+            if (!HasFilter)
+                return _streamBytes;
+
+            using (MemoryStream inputStream = new MemoryStream(_streamBytes))
+            {
+                using (MemoryStream outputStream = new MemoryStream())
+                {
+                    using (DeflateStream decodeStream = new DeflateStream(inputStream, CompressionMode.Decompress))
+                    {
+                        // Skip the two byte zlib header
+                        inputStream.Position = 2;
+                        decodeStream.CopyTo(outputStream);
+                        return outputStream.GetBuffer();
+                    }
+                }
             }
         }
     }

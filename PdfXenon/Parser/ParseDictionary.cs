@@ -9,8 +9,8 @@ namespace PdfXenon.Standard
         private Dictionary<string, ParseDictEntry> _entries;
 
         public ParseDictionary(long position, Dictionary<string, ParseDictEntry> entries)
+            : base(position)
         {
-            DictionaryOpenPosition = position;
             _entries = entries;
         }
 
@@ -21,7 +21,7 @@ namespace PdfXenon.Standard
             sb.AppendLine($"ParseDictionary ({Position}): Count:{Count} (");
 
             foreach (ParseDictEntry entry in _entries.Values)
-                sb.AppendLine($"    {entry.Name.Name} = {entry.Object.ToString()}");
+                sb.AppendLine($"    {entry.Name.Value} = {entry.Object.ToString()}");
 
             sb.AppendLine(")");
 
@@ -83,10 +83,6 @@ namespace PdfXenon.Standard
                 return false;
             }
         }
-
-        public override long Position { get => DictionaryOpenPosition; }
-
-        private long DictionaryOpenPosition { get; set; }
     }
 
     public class ParseDictEntry

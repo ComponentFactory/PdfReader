@@ -28,7 +28,7 @@ namespace ParserUnitTesting
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 1);
             Assert.True(o.Objects[0] is ParseName);
-            Assert.True((o.Objects[0] as ParseName).Name == "Example");
+            Assert.True((o.Objects[0] as ParseName).Value == "Example");
         }
 
         [Fact]
@@ -40,7 +40,7 @@ namespace ParserUnitTesting
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 1);
             Assert.True(o.Objects[0] is ParseInteger);
-            Assert.True((o.Objects[0] as ParseInteger).Integer == 42);
+            Assert.True((o.Objects[0] as ParseInteger).Value == 42);
         }
 
         [Fact]
@@ -52,7 +52,7 @@ namespace ParserUnitTesting
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 1);
             Assert.True(o.Objects[0] is ParseReal);
-            Assert.True((o.Objects[0] as ParseReal).Real == 3.14f);
+            Assert.True((o.Objects[0] as ParseReal).Value == 3.14f);
         }
 
         [Fact]
@@ -64,7 +64,7 @@ namespace ParserUnitTesting
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 1);
             Assert.True(o.Objects[0] is ParseString);
-            Assert.True((o.Objects[0] as ParseString).String == "de");
+            Assert.True((o.Objects[0] as ParseString).Value == "de");
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace ParserUnitTesting
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 1);
             Assert.True(o.Objects[0] is ParseString);
-            Assert.True((o.Objects[0] as ParseString).String == "de");
+            Assert.True((o.Objects[0] as ParseString).Value == "de");
         }
 
         [Fact]
@@ -124,7 +124,7 @@ namespace ParserUnitTesting
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 2);
             Assert.True(o.Objects[0] is ParseInteger);
-            Assert.True((o.Objects[0] as ParseInteger).Integer == 42);
+            Assert.True((o.Objects[0] as ParseInteger).Value == 42);
             Assert.True(o.Objects[1] is ParseObjectReference);
             Assert.True((o.Objects[1] as ParseObjectReference).Id == 1);
             Assert.True((o.Objects[1] as ParseObjectReference).Gen == 99);
@@ -139,9 +139,9 @@ namespace ParserUnitTesting
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 3);
             Assert.True(o.Objects[0] is ParseInteger);
-            Assert.True((o.Objects[0] as ParseInteger).Integer == 42);
+            Assert.True((o.Objects[0] as ParseInteger).Value == 42);
             Assert.True(o.Objects[1] is ParseInteger);
-            Assert.True((o.Objects[1] as ParseInteger).Integer == 2);
+            Assert.True((o.Objects[1] as ParseInteger).Value == 2);
             Assert.True(o.Objects[2] is ParseObjectReference);
             Assert.True((o.Objects[2] as ParseObjectReference).Id == 1);
             Assert.True((o.Objects[2] as ParseObjectReference).Gen == 99);
@@ -156,9 +156,9 @@ namespace ParserUnitTesting
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 4);
             Assert.True(o.Objects[0] is ParseInteger);
-            Assert.True((o.Objects[0] as ParseInteger).Integer == 42);
+            Assert.True((o.Objects[0] as ParseInteger).Value == 42);
             Assert.True(o.Objects[1] is ParseInteger);
-            Assert.True((o.Objects[1] as ParseInteger).Integer == 2);
+            Assert.True((o.Objects[1] as ParseInteger).Value == 2);
             Assert.True(o.Objects[2] is ParseNull);
             Assert.True(o.Objects[3] is ParseObjectReference);
             Assert.True((o.Objects[3] as ParseObjectReference).Id == 1);
@@ -174,11 +174,11 @@ namespace ParserUnitTesting
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 5);
             Assert.True(o.Objects[0] is ParseName);
-            Assert.True((o.Objects[0] as ParseName).Name == "Example");
+            Assert.True((o.Objects[0] as ParseName).Value == "Example");
             Assert.True(o.Objects[1] is ParseString);
-            Assert.True((o.Objects[1] as ParseString).String == "de");
+            Assert.True((o.Objects[1] as ParseString).Value == "de");
             Assert.True(o.Objects[2] is ParseReal);
-            Assert.True((o.Objects[2] as ParseReal).Real == 3.14f);
+            Assert.True((o.Objects[2] as ParseReal).Value == 3.14f);
             Assert.True(o.Objects[3] is ParseObjectReference);
             Assert.True((o.Objects[3] as ParseObjectReference).Id == 1);
             Assert.True((o.Objects[3] as ParseObjectReference).Gen == 99);
@@ -197,7 +197,7 @@ namespace ParserUnitTesting
 
             o = o.Objects[0] as ParseArray;
             Assert.True(o.Objects[0] is ParseName);
-            Assert.True((o.Objects[0] as ParseName).Name == "Example");
+            Assert.True((o.Objects[0] as ParseName).Value == "Example");
         }
 
         [Fact]
@@ -214,7 +214,7 @@ namespace ParserUnitTesting
             o = o.Objects[0] as ParseArray;
             Assert.True(o.Objects.Count == 1);
             Assert.True(o.Objects[0] is ParseName);
-            Assert.True((o.Objects[0] as ParseName).Name == "Example");
+            Assert.True((o.Objects[0] as ParseName).Value == "Example");
         }
 
         [Fact]
@@ -231,7 +231,7 @@ namespace ParserUnitTesting
             o = o.Objects[1] as ParseArray;
             Assert.True(o.Objects.Count == 1);
             Assert.True(o.Objects[0] is ParseName);
-            Assert.True((o.Objects[0] as ParseName).Name == "Example");
+            Assert.True((o.Objects[0] as ParseName).Value == "Example");
         }
 
         [Fact]
@@ -245,12 +245,12 @@ namespace ParserUnitTesting
             Assert.True(o.Objects[0] is ParseNull);
             Assert.True(o.Objects[1] is ParseArray);
             Assert.True(o.Objects[2] is ParseInteger);
-            Assert.True((o.Objects[2] as ParseInteger).Integer == 42);
+            Assert.True((o.Objects[2] as ParseInteger).Value == 42);
 
             o = o.Objects[1] as ParseArray;
             Assert.True(o.Objects.Count == 1);
             Assert.True(o.Objects[0] is ParseName);
-            Assert.True((o.Objects[0] as ParseName).Name == "Example");
+            Assert.True((o.Objects[0] as ParseName).Value == "Example");
         }
 
         [Fact]
@@ -265,12 +265,12 @@ namespace ParserUnitTesting
             Assert.True(o.Objects[1] is ParseArray);
             Assert.True(o.Objects[2] is ParseArray);
             Assert.True(o.Objects[3] is ParseInteger);
-            Assert.True((o.Objects[3] as ParseInteger).Integer == 42);
+            Assert.True((o.Objects[3] as ParseInteger).Value == 42);
 
             ParseArray o1 = o.Objects[1] as ParseArray;
             Assert.True(o1.Objects.Count == 1);
             Assert.True(o1.Objects[0] is ParseName);
-            Assert.True((o1.Objects[0] as ParseName).Name == "Example");
+            Assert.True((o1.Objects[0] as ParseName).Value == "Example");
 
             ParseArray o2 = o.Objects[2] as ParseArray;
             Assert.True(o2.Objects.Count == 1);
@@ -293,9 +293,9 @@ namespace ParserUnitTesting
 
             ParseDictEntry entry = d["Example"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Name == "Example");
+            Assert.True(entry.Name.Value == "Example");
             Assert.True(entry.Object is ParseString);
-            Assert.True((entry.Object as ParseString).String == "de");
+            Assert.True((entry.Object as ParseString).Value == "de");
         }
     }
 }

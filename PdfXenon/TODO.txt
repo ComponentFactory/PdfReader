@@ -1,1 +1,2 @@
-﻿Split numeric into integer and real
+﻿Use DeflateStream for the FlatDeflate filter
+	https://docs.microsoft.com/en-us/dotnet/api/system.io.compression.deflatestream?view=netframework-4.7.2

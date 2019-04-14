@@ -16,8 +16,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "a");
-            Assert.True(s.ResolvedString == "a");
+            Assert.True(s.Raw == "a");
+            Assert.True(s.Resolved == "a");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -28,8 +28,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "abc");
-            Assert.True(s.ResolvedString == "abc");
+            Assert.True(s.Raw == "abc");
+            Assert.True(s.Resolved == "abc");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -40,8 +40,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 2);
-            Assert.True(s.RawString == "abc");
-            Assert.True(s.ResolvedString == "abc");
+            Assert.True(s.Raw == "abc");
+            Assert.True(s.Resolved == "abc");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -52,8 +52,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 2);
-            Assert.True(s.RawString == "a\nb\nc");
-            Assert.True(s.ResolvedString == "a\nb\nc");
+            Assert.True(s.Raw == "a\nb\nc");
+            Assert.True(s.Resolved == "a\nb\nc");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -64,8 +64,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 2);
-            Assert.True(s.RawString == "abc");
-            Assert.True(s.ResolvedString == "abc");
+            Assert.True(s.Raw == "abc");
+            Assert.True(s.Resolved == "abc");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -76,8 +76,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "abc()d");
-            Assert.True(s.ResolvedString == "abc()d");
+            Assert.True(s.Raw == "abc()d");
+            Assert.True(s.Resolved == "abc()d");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -88,8 +88,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "ab(c)d");
-            Assert.True(s.ResolvedString == "ab(c)d");
+            Assert.True(s.Raw == "ab(c)d");
+            Assert.True(s.Resolved == "ab(c)d");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -100,8 +100,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "a(bc)d");
-            Assert.True(s.ResolvedString == "a(bc)d");
+            Assert.True(s.Raw == "a(bc)d");
+            Assert.True(s.Resolved == "a(bc)d");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -112,8 +112,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "a(b\\(c)\\)d");
-            Assert.True(s.ResolvedString == "a(b(c))d");
+            Assert.True(s.Raw == "a(b\\(c)\\)d");
+            Assert.True(s.Resolved == "a(b(c))d");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -124,8 +124,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "abc\\ndef");
-            Assert.True(s.ResolvedString == "abc\ndef");
+            Assert.True(s.Raw == "abc\\ndef");
+            Assert.True(s.Resolved == "abc\ndef");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -136,8 +136,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "abc\\rdef");
-            Assert.True(s.ResolvedString == "abc\rdef");
+            Assert.True(s.Raw == "abc\\rdef");
+            Assert.True(s.Resolved == "abc\rdef");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -148,8 +148,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "abc\\tdef");
-            Assert.True(s.ResolvedString == "abc\tdef");
+            Assert.True(s.Raw == "abc\\tdef");
+            Assert.True(s.Resolved == "abc\tdef");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -160,8 +160,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "abc\\bdef");
-            Assert.True(s.ResolvedString == "abc\bdef");
+            Assert.True(s.Raw == "abc\\bdef");
+            Assert.True(s.Resolved == "abc\bdef");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -172,8 +172,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "abc\\fdef");
-            Assert.True(s.ResolvedString == "abc\fdef");
+            Assert.True(s.Raw == "abc\\fdef");
+            Assert.True(s.Resolved == "abc\fdef");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -184,8 +184,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "abc\\(def");
-            Assert.True(s.ResolvedString == "abc(def");
+            Assert.True(s.Raw == "abc\\(def");
+            Assert.True(s.Resolved == "abc(def");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -196,8 +196,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "abc\\)def");
-            Assert.True(s.ResolvedString == "abc)def");
+            Assert.True(s.Raw == "abc\\)def");
+            Assert.True(s.Resolved == "abc)def");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -208,8 +208,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "abc\\def");
-            Assert.True(s.ResolvedString == "abc\\def");
+            Assert.True(s.Raw == "abc\\def");
+            Assert.True(s.Resolved == "abc\\def");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -220,8 +220,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "abc\\100def");
-            Assert.True(s.ResolvedString == "abc@def");
+            Assert.True(s.Raw == "abc\\100def");
+            Assert.True(s.Resolved == "abc@def");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -232,8 +232,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "abc\\tdef\\100ghi");
-            Assert.True(s.ResolvedString == "abc\tdef@ghi");
+            Assert.True(s.Raw == "abc\\tdef\\100ghi");
+            Assert.True(s.Resolved == "abc\tdef@ghi");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -244,8 +244,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "abc\\100");
-            Assert.True(s.ResolvedString == "abc@");
+            Assert.True(s.Raw == "abc\\100");
+            Assert.True(s.Resolved == "abc@");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -256,8 +256,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "abc\\11");
-            Assert.True(s.ResolvedString == "abc\t");
+            Assert.True(s.Raw == "abc\\11");
+            Assert.True(s.Resolved == "abc\t");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -268,8 +268,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "abc\\0");
-            Assert.True(s.ResolvedString == "abc\0");
+            Assert.True(s.Raw == "abc\\0");
+            Assert.True(s.Resolved == "abc\0");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -280,8 +280,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "abc\\011");
-            Assert.True(s.ResolvedString == "abc\t");
+            Assert.True(s.Raw == "abc\\011");
+            Assert.True(s.Resolved == "abc\t");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -292,8 +292,8 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.RawString == "abc\\0def");
-            Assert.True(s.ResolvedString == "abc\0def");
+            Assert.True(s.Raw == "abc\\0def");
+            Assert.True(s.Resolved == "abc\0def");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -310,7 +310,7 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.ResolvedString == "W");
+            Assert.True(s.Resolved == "W");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -327,7 +327,7 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.ResolvedString == "€");
+            Assert.True(s.Resolved == "€");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -344,7 +344,7 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.ResolvedString == "𐐷");
+            Assert.True(s.Resolved == "𐐷");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -361,7 +361,7 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.ResolvedString == "𤭢");
+            Assert.True(s.Resolved == "𤭢");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -381,7 +381,7 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.ResolvedString == "𐐷W€𤭢");
+            Assert.True(s.Resolved == "𐐷W€𤭢");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -398,7 +398,7 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.ResolvedString == "W");
+            Assert.True(s.Resolved == "W");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -415,7 +415,7 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.ResolvedString == "€");
+            Assert.True(s.Resolved == "€");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -432,7 +432,7 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.ResolvedString == "𐐷");
+            Assert.True(s.Resolved == "𐐷");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -449,7 +449,7 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.ResolvedString == "𤭢");
+            Assert.True(s.Resolved == "𤭢");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -469,7 +469,7 @@ namespace TokenizerUnitTesting
             TokenStringLiteral s = t.GetToken() as TokenStringLiteral;
             Assert.NotNull(s);
             Assert.True(s.Position == 0);
-            Assert.True(s.ResolvedString == "𐐷W€𤭢");
+            Assert.True(s.Resolved == "𐐷W€𤭢");
             Assert.True(t.GetToken() is TokenEmpty);
         }
     }

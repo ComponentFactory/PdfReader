@@ -3,18 +3,16 @@
     public class ParseName : ParseObject
     {
         public ParseName(TokenName token)
+            : base(token.Position)
         {
-            Token = token;
+            Value = token.Value;
         }
 
         public override string ToString()
         {
-            return $"ParseName ({Position}): {Name}";
+            return $"ParseName ({Position}): {Value}";
         }
 
-        public string Name { get => Token.Name; }
-        public override long Position { get => Token.Position; }
-
-        private TokenName Token { get; set; }
+        public string Value { get; private set; }
     }
 }

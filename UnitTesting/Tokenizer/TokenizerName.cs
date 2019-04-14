@@ -16,7 +16,7 @@ namespace TokenizerUnitTesting
             TokenName n = t.GetToken() as TokenName;
             Assert.NotNull(n);
             Assert.True(n.Position == 0);
-            Assert.True(n.Name == "");
+            Assert.True(n.Value == "");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -27,7 +27,7 @@ namespace TokenizerUnitTesting
             TokenName n = t.GetToken() as TokenName;
             Assert.NotNull(n);
             Assert.True(n.Position == 0);
-            Assert.True(n.Name == "");
+            Assert.True(n.Value == "");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -38,7 +38,7 @@ namespace TokenizerUnitTesting
             TokenName n = t.GetToken() as TokenName;
             Assert.NotNull(n);
             Assert.True(n.Position == 0);
-            Assert.True(n.Name == "Name");
+            Assert.True(n.Value == "Name");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -49,7 +49,7 @@ namespace TokenizerUnitTesting
             TokenName n = t.GetToken() as TokenName;
             Assert.NotNull(n);
             Assert.True(n.Position == 3);
-            Assert.True(n.Name == "Name");
+            Assert.True(n.Value == "Name");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -60,7 +60,7 @@ namespace TokenizerUnitTesting
             TokenName n = t.GetToken() as TokenName;
             Assert.NotNull(n);
             Assert.True(n.Position == 0);
-            Assert.True(n.Name == "A;_-*B?");
+            Assert.True(n.Value == "A;_-*B?");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -71,7 +71,7 @@ namespace TokenizerUnitTesting
             TokenName n = t.GetToken() as TokenName;
             Assert.NotNull(n);
             Assert.True(n.Position == 0);
-            Assert.True(n.Name == "1.2");
+            Assert.True(n.Value == "1.2");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -82,7 +82,7 @@ namespace TokenizerUnitTesting
             TokenName n = t.GetToken() as TokenName;
             Assert.NotNull(n);
             Assert.True(n.Position == 0);
-            Assert.True(n.Name == "A B");
+            Assert.True(n.Value == "A B");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -93,7 +93,7 @@ namespace TokenizerUnitTesting
             TokenName n = t.GetToken() as TokenName;
             Assert.NotNull(n);
             Assert.True(n.Position == 0);
-            Assert.True(n.Name == "A   B");
+            Assert.True(n.Value == "A   B");
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -104,7 +104,7 @@ namespace TokenizerUnitTesting
             TokenName n = t.GetToken() as TokenName;
             Assert.NotNull(n);
             Assert.True(n.Position == 0);
-            Assert.True(n.Name == "A(B)");
+            Assert.True(n.Value == "A(B)");
             Assert.True(t.GetToken() is TokenEmpty);
         }
     }

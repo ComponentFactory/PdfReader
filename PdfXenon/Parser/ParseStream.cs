@@ -13,6 +13,7 @@ namespace PdfXenon.Standard
         private string _stringContent;
 
         public ParseStream(ParseDictionary dictionary, byte[] streamBytes)
+            : base(dictionary.Position)
         {
             _dictionary = dictionary;
             _streamBytes = streamBytes;
@@ -25,8 +26,6 @@ namespace PdfXenon.Standard
             else
                 return $"ParseStream ({Position}): {ContentAsString}";
         }
-
-        public override long Position { get => _dictionary.Position; }
 
         public bool HasFilter
         {

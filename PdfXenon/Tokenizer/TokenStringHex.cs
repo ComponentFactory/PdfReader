@@ -14,17 +14,17 @@ namespace PdfXenon.Standard
 
         public override string ToString()
         {
-            return $"String ({Position}): Hex Len:{RawString.Length}";
+            return $"String ({Position}): Hex Len:{Raw.Length}";
         }
 
-        public override string ResolvedString
+        public override string Resolved
         {
             get
             {
                 if (_actual == null)
                 {
                     // Remove all whitespace from the hex string
-                    string[] sections = RawString.Split(new char[] { '\0', '\t', '\n', '\f', '\r', ' ' });
+                    string[] sections = Raw.Split(new char[] { '\0', '\t', '\n', '\f', '\r', ' ' });
                     string hex = string.Join(string.Empty, sections);
 
                     // If a missing character from last hex pair, then default to 0, as per the spec

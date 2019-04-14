@@ -5,14 +5,14 @@
         public TokenComment(long position, string comment)
             : base(position)
         {
-            Comment = comment;
+            Value = comment;
         }
 
         public override string ToString()
         {
-            return $"Comment ({Position}): {Comment} ";
+            return $"Comment ({Position}): {Value} ";
         }
 
-        public string Comment { get; private set; }
+        public string Value { get; private set; }
     }
 }

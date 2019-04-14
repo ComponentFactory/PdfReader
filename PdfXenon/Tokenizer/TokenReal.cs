@@ -5,14 +5,14 @@
         public TokenReal(long position, float real)
             : base(position)
         {
-            Real = real;
+            Value = real;
         }
 
         public override string ToString()
         {
-            return $"Real ({Position}): {Real}";
+            return $"Real ({Position}): {Value}";
         }
 
-        public float Real { get; set; }
+        public float Value { get; set; }
     }
 }

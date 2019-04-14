@@ -2,6 +2,11 @@
 {
     public abstract class ParseObject
     {
-        public abstract long Position { get; }
+        public ParseObject(long position)
+        {
+            Position = position;
+        }
+
+        public long Position { get; protected set; }
     }
 }

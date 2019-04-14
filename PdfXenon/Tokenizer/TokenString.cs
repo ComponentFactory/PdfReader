@@ -5,10 +5,10 @@
         public TokenString(long position, string rawString)
             : base(position)
         {
-            RawString = rawString;
+            Raw = rawString;
         }
 
-        public string RawString { get; private set; }
-        public abstract string ResolvedString { get; }
+        public string Raw { get; private set; }
+        public abstract string Resolved { get; }
     }
 }

@@ -16,7 +16,7 @@ namespace ParserUnitTesting
             ParseName o = p.ParseObject() as ParseName;
 
             Assert.NotNull(o);
-            Assert.True(o.Name == "Example");
+            Assert.True(o.Value == "Example");
         }
 
         [Fact]
@@ -26,7 +26,7 @@ namespace ParserUnitTesting
             ParseInteger o = p.ParseObject() as ParseInteger;
 
             Assert.NotNull(o);
-            Assert.True(o.Integer == 42);
+            Assert.True(o.Value == 42);
         }
 
         [Fact]
@@ -36,7 +36,7 @@ namespace ParserUnitTesting
             ParseReal o = p.ParseObject() as ParseReal;
 
             Assert.NotNull(o);
-            Assert.True(o.Real == 3.14f);
+            Assert.True(o.Value == 3.14f);
         }
 
         [Fact]
@@ -46,7 +46,7 @@ namespace ParserUnitTesting
             ParseString o = p.ParseObject() as ParseString;
 
             Assert.NotNull(o);
-            Assert.True(o.String == "de");
+            Assert.True(o.Value == "de");
         }
 
         [Fact]
@@ -56,7 +56,7 @@ namespace ParserUnitTesting
             ParseString o = p.ParseObject() as ParseString;
 
             Assert.NotNull(o);
-            Assert.True(o.String == "de");
+            Assert.True(o.Value == "de");
         }
 
         [Fact]

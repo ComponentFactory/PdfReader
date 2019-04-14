@@ -3,21 +3,20 @@
     public class ParseString : ParseObject
     {
         public ParseString(TokenString token)
+            : base(token.Position)
         {
             Token = token;
         }
 
         public override string ToString()
         {
-            return $"ParseString ({Position}): {String}";
+            return $"ParseString ({Position}): {Value}";
         }
 
-        public string String
+        public string Value
         {
-            get { return Token.ResolvedString; }
+            get { return Token.Resolved; }
         }
-
-        public override long Position { get => Token.Position; }
 
         private TokenString Token { get; set; }
     }

@@ -18,9 +18,9 @@ namespace ParserUnitTesting
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Child);
+            Assert.NotNull(i.Object);
 
-            ParseStream o = i.Child as ParseStream;
+            ParseStream o = i.Object as ParseStream;
             Assert.NotNull(o);
             Assert.True(o.ContentAsString == "de");
         }
@@ -34,9 +34,9 @@ namespace ParserUnitTesting
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Child);
+            Assert.NotNull(i.Object);
 
-            ParseStream o = i.Child as ParseStream;
+            ParseStream o = i.Object as ParseStream;
             Assert.NotNull(o);
             Assert.True(o.ContentAsString == "de");
         }

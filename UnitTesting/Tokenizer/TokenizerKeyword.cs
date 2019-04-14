@@ -27,7 +27,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == ParseKeyword.True);
+            Assert.True(k.Value == ParseKeyword.True);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -48,7 +48,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == ParseKeyword.False);
+            Assert.True(k.Value == ParseKeyword.False);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -69,7 +69,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == ParseKeyword.Null);
+            Assert.True(k.Value == ParseKeyword.Null);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -90,7 +90,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == ParseKeyword.Stream);
+            Assert.True(k.Value == ParseKeyword.Stream);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -101,7 +101,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == ParseKeyword.EndStream);
+            Assert.True(k.Value == ParseKeyword.EndStream);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -112,7 +112,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == ParseKeyword.Obj);
+            Assert.True(k.Value == ParseKeyword.Obj);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -123,7 +123,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == ParseKeyword.EndObj);
+            Assert.True(k.Value == ParseKeyword.EndObj);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -134,7 +134,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == ParseKeyword.R);
+            Assert.True(k.Value == ParseKeyword.R);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -145,7 +145,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == ParseKeyword.XRef);
+            Assert.True(k.Value == ParseKeyword.XRef);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -156,7 +156,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == ParseKeyword.Trailer);
+            Assert.True(k.Value == ParseKeyword.Trailer);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -167,7 +167,7 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == ParseKeyword.StartXRef);
+            Assert.True(k.Value == ParseKeyword.StartXRef);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -180,58 +180,58 @@ namespace TokenizerUnitTesting
             TokenKeyword k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 0);
-            Assert.True(k.Keyword == ParseKeyword.True);
+            Assert.True(k.Value == ParseKeyword.True);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 5);
-            Assert.True(k.Keyword == ParseKeyword.False);
+            Assert.True(k.Value == ParseKeyword.False);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 11);
-            Assert.True(k.Keyword == ParseKeyword.True);
+            Assert.True(k.Value == ParseKeyword.True);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
             Assert.True(k.Position == 16);
-            Assert.True(k.Keyword == ParseKeyword.False);
+            Assert.True(k.Value == ParseKeyword.False);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == ParseKeyword.Null);
+            Assert.True(k.Value == ParseKeyword.Null);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == ParseKeyword.Stream);
+            Assert.True(k.Value == ParseKeyword.Stream);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == ParseKeyword.EndStream);
+            Assert.True(k.Value == ParseKeyword.EndStream);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == ParseKeyword.Obj);
+            Assert.True(k.Value == ParseKeyword.Obj);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == ParseKeyword.EndObj);
+            Assert.True(k.Value == ParseKeyword.EndObj);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == ParseKeyword.R);
+            Assert.True(k.Value == ParseKeyword.R);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == ParseKeyword.XRef);
+            Assert.True(k.Value == ParseKeyword.XRef);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == ParseKeyword.Trailer);
+            Assert.True(k.Value == ParseKeyword.Trailer);
 
             k = t.GetToken() as TokenKeyword;
             Assert.NotNull(k);
-            Assert.True(k.Keyword == ParseKeyword.StartXRef);
+            Assert.True(k.Value == ParseKeyword.StartXRef);
 
             Assert.True(t.GetToken() is TokenEmpty);
         }

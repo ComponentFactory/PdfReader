@@ -18,11 +18,11 @@ namespace ParserUnitTesting
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Child);
+            Assert.NotNull(i.Object);
 
-            ParseInteger o = i.Child as ParseInteger;
+            ParseInteger o = i.Object as ParseInteger;
             Assert.NotNull(o);
-            Assert.True(o.Integer == 42);
+            Assert.True(o.Value == 42);
         }
 
         [Fact]
@@ -34,11 +34,11 @@ namespace ParserUnitTesting
             Assert.NotNull(i);
             Assert.True(i.Id == 99);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Child);
+            Assert.NotNull(i.Object);
 
-            ParseInteger o = i.Child as ParseInteger;
+            ParseInteger o = i.Object as ParseInteger;
             Assert.NotNull(o);
-            Assert.True(o.Integer == 42);
+            Assert.True(o.Value == 42);
         }
 
         [Fact]
@@ -50,11 +50,11 @@ namespace ParserUnitTesting
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 99);
-            Assert.NotNull(i.Child);
+            Assert.NotNull(i.Object);
 
-            ParseInteger o = i.Child as ParseInteger;
+            ParseInteger o = i.Object as ParseInteger;
             Assert.NotNull(o);
-            Assert.True(o.Integer == 42);
+            Assert.True(o.Value == 42);
         }
 
         [Fact]
@@ -66,11 +66,11 @@ namespace ParserUnitTesting
             Assert.NotNull(i);
             Assert.True(i.Id == 101);
             Assert.True(i.Gen == 102);
-            Assert.NotNull(i.Child);
+            Assert.NotNull(i.Object);
 
-            ParseInteger o = i.Child as ParseInteger;
+            ParseInteger o = i.Object as ParseInteger;
             Assert.NotNull(o);
-            Assert.True(o.Integer == 42);
+            Assert.True(o.Value == 42);
         }
 
         [Fact]
@@ -82,11 +82,11 @@ namespace ParserUnitTesting
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Child);
+            Assert.NotNull(i.Object);
 
-            ParseInteger o = i.Child as ParseInteger;
+            ParseInteger o = i.Object as ParseInteger;
             Assert.NotNull(o);
-            Assert.True(o.Integer == 42);
+            Assert.True(o.Value == 42);
         }
 
         [Fact]
@@ -98,11 +98,11 @@ namespace ParserUnitTesting
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Child);
+            Assert.NotNull(i.Object);
 
-            ParseInteger o = i.Child as ParseInteger;
+            ParseInteger o = i.Object as ParseInteger;
             Assert.NotNull(o);
-            Assert.True(o.Integer == 42);
+            Assert.True(o.Value == 42);
         }
 
         [Fact]
@@ -114,11 +114,11 @@ namespace ParserUnitTesting
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Child);
+            Assert.NotNull(i.Object);
 
-            ParseString o = i.Child as ParseString;
+            ParseString o = i.Object as ParseString;
             Assert.NotNull(o);
-            Assert.True(o.String == "de");
+            Assert.True(o.Value == "de");
         }
 
         [Fact]
@@ -130,11 +130,11 @@ namespace ParserUnitTesting
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Child);
+            Assert.NotNull(i.Object);
 
-            ParseName o = i.Child as ParseName;
+            ParseName o = i.Object as ParseName;
             Assert.NotNull(o);
-            Assert.True(o.Name == "Example");
+            Assert.True(o.Value == "Example");
         }
 
         [Fact]
@@ -146,13 +146,13 @@ namespace ParserUnitTesting
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Child);
+            Assert.NotNull(i.Object);
 
-            ParseArray o = i.Child as ParseArray;
+            ParseArray o = i.Object as ParseArray;
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 1);
             Assert.True(o.Objects[0] is ParseInteger);
-            Assert.True((o.Objects[0] as ParseInteger).Integer == 42);
+            Assert.True((o.Objects[0] as ParseInteger).Value == 42);
         }
 
         [Fact]
@@ -164,14 +164,14 @@ namespace ParserUnitTesting
             Assert.NotNull(i);
             Assert.True(i.Id == 1);
             Assert.True(i.Gen == 0);
-            Assert.NotNull(i.Child);
+            Assert.NotNull(i.Object);
 
-            ParseDictionary o = i.Child as ParseDictionary;
+            ParseDictionary o = i.Object as ParseDictionary;
             Assert.NotNull(o);
             Assert.True(o.Count == 1);
-            Assert.True(o["Type"].Name.Name == "Type");
+            Assert.True(o["Type"].Name.Value == "Type");
             Assert.True(o["Type"].Object is ParseString);
-            Assert.True((o["Type"].Object as ParseString).String == "Example");
+            Assert.True((o["Type"].Object as ParseString).Value == "Example");
         }
     }
 }

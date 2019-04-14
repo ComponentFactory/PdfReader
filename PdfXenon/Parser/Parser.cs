@@ -29,10 +29,10 @@ namespace PdfXenon.Standard
                 throw new ApplicationException("Missing PDF header.");
 
             TokenComment c = (TokenComment)t;
-            if (!c.Comment.StartsWith("%PDF"))
+            if (!c.Value.StartsWith("%PDF"))
                 throw new ApplicationException("PDF Header must start with '%PDF'.");
 
-            string[] splits = c.Comment.Substring(5).Split('.');
+            string[] splits = c.Value.Substring(5).Split('.');
             if (splits.Length != 2)
                 throw new ApplicationException("PDF Header must have a <major>.<minor> version number.");
 
@@ -63,8 +63,8 @@ namespace PdfXenon.Standard
             ThrowIfNot<TokenKeyword>(t);
 
             TokenKeyword keyword = (TokenKeyword)t;
-            if (keyword.Keyword != ParseKeyword.XRef)
-                throw new ApplicationException($"Cross-reference table has keyword {keyword.Keyword.ToString()} instead of 'xref' at position {t.Position}.");
+            if (keyword.Value != ParseKeyword.XRef)
+                throw new ApplicationException($"Cross-reference table has keyword {keyword.Value.ToString()} instead of 'xref' at position {t.Position}.");
 
             List<TokenXRefEntry> entries = new List<TokenXRefEntry>();
             ParseXRefSections(entries);
@@ -79,7 +79,7 @@ namespace PdfXenon.Standard
                 ThrowOnError(t);
 
                 // Cross-reference table ends when we find a 'trailer' keyword instead of another section
-                if ((t is TokenKeyword) && (((TokenKeyword)t).Keyword == ParseKeyword.Trailer))
+                if ((t is TokenKeyword) && (((TokenKeyword)t).Value == ParseKeyword.Trailer))
                 {
                     Tokenizer.PushToken(t);
                     return;
@@ -99,7 +99,7 @@ namespace PdfXenon.Standard
                     throw new ApplicationException($"Cross-reference section length must be an integer at position {t.Position}.");
 
                 // Load each line in the section
-                for (int i = 0, id = start.Integer; i < length.Integer; i++, id++)
+                for (int i = 0, id = start.Value; i < length.Value; i++, id++)
                 {
                     TokenObject entry = Tokenizer.GetXRefEntry(id);
                     ThrowOnError(entry);
@@ -115,7 +115,7 @@ namespace PdfXenon.Standard
             ThrowOnError(t);
 
             // Cross-reference table ends when we find a 'trailer' keyword instead of another section
-            if (!(t is TokenKeyword) || (((TokenKeyword)t).Keyword != ParseKeyword.Trailer))
+            if (!(t is TokenKeyword) || (((TokenKeyword)t).Value != ParseKeyword.Trailer))
                 throw new ApplicationException($"Trailer section must start with the 'trailer' keyword at position {t.Position}.");
 
             ParseObject obj = ParseObject();
@@ -166,7 +166,7 @@ namespace PdfXenon.Standard
             // This is the keyword 'obj'
             TokenObject v = Tokenizer.GetToken();
             ThrowOnEmptyOrError(v);
-            if (!(v is TokenKeyword) || ((v as TokenKeyword).Keyword != ParseKeyword.Obj))
+            if (!(v is TokenKeyword) || ((v as TokenKeyword).Value != ParseKeyword.Obj))
             {
                 Tokenizer.PushToken(t);
                 Tokenizer.PushToken(u);
@@ -187,9 +187,9 @@ namespace PdfXenon.Standard
             if (keyword == null)
                 throw new ApplicationException($"Indirect object has missing 'endobj or 'stream' at position {v.Position}.");
 
-            if (keyword.Keyword == ParseKeyword.EndObj)
+            if (keyword.Value == ParseKeyword.EndObj)
                 return new ParseIndirectObject(t as TokenInteger, u as TokenInteger, obj);
-            else if (keyword.Keyword == ParseKeyword.Stream)
+            else if (keyword.Value == ParseKeyword.Stream)
             {
                 ParseDictionary dictionary = obj as ParseDictionary;
                 if (dictionary == null)
@@ -210,12 +210,12 @@ namespace PdfXenon.Standard
                 if (length == null)
                     throw new ApplicationException($"Stream dictionary has a 'Length' entry that is not an integer entry at position {v.Position}.");
 
-                if (length.Integer < 0)
+                if (length.Value < 0)
                     throw new ApplicationException($"Stream dictionary has a 'Length' less than 0 at position {v.Position}.");
 
-                byte[] bytes = Tokenizer.GetBytes(length.Integer);
+                byte[] bytes = Tokenizer.GetBytes(length.Value);
                 if (bytes == null)
-                    throw new ApplicationException($"Cannot read in expected {length.Integer} bytes from stream at position {v.Position}.");
+                    throw new ApplicationException($"Cannot read in expected {length.Value} bytes from stream at position {v.Position}.");
 
                 // Stream contents must be followed by 'endstream'
                 v = Tokenizer.GetToken();
@@ -225,8 +225,8 @@ namespace PdfXenon.Standard
                 if (keyword == null)
                     throw new ApplicationException($"Stream has missing 'endstream' after content at at position {v.Position}.");
 
-                if (keyword.Keyword != ParseKeyword.EndStream)
-                    throw new ApplicationException($"Stream has unexpected keyword {keyword.Keyword} instead of 'endstream' at position {v.Position}.");
+                if (keyword.Value != ParseKeyword.EndStream)
+                    throw new ApplicationException($"Stream has unexpected keyword {keyword.Value} instead of 'endstream' at position {v.Position}.");
 
                 // Stream contents must be followed by 'endobj'
                 v = Tokenizer.GetToken();
@@ -236,13 +236,13 @@ namespace PdfXenon.Standard
                 if (keyword == null)
                     throw new ApplicationException($"Indirect object has missing 'endobj' at position { v.Position }.");
 
-                if (keyword.Keyword != ParseKeyword.EndObj)
-                    throw new ApplicationException($"Indirect object has unexpected keyword {keyword.Keyword} instead of 'endobj' at position {v.Position}.");
+                if (keyword.Value != ParseKeyword.EndObj)
+                    throw new ApplicationException($"Indirect object has unexpected keyword {keyword.Value} instead of 'endobj' at position {v.Position}.");
 
                 return new ParseIndirectObject(t as TokenInteger, u as TokenInteger, new ParseStream(dictionary, bytes));
             }
             else
-                throw new ApplicationException($"Indirect object has unexpected keyword {keyword.Keyword} at position {v.Position}.");
+                throw new ApplicationException($"Indirect object has unexpected keyword {keyword.Value} at position {v.Position}.");
         }
 
         public ParseObject ParseObject()
@@ -265,7 +265,7 @@ namespace PdfXenon.Standard
                     ThrowOnError(t3);
 
                     // An object reference has a third value which is the 'R' keyword
-                    if ((t3 is TokenKeyword) && (((TokenKeyword)t3).Keyword == ParseKeyword.R))
+                    if ((t3 is TokenKeyword) && (((TokenKeyword)t3).Value == ParseKeyword.R))
                         return new ParseObjectReference(t as TokenInteger, t2 as TokenInteger);
 
                     Tokenizer.PushToken(t3);
@@ -321,12 +321,12 @@ namespace PdfXenon.Standard
 
                     value2 = ParseObject();
                     if (value2 == null)
-                        throw new ApplicationException($"Dictionary value missing for key {name.Name} at position {name.Position}.");
+                        throw new ApplicationException($"Dictionary value missing for key {name.Value} at position {name.Position}.");
                     else
                         ThrowOnEmptyOrError(t);
 
                     // If key already exists then simply overwrite it with latest value
-                    entries[name.Name] = new ParseDictEntry() { Name = name, Object = value2 };
+                    entries[name.Value] = new ParseDictEntry() { Name = name, Object = value2 };
                 }
 
                 ThrowIfNot<TokenDictionaryClose>(Tokenizer.GetToken());
@@ -334,7 +334,7 @@ namespace PdfXenon.Standard
             }
             else if (t is TokenKeyword)
             {
-                switch ((t as TokenKeyword).Keyword)
+                switch ((t as TokenKeyword).Value)
                 {
                     case ParseKeyword.True:
                     case ParseKeyword.False:

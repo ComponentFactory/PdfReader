@@ -74,13 +74,13 @@ namespace PdfXenon.Standard
                     foreach (TokenXRefEntry xref in xrefs)
                     {
                         // Ignore unused entries and entries smaller than the defined size from the trailer dictionary
-                        if (xref.Used && (xref.Id < size.Integer))
+                        if (xref.Used && (xref.Id < size.Value))
                             IndirectObjects.AddXRef(xref);
                     }
 
                     // If there is a previous cross-reference table, then we want to process that as well
                     if (prev != null)
-                        xRefPosition = prev.Integer;
+                        xRefPosition = prev.Value;
                     else
                         xRefPosition = 0;
 
@@ -140,7 +140,7 @@ namespace PdfXenon.Standard
             {
                 if (indirect.Child == null)
                 {
-                    indirect.Child = _parser.ParseIndirectObject(indirect.Offset).Child;
+                    indirect.Child = _parser.ParseIndirectObject(indirect.Offset).Object;
 
                     Console.WriteLine($"{indirect.Id} {indirect.Gen} {indirect.Offset} obj");
                     Console.WriteLine(indirect.Child);

@@ -3,18 +3,16 @@
     public class ParseInteger : ParseObject
     {
         public ParseInteger(TokenInteger token)
+            : base(token.Position)
         {
-            Token = token;
+            Value = token.Value;
         }
 
         public override string ToString()
         {
-            return $"ParseInteger ({Position}): {Integer}";
+            return $"ParseInteger ({Position}): {Value}";
         }
 
-        public int Integer { get => Token.Integer; }
-        public override long Position { get => Token.Position; }
-
-        private TokenInteger Token { get; set; }
+        public int Value { get; private set; }
     }
 }

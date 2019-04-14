@@ -28,7 +28,7 @@ namespace PdfXenon.Standard
         public TokenKeyword(long position, ParseKeyword keyword)
             : base(position)
         {
-            Keyword = keyword;
+            Value = keyword;
         }
 
         public static TokenKeyword CheckKeywords(long position, string keyword)
@@ -41,9 +41,9 @@ namespace PdfXenon.Standard
 
         public override string ToString()
         {
-            return $"Keyword ({Position}): {Keyword}";
+            return $"Keyword ({Position}): {Value}";
         }
 
-        public ParseKeyword Keyword { get; private set; }
+        public ParseKeyword Value { get; private set; }
     }
 }

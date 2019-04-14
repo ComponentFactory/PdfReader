@@ -13,10 +13,10 @@ namespace PdfXenon.Standard
 
         public override string ToString()
         {
-            return $"String ({Position}): Literal Len:{RawString.Length}";
+            return $"String ({Position}): Literal Len:{Raw.Length}";
         }
 
-        public override string ResolvedString
+        public override string Resolved
         {
             get
             {
@@ -24,7 +24,7 @@ namespace PdfXenon.Standard
                 {
                     StringBuilder sb = new StringBuilder();
 
-                    string line = RawString;
+                    string line = Raw;
                     int last = line.Length;
                     int first = 0;
 

@@ -6,8 +6,8 @@ namespace PdfXenon.Standard
     public class ParseArray : ParseObject
     {
         public ParseArray(long position, List<ParseObject> objects)
+            : base(position)
         {
-            ArrayOpenPosition = position;
             Objects = objects;
         }
 
@@ -25,9 +25,6 @@ namespace PdfXenon.Standard
             return sb.ToString();
         }
 
-        public override long Position { get => ArrayOpenPosition; }
         public List<ParseObject> Objects { get; set; }
-
-        private long ArrayOpenPosition { get; set; }
     }
 }

@@ -30,7 +30,7 @@ namespace TokenizerUnitTesting
 
             TokenStringHex a2 = t.GetToken() as TokenStringHex;
             Assert.NotNull(a2);
-            Assert.True(a2.RawString == "6465");
+            Assert.True(a2.Raw == "6465");
             Assert.True(a2.Position == 1);
 
             TokenDictionaryOpen a3 = t.GetToken() as TokenDictionaryOpen;
@@ -39,22 +39,22 @@ namespace TokenizerUnitTesting
 
             TokenKeyword a4 = t.GetToken() as TokenKeyword;
             Assert.NotNull(a4);
-            Assert.True(a4.Keyword == ParseKeyword.True);
+            Assert.True(a4.Value == ParseKeyword.True);
             Assert.True(a4.Position == 9);
 
             TokenName a5 = t.GetToken() as TokenName;
             Assert.NotNull(a5);
-            Assert.True(a5.Name == "Name");
+            Assert.True(a5.Value == "Name");
             Assert.True(a5.Position == 13);
 
             TokenInteger a6 = t.GetToken() as TokenInteger;
             Assert.NotNull(a6);
-            Assert.True(a6.Integer == 1);
+            Assert.True(a6.Value == 1);
             Assert.True(a6.Position == 19);
 
             TokenReal a7 = t.GetToken() as TokenReal;
             Assert.NotNull(a7);
-            Assert.True(a7.Real == 3.14f);
+            Assert.True(a7.Value == 3.14f);
             Assert.True(a7.Position == 21);
 
             TokenDictionaryClose a8 = t.GetToken() as TokenDictionaryClose;
@@ -67,7 +67,7 @@ namespace TokenizerUnitTesting
 
             TokenComment a10 = t.GetToken() as TokenComment;
             Assert.NotNull(a10);
-            Assert.True(a10.Comment == "%comment");
+            Assert.True(a10.Value == "%comment");
             Assert.True(a10.Position == 29);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -83,26 +83,26 @@ namespace TokenizerUnitTesting
 
             TokenStringHex a2 = t.GetToken() as TokenStringHex;
             Assert.NotNull(a2);
-            Assert.True(a2.RawString == "64 65");
+            Assert.True(a2.Raw == "64 65");
 
             TokenDictionaryOpen a3 = t.GetToken() as TokenDictionaryOpen;
             Assert.NotNull(a3);
 
             TokenKeyword a4 = t.GetToken() as TokenKeyword;
             Assert.NotNull(a4);
-            Assert.True(a4.Keyword == ParseKeyword.True);
+            Assert.True(a4.Value == ParseKeyword.True);
 
             TokenName a5 = t.GetToken() as TokenName;
             Assert.NotNull(a5);
-            Assert.True(a5.Name == "Name");
+            Assert.True(a5.Value == "Name");
 
             TokenInteger a6 = t.GetToken() as TokenInteger;
             Assert.NotNull(a6);
-            Assert.True(a6.Integer == 1);
+            Assert.True(a6.Value == 1);
 
             TokenReal a7 = t.GetToken() as TokenReal;
             Assert.NotNull(a7);
-            Assert.True(a7.Real == 3.14f);
+            Assert.True(a7.Value == 3.14f);
 
             TokenDictionaryClose a8 = t.GetToken() as TokenDictionaryClose;
             Assert.NotNull(a8);
@@ -112,7 +112,7 @@ namespace TokenizerUnitTesting
 
             TokenComment a10 = t.GetToken() as TokenComment;
             Assert.NotNull(a10);
-            Assert.True(a10.Comment == "%comment");
+            Assert.True(a10.Value == "%comment");
             Assert.True(t.GetToken() is TokenEmpty);
         }
     }

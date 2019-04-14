@@ -5,14 +5,14 @@
         public TokenName(long position, string name)
             : base(position)
         {
-            Name = name;
+            Value = name;
         }
 
         public override string ToString()
         {
-            return $"Name ({Position}): {Name}";
+            return $"Name ({Position}): {Value}";
         }
 
-        public string Name { get; private set; }
+        public string Value { get; private set; }
     }
 }

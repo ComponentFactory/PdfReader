@@ -3,18 +3,16 @@
     public class ParseReal : ParseObject
     {
         public ParseReal(TokenReal token)
+            : base(token.Position)
         {
-            Token = token;
+            Value = token.Value;
         }
 
         public override string ToString()
         {
-            return $"ParseReal ({Position}): {Real}";
+            return $"ParseReal ({Position}): {Value}";
         }
 
-        public float Real { get => Token.Real; }
-        public override long Position { get => Token.Position; }
-
-        private TokenReal Token { get; set; }
+        public float Value { get; private set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace PdfXenon.Standard
 {
@@ -40,6 +41,20 @@ namespace PdfXenon.Standard
             }
         }
 
+        public PdfIndirectObjectGen this[ParseObjectReference reference]
+        {
+            get { return this[reference.Id, reference.Gen]; }
+        }
+
+        public T MandatoryValue<T>(ParseObjectReference reference) where T : ParseObject
+        {
+            PdfIndirectObjectGen gen = this[reference];
+            if ((gen == null) || (gen.Child == null) || !(gen.Child is ParseDictionary))
+                throw new ApplicationException("Pages indirect reference missing or not a dictionary.");
+
+            return gen.Child as T;
+        }
+
         public Dictionary<int, PdfIndirectObjectId>.KeyCollection Ids
         {
             get { return _identifiers.Keys; }
@@ -55,7 +70,7 @@ namespace PdfXenon.Standard
             // If this is the first time we have encountered this id, then add it
             if (!_identifiers.TryGetValue(xref.Id, out PdfIndirectObjectId indirectId))
             {
-                indirectId = new PdfIndirectObjectId(this);
+                indirectId = new PdfIndirectObjectId();
                 _identifiers.Add(xref.Id, indirectId);
             }
 

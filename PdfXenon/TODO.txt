@@ -1,2 +1,1 @@
-﻿Use DeflateStream for the FlatDeflate filter
-	https://docs.microsoft.com/en-us/dotnet/api/system.io.compression.deflatestream?view=netframework-4.7.2
+﻿AUto resolve indirect references when you access the child

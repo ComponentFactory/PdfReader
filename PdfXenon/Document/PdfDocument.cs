@@ -12,9 +12,9 @@ namespace PdfXenon.Standard
         private StreamReader _reader;
         private Parser _parser;
         private ParseObjectReference _refCatalog;
-        private PdfCatalog _pdfCatalog;
         private ParseObjectReference _refInfo;
-        private PdfDictionary _pdfInfo;
+        private PdfCatalog _pdfCatalog;
+        private PdfInfo _pdfInfo;
 
         public PdfDocument()
         {
@@ -22,8 +22,9 @@ namespace PdfXenon.Standard
             IndirectObjects = new PdfIndirectObjects(this);
 
             _refCatalog = null;
-            _pdfCatalog = null;
             _refInfo = null;
+            _pdfCatalog = null;
+            _pdfInfo = null;
         }
 
         public PdfVersion Version { get; private set; }
@@ -144,12 +145,12 @@ namespace PdfXenon.Standard
             }
         }
 
-        public PdfDictionary Info
+        public PdfInfo Info
         {
             get
             {
                 if ((_pdfInfo == null) && (_refInfo != null))
-                    _pdfInfo = new PdfCatalog(this, IndirectObjects.MandatoryValue<ParseDictionary>(_refInfo));
+                    _pdfInfo = new PdfInfo(this, IndirectObjects.MandatoryValue<ParseDictionary>(_refInfo));
 
                 return _pdfInfo;
             }

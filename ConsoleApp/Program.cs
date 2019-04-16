@@ -14,26 +14,31 @@ namespace ConsoleApp
             PdfCatalog catalog = document.Catalog;
             Console.WriteLine(catalog);
 
-            PdfDictionary info = document.Info;
+            PdfInfo info = document.Info;
             if (info != null)
             {
                 Console.WriteLine("Info");
                 Console.WriteLine("----");
-                foreach (var x in info)
-                    Console.WriteLine($"{x.Key} = {x.Value.Object}");
+                Console.WriteLine(info.Author?.ToString());
+                Console.WriteLine(info.Subject?.ToString());
+                Console.WriteLine(info.Keywords?.ToString());
+                Console.WriteLine(info.Creator?.ToString());
+                Console.WriteLine(info.Producer?.ToString());
+                Console.WriteLine(info.CreationDate?.ToString());
+                Console.WriteLine(info.ModDate?.ToString());
             }
 
-            PdfPagesTree pages = catalog.Pages;
-            for (int i = 0; i < pages.Count; i++)
-            {
-                PdfPage page = pages[i];
+            //PdfPagesTree pages = catalog.Pages;
+            //for (int i = 0; i < pages.Count; i++)
+            //{
+            //    PdfPage page = pages[i];
 
-                Console.WriteLine("Page");
-                Console.WriteLine("----");
-                Console.WriteLine(page.Resources.ToString());
-                Console.WriteLine(page.MediaBox.ToString());
-                Console.WriteLine(page.Contents.ToString());
-            }
+            //    Console.WriteLine("Page");
+            //    Console.WriteLine("----");
+            //    Console.WriteLine(page.Resources.ToString());
+            //    Console.WriteLine(page.MediaBox.ToString());
+            //    Console.WriteLine(page.Contents.ToString());
+            //}
 
             Console.ReadLine();
         }

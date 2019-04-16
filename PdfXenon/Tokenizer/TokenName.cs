@@ -8,11 +8,6 @@
             Value = name;
         }
 
-        public override string ToString()
-        {
-            return $"Name ({Position}): {Value}";
-        }
-
         public string Value { get; private set; }
     }
 }

@@ -8,11 +8,6 @@
             Value = comment;
         }
 
-        public override string ToString()
-        {
-            return $"Comment ({Position}): {Value} ";
-        }
-
         public string Value { get; private set; }
     }
 }

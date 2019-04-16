@@ -1,4 +1,6 @@
-﻿namespace PdfXenon.Standard
+﻿using System.Text;
+
+namespace PdfXenon.Standard
 {
     public class ParseName : ParseObject
     {
@@ -8,9 +10,11 @@
             Value = token.Value;
         }
 
-        public override string ToString()
+        public override int Output(StringBuilder sb, int indent)
         {
-            return $"ParseName ({Position}): {Value}";
+            string output = $"/{Value}";
+            sb.Append(output);
+            return indent + output.Length;
         }
 
         public string Value { get; private set; }

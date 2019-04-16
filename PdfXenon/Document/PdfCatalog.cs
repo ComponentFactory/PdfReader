@@ -6,20 +6,22 @@ namespace PdfXenon.Standard
     {
         private PdfPagesTree _pages;
 
-        public PdfCatalog(PdfDocument document, ParseDictionary dictionary)
-            : base(dictionary)
+        public PdfCatalog(PdfDocument doc, ParseDictionary dictionary)
+            : base(doc, dictionary)
         {
-            Document = document;
         }
 
-        public PdfDocument Document { get; private set; }
+        public override string ToString()
+        {
+            return $"PdfCatalog\n{base.ToString()}";
+        }
 
         public PdfPagesTree Pages
         {
             get
             {
                 if (_pages == null)
-                    _pages = new PdfPagesTree(this, Document.IndirectObjects.MandatoryValue<ParseDictionary>(MandatoryValue<ParseObjectReference>("Pages")));
+                    _pages = new PdfPagesTree(Doc, this, Doc.IndirectObjects.MandatoryValue<ParseDictionary>(MandatoryValue<ParseObjectReference>("Pages")));
 
                 return _pages;
             }

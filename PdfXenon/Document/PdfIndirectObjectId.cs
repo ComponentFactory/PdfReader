@@ -4,11 +4,12 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class PdfIndirectObjectId
+    public class PdfIndirectObjectId : PdfObject
     {
         private Dictionary<int, PdfIndirectObjectGen> _generations = new Dictionary<int, PdfIndirectObjectGen>();
 
-        public PdfIndirectObjectId()
+        public PdfIndirectObjectId(PdfDocument doc)
+            : base(doc)
         {
         }
 
@@ -43,7 +44,7 @@ namespace PdfXenon.Standard
             if (_generations.ContainsKey(xref.Gen))
                 throw new ApplicationException($"Indirect object with Id:{xref.Id} Gen:{xref.Gen} already exists, at position {xref.Position}.");
 
-            _generations.Add(xref.Gen, new PdfIndirectObjectGen(xref));
+            _generations.Add(xref.Gen, new PdfIndirectObjectGen(Doc, xref));
         }
     }
 }

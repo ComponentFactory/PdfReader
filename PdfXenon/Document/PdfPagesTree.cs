@@ -7,8 +7,8 @@ namespace PdfXenon.Standard
     {
         private List<PdfPage> _pages;
 
-        public PdfPagesTree(PdfCatalog catalog, ParseDictionary dictionary)
-            : base(null, dictionary)
+        public PdfPagesTree(PdfDocument doc, PdfCatalog catalog, ParseDictionary dictionary)
+            : base(doc, null, dictionary)
         {
             Catalog = catalog;
         }
@@ -27,7 +27,7 @@ namespace PdfXenon.Standard
                 if (_pages == null)
                 {
                     _pages = new List<PdfPage>();
-                    CreatePages(Catalog.Document, _pages);
+                    CreatePages(Doc, _pages);
                 }
 
                 return _pages;

@@ -11,11 +11,6 @@
             Used = used;
         }
 
-        public override string ToString()
-        {
-            return $"XRef ({Position}): Id:{Id} Gen:{Gen} Offset:{Offset} Used:{Used}";
-        }
-
         public int Id { get; private set; }
         public int Gen { get; private set; }
         public int Offset { get; private set; }

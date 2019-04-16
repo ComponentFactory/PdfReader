@@ -11,18 +11,28 @@ namespace PdfXenon.Standard
             Objects = objects;
         }
 
-        public override string ToString()
+        public override int Output(StringBuilder sb, int indent)
         {
-            StringBuilder sb = new StringBuilder();
+            sb.Append("[");
+            indent++;
 
-            sb.AppendLine($"ParseArray ({Position}): Count:{Objects.Count} (");
-
+            int index = 0;
+            int count = Objects.Count;
             foreach (ParseObject obj in Objects)
-                sb.AppendLine($"    {obj.ToString()}");
+            {
+                indent += obj.Output(sb, indent);
 
-            sb.AppendLine(")");
+                if (index < (count - 1))
+                    sb.Append(" ");
 
-            return sb.ToString();
+                index++;
+                indent++;
+            }
+
+            sb.Append("]");
+            indent++;
+
+            return indent;
         }
 
         public List<ParseObject> Objects { get; set; }

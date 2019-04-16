@@ -1,1 +1,2 @@
-﻿AUto resolve indirect references when you access the child
+﻿Auto resolve indirect references when you access the child
+Add access to mandatory fields of the Page, such as content and resources

@@ -20,9 +20,23 @@ namespace PdfXenon.Standard
             _streamBytes = streamBytes;
         }
 
-        public override string ToString()
+        public override int Output(StringBuilder sb, int indent)
         {
-            return $"ParseStream ({Position}): {ContentAsString}";
+            _dictionary.Output(sb, indent);
+
+            string blank = new string(' ', indent);
+            sb.Append("\n");
+            sb.Append(blank);
+            sb.Append("stream\n");
+
+            sb.Append(blank);
+            sb.Append(ContentAsString);
+
+            sb.Append("\n");
+            sb.Append(blank);
+            sb.Append("endstream");
+
+            return indent;
         }
 
         public bool HasFilter

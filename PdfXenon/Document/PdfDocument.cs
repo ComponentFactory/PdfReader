@@ -14,10 +14,11 @@ namespace PdfXenon.Standard
         private ParseObjectReference _refCatalog;
         private PdfCatalog _pdfCatalog;
         private ParseObjectReference _refInfo;
+        private PdfDictionary _pdfInfo;
 
         public PdfDocument()
         {
-            Version = new PdfVersion() { Major = 0, Minor = 0 };
+            Version = new PdfVersion(this) { Major = 0, Minor = 0 };
             IndirectObjects = new PdfIndirectObjects(this);
 
             _refCatalog = null;
@@ -143,19 +144,33 @@ namespace PdfXenon.Standard
             }
         }
 
-        private ParseObject ResolveReference(int id, int gen)
+        public PdfDictionary Info
+        {
+            get
+            {
+                if ((_pdfInfo == null) && (_refInfo != null))
+                    _pdfInfo = new PdfCatalog(this, IndirectObjects.MandatoryValue<ParseDictionary>(_refInfo));
+
+                return _pdfInfo;
+            }
+        }
+
+        public ParseObject ResolveReference(ParseObjectReference reference)
+        {
+            return ResolveReference(reference.Id, reference.Gen);
+        }
+
+        public ParseObject ResolveReference(int id, int gen)
         {
             PdfIndirectObjectGen indirect = IndirectObjects[id, gen];
             if (indirect != null)
             {
                 if (indirect.Child == null)
                 {
-                    indirect.Child = _parser.ParseIndirectObject(indirect.Offset).Object;
+                    ParseIndirectObject parseIndirectObject = _parser.ParseIndirectObject(indirect.Offset);
+                    indirect.Child = parseIndirectObject.Object;
 
-                    // TODO
-                    //Console.WriteLine($"{indirect.Id} {indirect.Gen} {indirect.Offset} obj");
-                    //Console.WriteLine(indirect.Child);
-                    //Console.WriteLine($"endobj");
+                    //Console.WriteLine(parseIndirectObject.ToString());
                 }
 
                 return indirect.Child;

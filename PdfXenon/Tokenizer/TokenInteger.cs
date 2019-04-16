@@ -8,11 +8,6 @@
             Value = integer;
         }
 
-        public override string ToString()
-        {
-            return $"Integer ({Position}): {Value}";
-        }
-
         public int Value { get; set; }
     }
 }

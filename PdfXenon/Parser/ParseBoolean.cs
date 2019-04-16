@@ -1,4 +1,6 @@
-﻿namespace PdfXenon.Standard
+﻿using System.Text;
+
+namespace PdfXenon.Standard
 {
     public class ParseBoolean : ParseObject
     {
@@ -8,9 +10,11 @@
             Value = (token.Value == ParseKeyword.True);
         }
 
-        public override string ToString()
+        public override int Output(StringBuilder sb, int indent)
         {
-            return $"ParseBoolean ({Position}): {Value}";
+            string output = Value.ToString();
+            sb.Append(output);
+            return indent + output.Length;
         }
 
         public bool Value { get; private set; }

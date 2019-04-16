@@ -1,4 +1,6 @@
-﻿namespace PdfXenon.Standard
+﻿using System.Text;
+
+namespace PdfXenon.Standard
 {
     public class ParseNull : ParseObject
     {
@@ -7,9 +9,10 @@
         {
         }
 
-        public override string ToString()
+        public override int Output(StringBuilder sb, int indent)
         {
-            return $"ParseNull ({Position})";
+            sb.Append("null");
+            return indent + 4;
         }
     }
 }

@@ -11,11 +11,6 @@ namespace PdfXenon.Standard
         {
         }
 
-        public override string ToString()
-        {
-            return $"String ({Position}): Literal Len:{Raw.Length}";
-        }
-
         public override string Resolved
         {
             get

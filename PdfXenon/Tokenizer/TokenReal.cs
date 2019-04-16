@@ -8,11 +8,6 @@
             Value = real;
         }
 
-        public override string ToString()
-        {
-            return $"Real ({Position}): {Value}";
-        }
-
         public float Value { get; set; }
     }
 }

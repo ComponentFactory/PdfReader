@@ -39,11 +39,6 @@ namespace PdfXenon.Standard
             return null;
         }
 
-        public override string ToString()
-        {
-            return $"Keyword ({Position}): {Value}";
-        }
-
         public ParseKeyword Value { get; private set; }
     }
 }

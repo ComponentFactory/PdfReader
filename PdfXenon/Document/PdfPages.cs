@@ -5,13 +5,12 @@ namespace PdfXenon.Standard
 {
     public class PdfPages : PdfPageInherit
     {
-        public PdfPages(PdfPages parent, ParseDictionary dictionary)
-            : base(parent, dictionary)
+        public PdfPages(PdfDocument doc, PdfPages parent, ParseDictionary dictionary)
+            : base(doc, parent, dictionary)
         {
-            Parent = parent;
         }
 
-        public PdfPages Parent { get; private set; }
+        public PdfPages Parent { get => (Inherit as PdfPages); }
 
         public void CreatePages(PdfDocument document, List<PdfPage> pages)
         {
@@ -23,12 +22,12 @@ namespace PdfXenon.Standard
 
                 if (type == "Page")
                 {
-                    PdfPage pdfPage = new PdfPage(this, dictionary);
+                    PdfPage pdfPage = new PdfPage(Doc, this, dictionary);
                     pages.Add(pdfPage);
                 }
                 else if (type == "Pages")
                 {
-                    PdfPages pdfPages = new PdfPages(this, dictionary);
+                    PdfPages pdfPages = new PdfPages(Doc, this, dictionary);
                     pdfPages.CreatePages(document, pages);
                 }
             }

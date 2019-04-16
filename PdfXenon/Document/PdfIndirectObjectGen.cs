@@ -4,11 +4,12 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class PdfIndirectObjectGen
+    public class PdfIndirectObjectGen : PdfObject
     {
         private TokenXRefEntry _xRef;
 
-        public PdfIndirectObjectGen(TokenXRefEntry xref)
+        public PdfIndirectObjectGen(PdfDocument doc, TokenXRefEntry xref)
+            : base(doc)
         {
             _xRef = xref;
         }

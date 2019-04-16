@@ -14,21 +14,44 @@ namespace PdfXenon.Standard
             _entries = entries;
         }
 
-        public override string ToString()
+        public override int Output(StringBuilder sb, int indent)
         {
-            StringBuilder sb = new StringBuilder();
+            string blank = new string(' ', indent);
 
-            sb.AppendLine($"ParseDictionary ({Position}): Count:{Count} (");
+            sb.Append("<<");
+            indent += 2;
 
+            int index = 0;
+            int count = _entries.Count;
             foreach (ParseDictEntry entry in _entries.Values)
-                sb.AppendLine($"    {entry.Name.Value} = {entry.Object.ToString()}");
+            {
+                if ((index == 1) && (count == 2))
+                    sb.Append(" ");
+                else if (index > 0)
+                    sb.Append("  ");
 
-            sb.AppendLine(")");
+                int entryIndent = entry.Name.Output(sb, indent);
+                sb.Append(" ");
+                entryIndent++;
+                entry.Object.Output(sb, entryIndent);
 
-            return sb.ToString();
+                if (count > 2)
+                {
+                    sb.Append("\n");
+                    sb.Append(blank);
+                }
+
+                index++;
+            }
+
+            sb.Append(">>");
+            return indent;
         }
 
         public int Count { get => _entries.Count; }
+        public Dictionary<string, ParseDictEntry>.KeyCollection Keys { get => _entries.Keys; }
+        public Dictionary<string, ParseDictEntry>.ValueCollection Values { get => _entries.Values; }
+        public Dictionary<string, ParseDictEntry>.Enumerator GetEnumerator() => _entries.GetEnumerator();
 
         public bool ContainsName(string name)
         {

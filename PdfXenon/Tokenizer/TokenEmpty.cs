@@ -6,10 +6,5 @@
             : base(position)
         {
         }
-
-        public override string ToString()
-        {
-            return $"Empty ({Position})";
-        }
     }
 }

@@ -14,11 +14,7 @@ namespace PdfXenon.Standard
         }
 
         public PdfCatalog Catalog { get; private set; }
-
-        public PdfPage this[int index]
-        {
-            get { return Pages[index]; }
-        }
+        public PdfPage this[int index] { get { return Pages[index]; } }
 
         private List<PdfPage> Pages
         {
@@ -26,8 +22,9 @@ namespace PdfXenon.Standard
             {
                 if (_pages == null)
                 {
+                    // Create the page tree hierarchy and accumulate the 
                     _pages = new List<PdfPage>();
-                    CreatePages(Doc, _pages);
+                    CreatePages(_pages);
                 }
 
                 return _pages;

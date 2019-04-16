@@ -1,46 +1,54 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace PdfXenon.Standard
 {
     public class PdfDictionary : PdfObject
     {
-        private ParseDictionary _dictionary;
-
-        public PdfDictionary(PdfDocument doc, ParseDictionary dictionary)
+        public PdfDictionary(PdfDocument doc, ParseDictionary parse)
             : base(doc)
         {
-            _dictionary = dictionary;
+            ParseDictionary = parse;
         }
 
         public override string ToString()
         {
-            return $"PdfDictionary\n{_dictionary.ToString()}";
+            return $"PdfDictionary\n{ParseDictionary.ToString()}";
         }
 
-        public int Count { get => _dictionary.Count; }
-        public Dictionary<string, ParseDictEntry>.KeyCollection Keys { get => _dictionary.Keys; }
-        public Dictionary<string, ParseDictEntry>.ValueCollection Values { get => _dictionary.Values; }
-        public Dictionary<string, ParseDictEntry>.Enumerator GetEnumerator() => _dictionary.GetEnumerator();
+        public ParseDictionary ParseDictionary { get; private set; }
 
-        public bool ContainsName(string name)
-        {
-            return _dictionary.ContainsName(name);
-        }
-
-        public ParseDictEntry this[string name]
-        {
-            get { return _dictionary[name]; }
-            set { _dictionary[name] = value; }
-        }
+        public int Count { get => ParseDictionary.Count; }
+        public bool ContainsName(string name) { return ParseDictionary.ContainsName(name); }
+        public Dictionary<string, ParseDictEntry>.KeyCollection Names { get => ParseDictionary.Names; }
+        public Dictionary<string, ParseDictEntry>.ValueCollection Values { get => ParseDictionary.Values; }
+        public Dictionary<string, ParseDictEntry>.Enumerator GetEnumerator() => ParseDictionary.GetEnumerator();
+        public ParseDictEntry this[string name] { get => ParseDictionary[name]; }
 
         public T OptionalValue<T>(string name) where T : ParseObject
         {
-            return _dictionary.OptionalValue<T>(name);
+            return ParseDictionary.OptionalValue<T>(name);
+        }
+
+        public PdfDateTime OptionalDateTime(string name)
+        {
+            ParseString parse = OptionalValue<ParseString>(name);
+            if (parse != null)
+            {
+                try
+                {
+                    // Some files seem to have an invalid format for the date
+                    return new PdfDateTime(Doc, parse);
+                }
+                catch { }
+            }
+
+            return null;
         }
 
         public T MandatoryValue<T>(string name) where T : ParseObject
         {
-            return _dictionary.MandatoryValue<T>(name);
+            return ParseDictionary.MandatoryValue<T>(name);
         }
     }
 }

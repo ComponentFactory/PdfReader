@@ -49,14 +49,10 @@ namespace PdfXenon.Standard
         }
 
         public int Count { get => _entries.Count; }
-        public Dictionary<string, ParseDictEntry>.KeyCollection Keys { get => _entries.Keys; }
+        public bool ContainsName(string name) { return _entries.ContainsKey(name); }
+        public Dictionary<string, ParseDictEntry>.KeyCollection Names { get => _entries.Keys; }
         public Dictionary<string, ParseDictEntry>.ValueCollection Values { get => _entries.Values; }
         public Dictionary<string, ParseDictEntry>.Enumerator GetEnumerator() => _entries.GetEnumerator();
-
-        public bool ContainsName(string name)
-        {
-            return _entries.ContainsKey(name);
-        }
 
         public ParseDictEntry this[string name]
         {
@@ -90,21 +86,6 @@ namespace PdfXenon.Standard
             }
             else
                 throw new ApplicationException($"Dictionary is missing mandatory name '{name}'.");
-        }
-
-        public bool TryGetValue(string name, out ParseObject obj)
-        {
-            ParseDictEntry entry;
-            if (_entries.TryGetValue(name, out entry))
-            {
-                obj = entry.Object;
-                return true;
-            }
-            else
-            {
-                obj = null;
-                return false;
-            }
         }
     }
 

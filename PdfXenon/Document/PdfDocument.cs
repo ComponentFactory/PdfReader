@@ -18,13 +18,8 @@ namespace PdfXenon.Standard
 
         public PdfDocument()
         {
-            Version = new PdfVersion(this) { Major = 0, Minor = 0 };
+            Version = new PdfVersion(this, 0, 0);
             IndirectObjects = new PdfIndirectObjects(this);
-
-            _refCatalog = null;
-            _refInfo = null;
-            _pdfCatalog = null;
-            _pdfInfo = null;
         }
 
         public PdfVersion Version { get; private set; }
@@ -49,11 +44,8 @@ namespace PdfXenon.Standard
             _parser.ResolveReference += Parser_ResolveReference;
 
             // PDF file should have a well known marker at top of file
-            int versionMajor = 0;
-            int versionMinor = 0;
-            _parser.ParseHeader(out versionMajor, out versionMinor);
-            Version.Major = versionMajor;
-            Version.Minor = versionMinor;
+            _parser.ParseHeader(out int versionMajor, out int versionMinor);
+            Version = new PdfVersion(this, versionMajor, versionMinor);
 
             // Find stream position of the last cross-reference table
             long xRefPosition = _parser.ParseXRefOffset();

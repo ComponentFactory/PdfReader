@@ -1,2 +1,2 @@
-﻿Auto resolve indirect references when you access the child
-Add access to mandatory fields of the Page, such as content and resources
+﻿Allow parsing of unknown keyword
+Update PdfContent to return a sequence of tokens aggregated from all its streams

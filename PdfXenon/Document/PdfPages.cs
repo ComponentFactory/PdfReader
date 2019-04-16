@@ -12,12 +12,12 @@ namespace PdfXenon.Standard
 
         public PdfPages Parent { get => (Inherit as PdfPages); }
 
-        public void CreatePages(PdfDocument document, List<PdfPage> pages)
+        public void CreatePages(List<PdfPage> pages)
         {
             ParseArray kids = MandatoryValue<ParseArray>("Kids");
             foreach(ParseObjectReference reference in kids.Objects)
             {
-                ParseDictionary dictionary = document.IndirectObjects.MandatoryValue<ParseDictionary>(reference);
+                ParseDictionary dictionary = Doc.IndirectObjects.MandatoryValue<ParseDictionary>(reference);
                 string type = dictionary.MandatoryValue<ParseName>("Type").Value;
 
                 if (type == "Page")
@@ -28,7 +28,7 @@ namespace PdfXenon.Standard
                 else if (type == "Pages")
                 {
                     PdfPages pdfPages = new PdfPages(Doc, this, dictionary);
-                    pdfPages.CreatePages(document, pages);
+                    pdfPages.CreatePages(pages);
                 }
             }
         }

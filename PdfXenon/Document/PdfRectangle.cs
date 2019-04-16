@@ -18,7 +18,7 @@ namespace PdfXenon.Standard
             float ux = ObjcetToFloat(array.Objects[2]);
             float uy = ObjcetToFloat(array.Objects[3]);
 
-            // Normalize because the two points are guaranteed to be lower-left and upper-right
+            // Normalize so the lower-left and upper-right are actually those values, because this is not guaranteed
             _lowerLeftX = Math.Min(lx, ux);
             _lowerLeftY = Math.Max(ly, uy);
             _upperRightX = Math.Max(lx, ux);
@@ -32,6 +32,7 @@ namespace PdfXenon.Standard
 
         private float ObjcetToFloat(ParseObject obj)
         {
+            // Might be an integer if the value has no fractional part
             if (obj is ParseInteger)
                 return (obj as ParseInteger).Value;
             else if (obj is ParseReal)

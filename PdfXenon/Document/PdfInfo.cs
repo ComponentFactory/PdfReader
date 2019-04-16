@@ -4,10 +4,8 @@ namespace PdfXenon.Standard
 {
     public class PdfInfo : PdfDictionary
     {
-        private PdfPagesTree _pages;
-
-        public PdfInfo(PdfDocument doc, ParseDictionary dictionary)
-            : base(doc, dictionary)
+        public PdfInfo(PdfDocument doc, ParseDictionary parse)
+            : base(doc, parse)
         {
         }
 
@@ -16,35 +14,13 @@ namespace PdfXenon.Standard
             return $"PdfInfo\n{base.ToString()}";
         }
 
-        public ParseString Title { get { return OptionalValue<ParseString>("Title"); } }
-        public ParseString Author { get { return OptionalValue<ParseString>("Author"); } }
-        public ParseString Subject { get { return OptionalValue<ParseString>("Subject"); } }
-        public ParseString Keywords { get { return OptionalValue<ParseString>("Keywords"); } }
-        public ParseString Creator { get { return OptionalValue<ParseString>("Creator"); } }
-        public ParseString Producer { get { return OptionalValue<ParseString>("Producer"); } }
-
-        public PdfDateTime CreationDate
-        {
-            get
-            {
-                ParseString parse = OptionalValue<ParseString>("CreationDate");
-                if (parse != null)
-                    return new PdfDateTime(Doc, parse);
-                else
-                    return null;
-            }
-        }
-
-        public PdfDateTime ModDate
-        {
-            get
-            {
-                ParseString parse = OptionalValue<ParseString>("ModDate");
-                if (parse != null)
-                    return new PdfDateTime(Doc, parse);
-                else
-                    return null;
-            }
-        }
+        public ParseString Title { get => OptionalValue<ParseString>("Title"); }
+        public ParseString Author { get => OptionalValue<ParseString>("Author"); }
+        public ParseString Subject { get => OptionalValue<ParseString>("Subject"); }
+        public ParseString Keywords { get => OptionalValue<ParseString>("Keywords"); }
+        public ParseString Creator { get => OptionalValue<ParseString>("Creator"); }
+        public ParseString Producer { get => OptionalValue<ParseString>("Producer"); }
+        public PdfDateTime CreationDate { get => OptionalDateTime("CreationDate"); }
+        public PdfDateTime ModDate { get => OptionalDateTime("ModDate"); }
     }
 }

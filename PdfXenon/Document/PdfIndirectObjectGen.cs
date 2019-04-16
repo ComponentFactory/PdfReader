@@ -6,17 +6,17 @@ namespace PdfXenon.Standard
 {
     public class PdfIndirectObjectGen : PdfObject
     {
-        private TokenXRefEntry _xRef;
-
         public PdfIndirectObjectGen(PdfDocument doc, TokenXRefEntry xref)
             : base(doc)
         {
-            _xRef = xref;
+            Id = xref.Id;
+            Gen = xref.Gen;
+            Offset = xref.Offset;
         }
 
-        public int Id { get => _xRef.Id; }
-        public int Gen { get => _xRef.Gen; }
-        public int Offset { get => _xRef.Offset; }
+        public int Id { get; private set; }
+        public int Gen { get; private set; }
+        public int Offset { get; private set; }
         public ParseObject Child { get; set; }
     }
 }

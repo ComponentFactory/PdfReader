@@ -6,10 +6,10 @@ namespace PdfXenon.Standard
     {
         private PdfDictionary _resources;
         private PdfRectangle _mediaBox;
-        private PdfContent _contents;
+        private PdfContents _contents;
 
-        public PdfPage(PdfDocument doc, PdfPages parent, ParseDictionary dictionary)
-            : base(doc, parent, dictionary)
+        public PdfPage(PdfDocument doc, PdfPages parent, ParseDictionary parse)
+            : base(doc, parent, parse)
         {
         }
 
@@ -25,7 +25,7 @@ namespace PdfXenon.Standard
             get
             {
                 if (_resources == null)
-                    _resources = new PdfDictionary(Doc, MandatoryInheritableValue<ParseDictionary>("Resources"));
+                    _resources = new PdfDictionary(Doc, InheritableMandatoryValue<ParseDictionary>("Resources"));
 
                 return _resources;
             }
@@ -36,18 +36,18 @@ namespace PdfXenon.Standard
             get
             {
                 if (_mediaBox == null)
-                    _mediaBox = new PdfRectangle(Doc, MandatoryInheritableValue<ParseArray>("MediaBox"));
+                    _mediaBox = new PdfRectangle(Doc, InheritableMandatoryValue<ParseArray>("MediaBox"));
 
                 return _mediaBox;
             }
         }
 
-        public PdfContent Contents
+        public PdfContents Contents
         {
             get
             {
                 if (_contents == null)
-                    _contents = new PdfContent(Doc, OptionalValue<ParseObject>("Contents"));
+                    _contents = new PdfContents(Doc, OptionalValue<ParseObject>("Contents"));
 
                 return _contents;
             }

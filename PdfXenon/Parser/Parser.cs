@@ -60,14 +60,56 @@ namespace PdfXenon.Standard
         {
             Tokenizer.IgnoreComments = true;
             TokenObject t = Tokenizer.GetToken();
-            ThrowIfNot<TokenKeyword>(t);
+            TokenKeyword keyword = t as TokenKeyword;
 
-            TokenKeyword keyword = (TokenKeyword)t;
-            if (keyword.Value != ParseKeyword.XRef)
-                throw new ApplicationException($"Cross-reference table has keyword {keyword.Value.ToString()} instead of 'xref' at position {t.Position}.");
+            if ((keyword == null) || (keyword.Value != ParseKeyword.XRef))
+            {
+                // Scan entire source creating XRef entries for each indirect object
+                return IndirectObjectsToXRef();
+            }
+            else
+            {
+                List<TokenXRefEntry> entries = new List<TokenXRefEntry>();
+                ParseXRefSections(entries);
+                return entries;
+            }
+        }
 
+        public List<TokenXRefEntry> IndirectObjectsToXRef()
+        {
             List<TokenXRefEntry> entries = new List<TokenXRefEntry>();
-            ParseXRefSections(entries);
+
+            // Start scanning from beginning of the source
+            Tokenizer.IgnoreComments = false;
+            Tokenizer.Position = 0;
+
+            long lastTrailer = -1;
+
+            do
+            {
+                TokenObject t1 = Tokenizer.GetToken();
+                if (t1 is TokenInteger)
+                {
+                    TokenInteger t2 = Tokenizer.GetToken() as TokenInteger;
+                    if (t2 != null)
+                    {
+                        TokenKeyword t3 = Tokenizer.GetToken() as TokenKeyword;
+                        if ((t3 != null) && (t3.Value == ParseKeyword.Obj))
+                        {
+                            TokenInteger id = (TokenInteger)t1;
+                            entries.Add(new TokenXRefEntry(t1.Position, id.Value, t2.Value, t1.Position, true));
+                        }
+                    }
+                }
+                else if ((t1 is TokenKeyword) && ((TokenKeyword)t1).Value == ParseKeyword.Trailer)
+                    lastTrailer = t1.Position;
+
+            } while (Tokenizer.GotoNextLine());
+
+            // Leave with the position on the last 'trailer' as caller will then parse it
+            if (lastTrailer >= 0)
+                Tokenizer.Position = lastTrailer;
+
             return entries;
         }
 

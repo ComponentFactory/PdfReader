@@ -20,10 +20,12 @@ namespace PdfXenon.Standard
         {
             Version = new PdfVersion(this, 0, 0);
             IndirectObjects = new PdfIndirectObjects(this);
+            Decrypt = new PdfDecryptNone(this);
         }
 
         public PdfVersion Version { get; private set; }
         public PdfIndirectObjects IndirectObjects { get; private set; }
+        public PdfDecrypt Decrypt { get; private set; }
 
         public void Load(string filename, bool immediate = false)
         {
@@ -49,7 +51,6 @@ namespace PdfXenon.Standard
 
             // Find stream position of the last cross-reference table
             long xRefPosition = _parser.ParseXRefOffset();
-
             bool lastHeader = true;
 
             do
@@ -57,17 +58,9 @@ namespace PdfXenon.Standard
                 // Get the aggregated set of entries from all the cross-reference table sections
                 List<TokenXRefEntry> xrefs = _parser.ParseXRef(xRefPosition);
 
+                // Should always be positioned at the trailer after parsing cross-table references
                 ParseDictionary trailer = _parser.ParseTrailer();
                 ParseInteger size = trailer.MandatoryValue<ParseInteger>("Size");
-                ParseInteger prev = trailer.OptionalValue<ParseInteger>("Prev");
-
-                if (lastHeader)
-                {
-                    // We only care about the latest defined catalog and information dictionary
-                    _refCatalog = trailer.MandatoryValue<ParseObjectReference>("Root");
-                    _refInfo = trailer.OptionalValue<ParseObjectReference>("Info");
-                }
-
                 foreach (TokenXRefEntry xref in xrefs)
                 {
                     // Ignore unused entries and entries smaller than the defined size from the trailer dictionary
@@ -75,7 +68,18 @@ namespace PdfXenon.Standard
                         IndirectObjects.AddXRef(xref);
                 }
 
+                if (lastHeader)
+                {
+                    // Replace the default decryption handler with one from document settings
+                    Decrypt = PdfDecrypt.CreateDecrypt(this, trailer);
+
+                    // We only care about the latest defined catalog and information dictionary
+                    _refCatalog = trailer.MandatoryValue<ParseObjectReference>("Root");
+                    _refInfo = trailer.OptionalValue<ParseObjectReference>("Info");
+                }
+
                 // If there is a previous cross-reference table, then we want to process that as well
+                ParseInteger prev = trailer.OptionalValue<ParseInteger>("Prev");
                 if (prev != null)
                     xRefPosition = prev.Value;
                 else

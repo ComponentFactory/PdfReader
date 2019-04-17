@@ -11,7 +11,7 @@ namespace PdfXenon.Standard
         {
         }
 
-        public override string Resolved
+        public override string ResolvedAsString
         {
             get
             {
@@ -113,6 +113,14 @@ namespace PdfXenon.Standard
                 }
                
                 return _actual;
+            }
+        }
+
+        public override byte[] ResolvedAsBytes
+        {
+            get
+            {
+                return Encoding.ASCII.GetBytes(ResolvedAsString);
             }
         }
     }

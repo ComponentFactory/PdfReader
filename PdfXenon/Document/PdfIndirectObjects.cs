@@ -21,9 +21,25 @@ namespace PdfXenon.Standard
         public PdfIndirectObjectGen this[int id, int gen] { get =>_ids[id][gen]; }
         public PdfIndirectObjectGen this[ParseObjectReference reference] { get => this[reference.Id, reference.Gen]; }
 
+        public T OptionalValue<T>(ParseObjectReference reference) where T : ParseObject
+        {
+            ParseObject obj = Doc.ResolveReference(reference.Id, reference.Gen);
+
+            if (obj != null)
+            {
+                if (!(obj is T))
+                    throw new ApplicationException($"Optional indirect object ({reference.Id},{reference.Gen}) incorrect type at position {reference.Position}.");
+
+                return (T)obj;
+            }
+
+            return null;
+        }
+
         public T MandatoryValue<T>(ParseObjectReference reference) where T : ParseObject
         {
             ParseObject obj = Doc.ResolveReference(reference.Id, reference.Gen);
+
             if ((obj == null) ||  !(obj is T))
                 throw new ApplicationException($"Mandatory indirect object ({reference.Id},{reference.Gen}) missing or incorrect type at position {reference.Position}.");
 

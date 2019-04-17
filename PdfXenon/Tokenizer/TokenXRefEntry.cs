@@ -2,7 +2,7 @@
 {
     public class TokenXRefEntry : TokenObject
     {
-        public TokenXRefEntry(long position, int id, int gen, int offset, bool used)
+        public TokenXRefEntry(long position, int id, int gen, long offset, bool used)
             : base(position)
         {
             Id = id;
@@ -13,7 +13,7 @@
 
         public int Id { get; private set; }
         public int Gen { get; private set; }
-        public int Offset { get; private set; }
+        public long Offset { get; private set; }
         public bool Used { get; private set; }
     }
 }

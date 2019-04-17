@@ -16,7 +16,7 @@ namespace PdfXenon.Standard
 
         public int Id { get; private set; }
         public int Gen { get; private set; }
-        public int Offset { get; private set; }
+        public long Offset { get; private set; }
         public ParseObject Child { get; set; }
     }
 }

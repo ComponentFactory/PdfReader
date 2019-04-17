@@ -137,6 +137,21 @@ namespace PdfXenon.Standard
             return t;
         }
 
+        public bool GotoNextLine()
+        {
+            _position = Reader.Position;
+            _line = Reader.ReadLine();
+
+            if (_line != null)
+            {
+                _length = _line.Length;
+                _index = 0;
+                return true;
+            }
+            else
+                return false;
+        }
+
         public byte[] GetBytes(int length)
         {
             return Reader.GetBytes(length);

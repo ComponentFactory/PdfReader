@@ -11,9 +11,15 @@ namespace ConsoleApp
             PdfDocument document = new PdfDocument();
             document.Load(@"d:\PDF17.pdf", false);
 
-            Console.WriteLine(document.Catalog.Pages.Count);
-            foreach(PdfPage page in document.Catalog.Pages)
-                Console.WriteLine(page.MediaBox.ToString());
+            Console.WriteLine($"Pages: {document.Catalog.Pages.Count}");
+            Console.WriteLine($"Author: {document.Info.Author}");
+            Console.WriteLine($"CreationDate: {document.Info.CreationDate}");
+            Console.WriteLine($"Creator: {document.Info.Creator}");
+            Console.WriteLine($"Keywords: {document.Info.Keywords}");
+            Console.WriteLine($"ModDate: {document.Info.ModDate}");
+            Console.WriteLine($"Producer: {document.Info.Producer}");
+            Console.WriteLine($"Subject: {document.Info.Subject}");
+            Console.WriteLine($"Title: {document.Info.Title}");
 
             Console.ReadLine();
         }

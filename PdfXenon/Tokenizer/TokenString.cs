@@ -9,6 +9,8 @@
         }
 
         public string Raw { get; private set; }
-        public abstract string Resolved { get; }
+
+        public abstract string ResolvedAsString { get; }
+        public abstract byte[] ResolvedAsBytes { get; }
     }
 }

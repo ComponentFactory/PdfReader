@@ -1,4 +1,6 @@
-﻿Allow parsing of unknown keyword
+﻿If xref is not found then build the xref entries by scanning the lines and checking or indirect objects by pattern at start of lines and processing the last trailer to get dictionary
+
+Allow parsing of unknown keyword
 Update PdfContent to return a sequence of tokens aggregated from all its streams
 
 PDFClown

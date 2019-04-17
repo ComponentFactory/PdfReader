@@ -7,7 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PdfXenon.Standard", "PdfXen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PdfXenon.UnitTesting", "UnitTesting\PdfXenon.UnitTesting.csproj", "{818FEC8F-17B4-4E6D-B0DE-0FBA73F6C9AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{B719C92C-4D11-4861-A2CB-CD9E23F9AA98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{B719C92C-4D11-4861-A2CB-CD9E23F9AA98}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{F76A0363-5E23-4485-AE79-59E34EEF1C76}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Downloads\Frhed-1.6.0-exe.zip = ..\..\Downloads\Frhed-1.6.0-exe.zip
+		..\..\PDF17.pdf = ..\..\PDF17.pdf
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

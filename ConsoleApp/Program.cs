@@ -9,16 +9,11 @@ namespace ConsoleApp
         static void Main(string[] args)
         {
             PdfDocument document = new PdfDocument();
-            document.Load(@"d:\Slides.pdf", false);
+            document.Load(@"d:\PDF17.pdf", false);
 
+            Console.WriteLine(document.Catalog.Pages.Count);
             foreach(PdfPage page in document.Catalog.Pages)
-            {
-                Console.WriteLine("Page");
-                Console.WriteLine("----");
-                Console.WriteLine(page.Resources.ToString());
                 Console.WriteLine(page.MediaBox.ToString());
-                Console.WriteLine(page.Contents.ToString());
-            }
 
             Console.ReadLine();
         }

@@ -1,2 +1,6 @@
 ﻿Allow parsing of unknown keyword
 Update PdfContent to return a sequence of tokens aggregated from all its streams
+
+PDFClown
+iTextShar-Develop
+https://github.com/PDFium/PDFium

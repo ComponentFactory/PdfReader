@@ -23,15 +23,7 @@ namespace PdfXenon.Standard
 
                 // We only implement the simple Standard, Version 1 scheme
                 if ((filter.Value == "Standard") && (v != null) && (v.Value == 1))
-                {
-                    // Extract the first document identifier
-                    ParseArray ids = trailer.MandatoryValue<ParseArray>("ID");
-                    ParseString id0 = (ParseString)ids.Objects[0];
-                    byte[] documentId = id0.ValueAsBytes;
-
-                    // 
-                    ret = new PdfDecryptStandard(doc, encryptDict, documentId);
-                }
+                    ret = new PdfDecryptStandard(doc, trailer, encryptDict);
 
                 throw new ApplicationException("Can only decrypt the standard handler with version 1.");
             }

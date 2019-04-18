@@ -1,5 +1,6 @@
 ﻿using PdfXenon.Standard;
 using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace ConsoleApp
@@ -8,8 +9,14 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             PdfDocument document = new PdfDocument();
-            document.Load(@"d:\PDF17.pdf", false);
+            document.Load(@"d:\PDF17.pdf", true);
+            document.Close();
+            sw.Stop();
+
+            Console.WriteLine($"Process {sw.ElapsedMilliseconds}ms\n");
 
             Console.WriteLine($"Pages: {document.Catalog.Pages.Count}");
             Console.WriteLine($"Author: {document.Info.Author}");

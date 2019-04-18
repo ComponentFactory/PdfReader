@@ -2,17 +2,12 @@
 
 namespace PdfXenon.Standard
 {
-    public class PdfDateTime : PdfObject
+    public class PdfDateTime : PdfString
     {
-        public PdfDateTime(PdfDocument doc, ParseString parse)
-            : base(doc)
+        public PdfDateTime(PdfObject parent, PdfString str)
+            : base(parent, str.ParseObject as ParseString)
         {
-            DateTime = parse.ValueAsDateTime;
-        }
-
-        public override string ToString()
-        {
-            return DateTime.ToString();
+            DateTime = str.ValueAsDateTime;
         }
 
         public DateTime DateTime { get; private set; }

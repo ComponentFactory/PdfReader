@@ -5,18 +5,19 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class PdfDocument
+    public class PdfDocument : PdfObject
     {
         private bool _open;
         private Stream _stream;
         private StreamReader _reader;
         private Parser _parser;
-        private ParseObjectReference _refCatalog;
-        private ParseObjectReference _refInfo;
+        private PdfObjectReference _refCatalog;
+        private PdfObjectReference _refInfo;
         private PdfCatalog _pdfCatalog;
         private PdfInfo _pdfInfo;
 
         public PdfDocument()
+            : base(null)
         {
             Version = new PdfVersion(this, 0, 0);
             IndirectObjects = new PdfIndirectObjects(this);
@@ -59,8 +60,8 @@ namespace PdfXenon.Standard
                 List<TokenXRefEntry> xrefs = _parser.ParseXRef(xRefPosition);
 
                 // Should always be positioned at the trailer after parsing cross-table references
-                ParseDictionary trailer = _parser.ParseTrailer();
-                ParseInteger size = trailer.MandatoryValue<ParseInteger>("Size");
+                PdfDictionary trailer = new PdfDictionary(this, _parser.ParseTrailer());
+                PdfInteger size = trailer.MandatoryValue<PdfInteger>("Size");
                 foreach (TokenXRefEntry xref in xrefs)
                 {
                     // Ignore unused entries and entries smaller than the defined size from the trailer dictionary
@@ -70,16 +71,16 @@ namespace PdfXenon.Standard
 
                 if (lastHeader)
                 {
-                    // Replace the default decryption handler with one from document settings
+                    // Replace the default decryption handler with one from the document settings
                     Decrypt = PdfDecrypt.CreateDecrypt(this, trailer);
 
                     // We only care about the latest defined catalog and information dictionary
-                    _refCatalog = trailer.MandatoryValue<ParseObjectReference>("Root");
-                    _refInfo = trailer.OptionalValue<ParseObjectReference>("Info");
+                    _refCatalog = trailer.MandatoryValue<PdfObjectReference>("Root");
+                    _refInfo = trailer.OptionalValue<PdfObjectReference>("Info");
                 }
 
                 // If there is a previous cross-reference table, then we want to process that as well
-                ParseInteger prev = trailer.OptionalValue<ParseInteger>("Prev");
+                PdfInteger prev = trailer.OptionalValue<PdfInteger>("Prev");
                 if (prev != null)
                     xRefPosition = prev.Value;
                 else
@@ -134,8 +135,11 @@ namespace PdfXenon.Standard
         {
             get
             {
-                if (_pdfCatalog == null)
-                    _pdfCatalog = new PdfCatalog(this, IndirectObjects.MandatoryValue<ParseDictionary>(_refCatalog));
+                if ((_pdfCatalog == null) && (_refCatalog != null))
+                {
+                    PdfDictionary dictionary = IndirectObjects.MandatoryValue<PdfDictionary>(_refCatalog);
+                    _pdfCatalog = new PdfCatalog(this, dictionary.ParseObject as ParseDictionary);
+                }
 
                 return _pdfCatalog;
             }
@@ -146,18 +150,21 @@ namespace PdfXenon.Standard
             get
             {
                 if ((_pdfInfo == null) && (_refInfo != null))
-                    _pdfInfo = new PdfInfo(this, IndirectObjects.MandatoryValue<ParseDictionary>(_refInfo));
+                {
+                    PdfDictionary dictionary = IndirectObjects.MandatoryValue<PdfDictionary>(_refInfo);
+                    _pdfInfo = new PdfInfo(this, dictionary.ParseObject as ParseDictionary);
+                }
 
                 return _pdfInfo;
             }
         }
 
-        public ParseObject ResolveReference(ParseObjectReference reference)
+        public PdfObject ResolveReference(PdfObjectReference reference)
         {
             return ResolveReference(reference.Id, reference.Gen);
         }
 
-        public ParseObject ResolveReference(int id, int gen)
+        public PdfObject ResolveReference(int id, int gen)
         {
             PdfIndirectObjectGen indirect = IndirectObjects[id, gen];
             if (indirect != null)
@@ -165,7 +172,7 @@ namespace PdfXenon.Standard
                 if (indirect.Child == null)
                 {
                     ParseIndirectObject parseIndirectObject = _parser.ParseIndirectObject(indirect.Offset);
-                    indirect.Child = parseIndirectObject.Object;
+                    indirect.Child = indirect.WrapObject(parseIndirectObject.Object);
 
                     //Console.WriteLine(parseIndirectObject.ToString());
                 }
@@ -178,7 +185,7 @@ namespace PdfXenon.Standard
 
         private void Parser_ResolveReference(object sender, ParseResolveEventArgs e)
         {
-            e.Object = ResolveReference(e.Id, e.Gen);
+            e.Object = ResolveReference(e.Id, e.Gen).ParseObject;
         }
     }
 }

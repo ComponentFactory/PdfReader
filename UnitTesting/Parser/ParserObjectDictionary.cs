@@ -28,11 +28,10 @@ namespace ParserUnitTesting
             Assert.NotNull(d);
             Assert.True(d.Count == 1);
 
-            ParseDictEntry entry = d["Example"];
+            ParseObject entry = d["Example"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "Example");
-            Assert.True(entry.Object is ParseString);
-            Assert.True((entry.Object as ParseString).Value == "de");
+            Assert.True(entry is ParseString);
+            Assert.True((entry as ParseString).Value == "de");
         }
 
         [Fact]
@@ -44,11 +43,10 @@ namespace ParserUnitTesting
             Assert.NotNull(d);
             Assert.True(d.Count == 1);
 
-            ParseDictEntry entry = d["Example"];
+            ParseObject entry = d["Example"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "Example");
-            Assert.True(entry.Object is ParseString);
-            Assert.True((entry.Object as ParseString).Value == "de");
+            Assert.True(entry is ParseString);
+            Assert.True((entry as ParseString).Value == "de");
         }
 
         [Fact]
@@ -60,11 +58,10 @@ namespace ParserUnitTesting
             Assert.NotNull(d);
             Assert.True(d.Count == 1);
 
-            ParseDictEntry entry = d["Example"];
+            ParseObject entry = d["Example"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "Example");
-            Assert.True(entry.Object is ParseInteger);
-            Assert.True((entry.Object as ParseInteger).Value == 42);
+            Assert.True(entry is ParseInteger);
+            Assert.True((entry as ParseInteger).Value == 42);
         }
 
         [Fact]
@@ -76,11 +73,10 @@ namespace ParserUnitTesting
             Assert.NotNull(d);
             Assert.True(d.Count == 1);
 
-            ParseDictEntry entry = d["Example"];
+            ParseObject entry = d["Example"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "Example");
-            Assert.True(entry.Object is ParseReal);
-            Assert.True((entry.Object as ParseReal).Value == 3.14f);
+            Assert.True(entry is ParseReal);
+            Assert.True((entry as ParseReal).Value == 3.14f);
         }
 
         [Fact]
@@ -92,10 +88,9 @@ namespace ParserUnitTesting
             Assert.NotNull(d);
             Assert.True(d.Count == 1);
 
-            ParseDictEntry entry = d["Example"];
+            ParseObject entry = d["Example"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "Example");
-            Assert.True(entry.Object is ParseNull);
+            Assert.True(entry is ParseNull);
         }
 
         [Fact]
@@ -107,11 +102,10 @@ namespace ParserUnitTesting
             Assert.NotNull(d);
             Assert.True(d.Count == 1);
 
-            ParseDictEntry entry = d["Example"];
+            ParseObject entry = d["Example"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "Example");
-            Assert.True(entry.Object is ParseName);
-            Assert.True((entry.Object as ParseName).Value == "Other");
+            Assert.True(entry is ParseName);
+            Assert.True((entry as ParseName).Value == "Other");
         }
 
         [Fact]
@@ -123,11 +117,10 @@ namespace ParserUnitTesting
             Assert.NotNull(d);
             Assert.True(d.Count == 1);
 
-            ParseDictEntry entry = d["Example"];
+            ParseObject entry = d["Example"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "Example");
-            Assert.True(entry.Object is ParseName);
-            Assert.True((entry.Object as ParseName).Value == "Other");
+            Assert.True(entry is ParseName);
+            Assert.True((entry as ParseName).Value == "Other");
         }
 
         [Fact]
@@ -139,11 +132,10 @@ namespace ParserUnitTesting
             Assert.NotNull(d);
             Assert.True(d.Count == 1);
 
-            ParseDictEntry entry = d["Example"];
+            ParseObject entry = d["Example"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "Example");
-            Assert.True(entry.Object is ParseBoolean);
-            Assert.True((entry.Object as ParseBoolean).Value);
+            Assert.True(entry is ParseBoolean);
+            Assert.True((entry as ParseBoolean).Value);
         }
 
         [Fact]
@@ -155,12 +147,11 @@ namespace ParserUnitTesting
             Assert.NotNull(d);
             Assert.True(d.Count == 1);
 
-            ParseDictEntry entry = d["Example"];
+            ParseObject entry = d["Example"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "Example");
-            Assert.True(entry.Object is ParseObjectReference);
-            Assert.True((entry.Object as ParseObjectReference).Id == 99);
-            Assert.True((entry.Object as ParseObjectReference).Gen == 1);
+            Assert.True(entry is ParseObjectReference);
+            Assert.True((entry as ParseObjectReference).Id == 99);
+            Assert.True((entry as ParseObjectReference).Gen == 1);
         }
 
         [Fact]
@@ -172,18 +163,16 @@ namespace ParserUnitTesting
             Assert.NotNull(d);
             Assert.True(d.Count == 2);
 
-            ParseDictEntry entry = d["Example"];
+            ParseObject entry = d["Example"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "Example");
-            Assert.True(entry.Object is ParseObjectReference);
-            Assert.True((entry.Object as ParseObjectReference).Id == 99);
-            Assert.True((entry.Object as ParseObjectReference).Gen == 1);
+            Assert.True(entry is ParseObjectReference);
+            Assert.True((entry as ParseObjectReference).Id == 99);
+            Assert.True((entry as ParseObjectReference).Gen == 1);
 
             entry = d["Other"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "Other");
-            Assert.True(entry.Object is ParseInteger);
-            Assert.True((entry.Object as ParseInteger).Value == 2);
+            Assert.True(entry is ParseInteger);
+            Assert.True((entry as ParseInteger).Value == 2);
         }
 
         [Fact]
@@ -195,28 +184,24 @@ namespace ParserUnitTesting
             Assert.NotNull(d);
             Assert.True(d.Count == 4);
 
-            ParseDictEntry entry = d["1"];
+            ParseObject entry = d["1"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "1");
-            Assert.True(entry.Object is ParseName);
-            Assert.True((entry.Object as ParseName).Value == "Example");
+            Assert.True(entry is ParseName);
+            Assert.True((entry as ParseName).Value == "Example");
 
             entry = d["2"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "2");
-            Assert.True(entry.Object is ParseString);
-            Assert.True((entry.Object as ParseString).Value == "de");
+            Assert.True(entry is ParseString);
+            Assert.True((entry as ParseString).Value == "de");
 
             entry = d["3"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "3");
-            Assert.True(entry.Object is ParseReal);
-            Assert.True((entry.Object as ParseReal).Value == 3.14f);
+            Assert.True(entry is ParseReal);
+            Assert.True((entry as ParseReal).Value == 3.14f);
 
             entry = d["4"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "4");
-            Assert.True(entry.Object is ParseNull);
+            Assert.True(entry is ParseNull);
         }
 
         [Fact]
@@ -228,28 +213,24 @@ namespace ParserUnitTesting
             Assert.NotNull(d);
             Assert.True(d.Count == 4);
 
-            ParseDictEntry entry = d["1"];
+            ParseObject entry = d["1"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "1");
-            Assert.True(entry.Object is ParseName);
-            Assert.True((entry.Object as ParseName).Value == "Example");
+            Assert.True(entry is ParseName);
+            Assert.True((entry as ParseName).Value == "Example");
 
             entry = d["2"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "2");
-            Assert.True(entry.Object is ParseString);
-            Assert.True((entry.Object as ParseString).Value == "de");
+            Assert.True(entry is ParseString);
+            Assert.True((entry as ParseString).Value == "de");
 
             entry = d["3"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "3");
-            Assert.True(entry.Object is ParseReal);
-            Assert.True((entry.Object as ParseReal).Value == 3.14f);
+            Assert.True(entry is ParseReal);
+            Assert.True((entry as ParseReal).Value == 3.14f);
 
             entry = d["4"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "4");
-            Assert.True(entry.Object is ParseNull);
+            Assert.True(entry is ParseNull);
         }
 
         [Fact]
@@ -261,12 +242,11 @@ namespace ParserUnitTesting
             Assert.NotNull(d);
             Assert.True(d.Count == 1);
 
-            ParseDictEntry entry = d["1"];
+            ParseObject entry = d["1"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "1");
-            Assert.True(entry.Object is ParseArray);
+            Assert.True(entry is ParseArray);
 
-            ParseArray o = entry.Object as ParseArray;
+            ParseArray o = entry as ParseArray;
             Assert.NotNull(o);
             Assert.True(o.Objects.Count == 4);
             Assert.True(o.Objects[0] is ParseName);
@@ -287,19 +267,17 @@ namespace ParserUnitTesting
             Assert.NotNull(d);
             Assert.True(d.Count == 1);
 
-            ParseDictEntry entry = d["1"];
+            ParseObject entry = d["1"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "1");
-            Assert.True(entry.Object is ParseDictionary);
+            Assert.True(entry is ParseDictionary);
 
-            d = entry.Object as ParseDictionary;
+            d = entry as ParseDictionary;
             Assert.True(d.Count == 1);
 
             entry = d["1"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "1");
-            Assert.True(entry.Object is ParseString);
-            Assert.True((entry.Object as ParseString).Value == "de");
+            Assert.True(entry is ParseString);
+            Assert.True((entry as ParseString).Value == "de");
         }
 
         [Fact]
@@ -311,33 +289,29 @@ namespace ParserUnitTesting
             Assert.NotNull(d);
             Assert.True(d.Count == 2);
 
-            ParseDictEntry entry = d["1"];
+            ParseObject entry = d["1"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "1");
-            Assert.True(entry.Object is ParseDictionary);
+            Assert.True(entry is ParseDictionary);
 
-            ParseDictionary d1 = entry.Object as ParseDictionary;
+            ParseDictionary d1 = entry as ParseDictionary;
             Assert.True(d1.Count == 1);
 
             entry = d1["A"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "A");
-            Assert.True(entry.Object is ParseString);
-            Assert.True((entry.Object as ParseString).Value == "de");
+            Assert.True(entry is ParseString);
+            Assert.True((entry as ParseString).Value == "de");
 
             entry = d["2"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "2");
-            Assert.True(entry.Object is ParseDictionary);
+            Assert.True(entry is ParseDictionary);
 
-            ParseDictionary d2 = entry.Object as ParseDictionary;
+            ParseDictionary d2 = entry as ParseDictionary;
             Assert.True(d2.Count == 1);
 
             entry = d2["B"];
             Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "B");
-            Assert.True(entry.Object is ParseString);
-            Assert.True((entry.Object as ParseString).Value == "fg");
+            Assert.True(entry is ParseString);
+            Assert.True((entry as ParseString).Value == "fg");
         }
     }
 }

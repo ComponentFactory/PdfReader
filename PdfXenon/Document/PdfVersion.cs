@@ -2,8 +2,8 @@
 {
     public class PdfVersion : PdfObject
     {
-        public PdfVersion(PdfDocument doc, int major, int minor)
-            : base(doc)
+        public PdfVersion(PdfObject parent, int major, int minor)
+            : base(parent)
         {
             Major = major;
             Minor = minor;

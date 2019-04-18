@@ -1,4 +1,4 @@
-﻿Hex string to string checking for unicode
+﻿Feedback class in document, RebuiltXRef, Decrypting
 
 Allow parsing of unknown keyword
 Update PdfContent to return a sequence of tokens aggregated from all its streams

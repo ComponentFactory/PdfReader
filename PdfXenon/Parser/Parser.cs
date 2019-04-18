@@ -240,8 +240,7 @@ namespace PdfXenon.Standard
                 if (!dictionary.ContainsName("Length"))
                     throw new ApplicationException($"Stream dictionary must contain a 'Length' entry at position {v.Position}.");
 
-                ParseDictEntry entry = dictionary["Length"];
-                ParseObject lengthObj = entry.Object;
+                ParseObject lengthObj = dictionary["Length"];
 
                 // Resolve any object reference
                 ParseObjectReference reference = lengthObj as ParseObjectReference;
@@ -344,7 +343,7 @@ namespace PdfXenon.Standard
             }
             else if (t is TokenDictionaryOpen)
             {
-                Dictionary<string, ParseDictEntry> entries = new Dictionary<string, ParseDictEntry>();
+                Dictionary<string, ParseObject> dictionary = new Dictionary<string, ParseObject>();
 
                 ParseObject value1 = null;
                 ParseObject value2 = null;
@@ -368,11 +367,11 @@ namespace PdfXenon.Standard
                         ThrowOnEmptyOrError(t);
 
                     // If key already exists then simply overwrite it with latest value
-                    entries[name.Value] = new ParseDictEntry() { Name = name, Object = value2 };
+                    dictionary[name.Value] = value2;
                 }
 
                 ThrowIfNot<TokenDictionaryClose>(Tokenizer.GetToken());
-                return new ParseDictionary(t.Position, entries);
+                return new ParseDictionary(t.Position, dictionary);
             }
             else if (t is TokenKeyword)
             {

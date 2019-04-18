@@ -4,8 +4,8 @@ namespace PdfXenon.Standard
 {
     public class PdfDecryptNone : PdfDecrypt
     {
-        public PdfDecryptNone(PdfDocument doc)
-            : base(doc)
+        public PdfDecryptNone(PdfObject parent)
+            : base(parent)
         {
         }
     }

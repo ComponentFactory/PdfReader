@@ -83,10 +83,10 @@ namespace PdfXenon.Standard
             if (HasFilter)
             {
                 // Get the filtering as an array to be applied in order (if a single filter then convert from Name to an Array of one entry)
-                ParseDictEntry entry = _dictionary["Filter"];
-                ParseArray filters = entry.Object as ParseArray;
-                if ((filters == null) && (entry.Object is ParseName))
-                    filters = new ParseArray(entry.Object.Position, new List<ParseObject>() { entry.Object });
+                ParseObject obj = _dictionary["Filter"];
+                ParseArray filters = obj as ParseArray;
+                if ((filters == null) && (obj is ParseName))
+                    filters = new ParseArray(obj.Position, new List<ParseObject>() { obj });
 
                 foreach (ParseName filter in filters.Objects)
                 {

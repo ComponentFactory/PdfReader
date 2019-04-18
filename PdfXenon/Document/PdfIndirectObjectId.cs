@@ -8,8 +8,8 @@ namespace PdfXenon.Standard
     {
         private Dictionary<int, PdfIndirectObjectGen> _gens = new Dictionary<int, PdfIndirectObjectGen>();
 
-        public PdfIndirectObjectId(PdfDocument doc)
-            : base(doc)
+        public PdfIndirectObjectId(PdfObject parent)
+            : base(parent)
         {
         }
 
@@ -25,7 +25,7 @@ namespace PdfXenon.Standard
             if (_gens.ContainsKey(xref.Gen))
                 throw new ApplicationException($"Indirect object with Id:{xref.Id} Gen:{xref.Gen} already exists, at position {xref.Position}.");
 
-            _gens.Add(xref.Gen, new PdfIndirectObjectGen(Doc, xref));
+            _gens.Add(xref.Gen, new PdfIndirectObjectGen(this, xref));
         }
     }
 }

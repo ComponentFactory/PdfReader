@@ -8,33 +8,23 @@ namespace PdfXenon.Standard
     {
         private List<ParseStream> _streams = new List<ParseStream>();
 
-        public PdfContents(PdfDocument doc, ParseObject parse)
-            : base(doc)
+        public PdfContents(PdfObject parent, ParseObject obj)
+            : base(parent, obj)
         {
-            ResolveToStreams(parse);
+            ResolveToStreams(obj);
         }
 
-        public override string ToString()
+        private void ResolveToStreams(ParseObject obj)
         {
-            StringBuilder sb = new StringBuilder();
-
-            sb.Append($"PdfContent\n");
-
-            foreach (ParseStream stream in _streams)
-                sb.AppendLine(stream.ToString());
-
-            return sb.ToString();
-        }
-
-        private void ResolveToStreams(ParseObject parse)
-        {
-            if (parse is ParseStream)
-                _streams.Add(parse as ParseStream);
-            else if (parse is ParseObjectReference)
-                ResolveToStreams(Doc.ResolveReference(parse as ParseObjectReference));
-            else if (parse is ParseArray)
+            if (obj is ParseStream)
+                _streams.Add(obj as ParseStream);
+            else if (obj is ParseObjectReference)
             {
-                ParseArray array = (ParseArray)parse;
+                ResolveToStreams(Document.ResolveReference(new PdfObjectReference(this, obj as ParseObjectReference)).ParseObject);
+            }
+            else if (obj is ParseArray)
+            {
+                ParseArray array = (ParseArray)obj;
                 foreach (ParseObject entry in array.Objects)
                     ResolveToStreams(entry);
             }

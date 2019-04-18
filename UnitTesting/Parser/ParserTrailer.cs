@@ -18,10 +18,10 @@ namespace ParserUnitTesting
 
             Assert.NotNull(d);
             Assert.True(d.Count == 4);
-            Assert.True(d["Size"].Object is ParseInteger);
-            Assert.True(d["Root"].Object is ParseObjectReference);
-            Assert.True(d["Info"].Object is ParseObjectReference);
-            Assert.True(d["ID"].Object is ParseArray);
+            Assert.True(d["Size"] is ParseInteger);
+            Assert.True(d["Root"] is ParseObjectReference);
+            Assert.True(d["Info"] is ParseObjectReference);
+            Assert.True(d["ID"] is ParseArray);
         }
     }
 }

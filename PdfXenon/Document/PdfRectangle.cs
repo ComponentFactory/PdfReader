@@ -9,8 +9,8 @@ namespace PdfXenon.Standard
         private float _upperRightX;
         private float _upperRightY;
 
-        public PdfRectangle(PdfDocument doc, ParseArray array)
-            : base(doc)
+        public PdfRectangle(PdfObject parent, ParseArray array)
+            : base(parent, array)
         {
             // Extract raw values
             float lx = ObjcetToFloat(array.Objects[0]);
@@ -23,11 +23,6 @@ namespace PdfXenon.Standard
             _lowerLeftY = Math.Max(ly, uy);
             _upperRightX = Math.Max(lx, ux);
             _upperRightY = Math.Min(ly, uy);
-        }
-
-        public override string ToString()
-        {
-            return $"PdfRectangle\n({_lowerLeftX},{_lowerLeftY}) -> ({_upperRightX},{_upperRightY})";
         }
 
         private float ObjcetToFloat(ParseObject obj)

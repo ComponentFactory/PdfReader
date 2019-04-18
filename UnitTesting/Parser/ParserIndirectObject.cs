@@ -169,9 +169,8 @@ namespace ParserUnitTesting
             ParseDictionary o = i.Object as ParseDictionary;
             Assert.NotNull(o);
             Assert.True(o.Count == 1);
-            Assert.True(o["Type"].Name.Value == "Type");
-            Assert.True(o["Type"].Object is ParseString);
-            Assert.True((o["Type"].Object as ParseString).Value == "Example");
+            Assert.True(o["Type"] is ParseString);
+            Assert.True((o["Type"] as ParseString).Value == "Example");
         }
     }
 }

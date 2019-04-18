@@ -7,13 +7,11 @@ namespace PdfXenon.Standard
     {
         private List<PdfPage> _pages;
 
-        public PdfPagesTree(PdfDocument doc, PdfCatalog catalog, ParseDictionary dictionary)
-            : base(doc, null, dictionary)
+        public PdfPagesTree(PdfObject parent, ParseDictionary dictionary)
+            : base(parent, dictionary)
         {
-            Catalog = catalog;
         }
 
-        public PdfCatalog Catalog { get; private set; }
         public PdfPage this[int index] { get { return Pages[index]; } }
 
         private List<PdfPage> Pages

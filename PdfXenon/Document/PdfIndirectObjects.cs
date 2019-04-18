@@ -7,8 +7,8 @@ namespace PdfXenon.Standard
     {
         private Dictionary<int, PdfIndirectObjectId> _ids = new Dictionary<int, PdfIndirectObjectId>();
 
-        public PdfIndirectObjects(PdfDocument doc)
-            : base(doc)
+        public PdfIndirectObjects(PdfObject parent)
+            : base(parent)
         {
         }
 
@@ -19,16 +19,16 @@ namespace PdfXenon.Standard
         public Dictionary<int, PdfIndirectObjectId>.Enumerator GetEnumerator() => _ids.GetEnumerator();
         public PdfIndirectObjectId this[int id] { get => _ids[id]; }
         public PdfIndirectObjectGen this[int id, int gen] { get =>_ids[id][gen]; }
-        public PdfIndirectObjectGen this[ParseObjectReference reference] { get => this[reference.Id, reference.Gen]; }
+        public PdfIndirectObjectGen this[PdfObjectReference reference] { get => this[reference.Id, reference.Gen]; }
 
-        public T OptionalValue<T>(ParseObjectReference reference) where T : ParseObject
+        public T OptionalValue<T>(PdfObjectReference reference) where T : PdfObject
         {
-            ParseObject obj = Doc.ResolveReference(reference.Id, reference.Gen);
+            PdfObject obj = Document.ResolveReference(reference.Id, reference.Gen);
 
             if (obj != null)
             {
                 if (!(obj is T))
-                    throw new ApplicationException($"Optional indirect object ({reference.Id},{reference.Gen}) incorrect type at position {reference.Position}.");
+                    throw new ApplicationException($"Optional indirect object ({reference.Id},{reference.Gen}) incorrect type at position {reference.ParseObject.Position}.");
 
                 return (T)obj;
             }
@@ -36,12 +36,12 @@ namespace PdfXenon.Standard
             return null;
         }
 
-        public T MandatoryValue<T>(ParseObjectReference reference) where T : ParseObject
+        public T MandatoryValue<T>(PdfObjectReference reference) where T : PdfObject
         {
-            ParseObject obj = Doc.ResolveReference(reference.Id, reference.Gen);
+            PdfObject obj = Document.ResolveReference(reference.Id, reference.Gen);
 
             if ((obj == null) ||  !(obj is T))
-                throw new ApplicationException($"Mandatory indirect object ({reference.Id},{reference.Gen}) missing or incorrect type at position {reference.Position}.");
+                throw new ApplicationException($"Mandatory indirect object ({reference.Id},{reference.Gen}) missing or incorrect type at position {reference.ParseObject.Position}.");
 
             return (T)obj;
         }
@@ -51,7 +51,7 @@ namespace PdfXenon.Standard
             // If this is the first time we have encountered this id, then add it
             if (!_ids.TryGetValue(xref.Id, out PdfIndirectObjectId indirectId))
             {
-                indirectId = new PdfIndirectObjectId(Doc);
+                indirectId = new PdfIndirectObjectId(this);
                 _ids.Add(xref.Id, indirectId);
             }
 

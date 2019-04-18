@@ -4,15 +4,14 @@ namespace PdfXenon.Standard
 {
     public class PdfPageInherit : PdfDictionary
     {
-        public PdfPageInherit(PdfDocument doc, PdfPageInherit inherit, ParseDictionary parse)
-            : base(doc, parse)
+        public PdfPageInherit(PdfObject parent, ParseDictionary parse)
+            : base(parent, parse)
         {
-            Inherit = inherit;
         }
 
-        public PdfPageInherit Inherit { get; private set; }
+        public PdfPageInherit Inherit { get => TypedParent<PdfPageInherit>(); }
 
-        public T InheritableMandatoryValue<T>(string name) where T : ParseObject
+        public T InheritableMandatoryValue<T>(string name) where T : PdfObject
         {
             // Try and get the value from this dictionary
             T here = OptionalValue<T>(name);

@@ -8,14 +8,9 @@ namespace PdfXenon.Standard
         private PdfPages _pageTree;
         private List<PdfPage> _pages;
 
-        public PdfCatalog(PdfDocument doc, ParseDictionary parse)
-            : base(doc, parse)
+        public PdfCatalog(PdfObject parent, ParseDictionary dictionary)
+            : base(parent, dictionary)
         {
-        }
-
-        public override string ToString()
-        {
-            return $"PdfCatalog\n{base.ToString()}";
         }
 
         public List<PdfPage> Pages
@@ -24,26 +19,26 @@ namespace PdfXenon.Standard
             {
                 if (_pages == null)
                 {
-                    // Accessing the PageTree will cause it to generate the pages collection
-                    var temp = PageTree;
+                    // Accessing the root pages will cause it to generate the pages collection
+                    var temp = RootPages;
                 }
 
                 return _pages;
             }
         }
 
-        public PdfPages PageTree
+        public PdfPages RootPages
         {
             get
             {
                 if (_pageTree == null)
                 {
                     // Catalog has a mandatory 'Pages' entry that is a reference to the page tree root
-                    ParseObjectReference reference = MandatoryValue<ParseObjectReference>("Pages");
-                    ParseDictionary dictionary = Doc.IndirectObjects.MandatoryValue<ParseDictionary>(reference);
+                    PdfObjectReference reference = MandatoryValue<PdfObjectReference>("Pages");
+                    PdfDictionary dictionary = Document.IndirectObjects.MandatoryValue<PdfDictionary>(reference);
 
                     // Build all the objects in the page tree
-                    _pageTree = new PdfPages(Doc, null, dictionary);
+                    _pageTree = new PdfPages(this, dictionary.ParseObject as ParseDictionary);
                     _pages = new List<PdfPage>();
                     _pageTree.CreatePages(_pages);
                 }

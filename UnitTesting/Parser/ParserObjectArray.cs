@@ -291,11 +291,10 @@ namespace ParserUnitTesting
             Assert.NotNull(d);
             Assert.True(d.Count == 1);
 
-            ParseDictEntry entry = d["Example"];
-            Assert.NotNull(entry);
-            Assert.True(entry.Name.Value == "Example");
-            Assert.True(entry.Object is ParseString);
-            Assert.True((entry.Object as ParseString).Value == "de");
+            ParseObject obj = d["Example"];
+            Assert.NotNull(obj);
+            Assert.True(obj is ParseString);
+            Assert.True((obj as ParseString).Value == "de");
         }
     }
 }

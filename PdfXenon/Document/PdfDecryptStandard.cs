@@ -5,19 +5,19 @@ namespace PdfXenon.Standard
 {
     public class PdfDecryptStandard : PdfDecrypt
     {
-        public PdfDecryptStandard(PdfDocument doc, ParseDictionary trailer, ParseDictionary encrypt)
-            : base(doc)
+        public PdfDecryptStandard(PdfObject parent, PdfDictionary trailer, PdfDictionary encrypt)
+            : base(parent)
         {
             // Extract the first document identifier from the trailer
-            ParseArray ids = trailer.MandatoryValue<ParseArray>("ID");
-            ParseString id0 = (ParseString)ids.Objects[0];
+            PdfArray ids = trailer.MandatoryValue<PdfArray>("ID");
+            PdfString id0 = (PdfString)ids.Objects[0];
 
             // Extract and check the mandatory fields
-            ParseInteger R = encrypt.MandatoryValue<ParseInteger>("R");
-            ParseInteger length = encrypt.MandatoryValue<ParseInteger>("Length");
-            ParseInteger P = encrypt.MandatoryValue<ParseInteger>("P");
-            ParseString O = encrypt.MandatoryValue<ParseString>("O");
-            ParseString U = encrypt.MandatoryValue<ParseString>("U");
+            PdfInteger R = encrypt.MandatoryValue<PdfInteger>("R");
+            PdfInteger length = encrypt.MandatoryValue<PdfInteger>("Length");
+            PdfInteger P = encrypt.MandatoryValue<PdfInteger>("P");
+            PdfString O = encrypt.MandatoryValue<PdfString>("O");
+            PdfString U = encrypt.MandatoryValue<PdfString>("U");
 
             if (R.Value != 3)
                 throw new ApplicationException("Cannot decrypt standard handler with revision other than 3.");

@@ -9,6 +9,9 @@ namespace PdfXenon.Standard
         {
         }
 
+        public abstract string DecodeString(PdfObject obj, string str);
+        public abstract byte[] DecodeBytes(PdfObject obj, byte[] bytes);
+
         public static PdfDecrypt CreateDecrypt(PdfDocument doc, PdfDictionary trailer)
         {
             PdfDecrypt ret = new PdfDecryptNone(doc);

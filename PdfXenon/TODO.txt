@@ -1,7 +1,8 @@
-﻿Feedback class in document, RebuiltXRef, Decrypting
+﻿Resolving string bytes should go through the descrypt
+Finish the decrypt implementation
 
-Allow parsing of unknown keyword
 Update PdfContent to return a sequence of tokens aggregated from all its streams
+Allow parsing of unknown keyword
 
 PDFClown
 iTextShar-Develop

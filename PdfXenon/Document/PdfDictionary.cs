@@ -5,18 +5,17 @@ namespace PdfXenon.Standard
 {
     public class PdfDictionary : PdfObject
     {
-        private ParseDictionary _dictionary;
         private Dictionary<string, PdfObject> _wrapped;
 
         public PdfDictionary(PdfObject parent, ParseDictionary dictionary)
             : base(parent, dictionary)
         {
-            _dictionary = dictionary;
             _wrapped = new Dictionary<string, PdfObject>();
         }
 
-        public int Count { get => _dictionary.Count; }
-        public bool ContainsName(string name) { return _dictionary.ContainsName(name); }
+        public ParseDictionary ParseDictionary { get => ParseObject as ParseDictionary; }
+        public int Count { get => ParseDictionary.Count; }
+        public bool ContainsName(string name) { return ParseDictionary.ContainsName(name); }
 
         public Dictionary<string, PdfObject>.KeyCollection Names
         {
@@ -53,7 +52,7 @@ namespace PdfXenon.Standard
 
         public T OptionalValue<T>(string name) where T : PdfObject
         {
-            if (_dictionary.ContainsName(name))
+            if (ParseDictionary.ContainsName(name))
             {
                 WrapName(name);
                 if (_wrapped.TryGetValue(name, out PdfObject entry))
@@ -79,7 +78,7 @@ namespace PdfXenon.Standard
 
         public T MandatoryValue<T>(string name) where T : PdfObject
         {
-            if (_dictionary.ContainsName(name))
+            if (ParseDictionary.ContainsName(name))
             {
                 WrapName(name);
                 if (_wrapped.TryGetValue(name, out PdfObject entry))
@@ -99,18 +98,18 @@ namespace PdfXenon.Standard
         private void WrapName(string name)
         {
             if (!_wrapped.ContainsKey(name))
-                _wrapped.Add(name, WrapObject(_dictionary[name]));
+                _wrapped.Add(name, WrapObject(ParseDictionary[name]));
         }
 
         private void WrapAllNames()
         {
             // Are there any dictionary entries that still need wrapping?
-            if (_dictionary.Count > _wrapped.Count)
+            if (ParseDictionary.Count > _wrapped.Count)
             {
-                foreach (var name in _dictionary.Names)
+                foreach (var name in ParseDictionary.Names)
                 {
                     if (!_wrapped.ContainsKey(name))
-                        _wrapped.Add(name, WrapObject(_dictionary[name]));
+                        _wrapped.Add(name, WrapObject(ParseDictionary[name]));
                 }
             }
         }

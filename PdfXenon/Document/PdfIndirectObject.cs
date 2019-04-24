@@ -4,9 +4,9 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class PdfIndirectObjectGen : PdfObject
+    public class PdfIndirectObject : PdfObject
     {
-        public PdfIndirectObjectGen(PdfObject parent, TokenXRefEntry xref)
+        public PdfIndirectObject(PdfObject parent, TokenXRefEntry xref)
             : base(parent)
         {
             Id = xref.Id;

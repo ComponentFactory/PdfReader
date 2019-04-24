@@ -4,14 +4,12 @@ namespace PdfXenon.Standard
 {
     public class PdfInteger : PdfObject
     {
-        private ParseInteger _integer;
-
         public PdfInteger(PdfObject parent, ParseInteger integer)
             : base(parent, integer)
         {
-            _integer = integer;
         }
 
-        public int Value { get => _integer.Value; }
+        public ParseInteger ParseInteger { get => ParseObject as ParseInteger; }
+        public int Value { get => ParseInteger.Value; }
     }
 }

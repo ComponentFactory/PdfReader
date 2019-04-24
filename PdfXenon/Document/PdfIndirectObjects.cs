@@ -18,8 +18,8 @@ namespace PdfXenon.Standard
         public Dictionary<int, PdfIndirectObjectId>.ValueCollection Values { get => _ids.Values; }
         public Dictionary<int, PdfIndirectObjectId>.Enumerator GetEnumerator() => _ids.GetEnumerator();
         public PdfIndirectObjectId this[int id] { get => _ids[id]; }
-        public PdfIndirectObjectGen this[int id, int gen] { get =>_ids[id][gen]; }
-        public PdfIndirectObjectGen this[PdfObjectReference reference] { get => this[reference.Id, reference.Gen]; }
+        public PdfIndirectObject this[int id, int gen] { get =>_ids[id][gen]; }
+        public PdfIndirectObject this[PdfObjectReference reference] { get => this[reference.Id, reference.Gen]; }
 
         public T OptionalValue<T>(PdfObjectReference reference) where T : PdfObject
         {

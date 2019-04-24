@@ -4,8 +4,8 @@ namespace PdfXenon.Standard
 {
     public class PdfPageInherit : PdfDictionary
     {
-        public PdfPageInherit(PdfObject parent, ParseDictionary parse)
-            : base(parent, parse)
+        public PdfPageInherit(PdfObject parent, ParseDictionary dictionary)
+            : base(parent, dictionary)
         {
         }
 

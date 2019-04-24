@@ -51,7 +51,6 @@ namespace PdfXenon.Standard
             }
         }
 
-
         private string GetStringLiteralUTF16(byte[] raw, bool bigEndian)
         {
             int index = 0;

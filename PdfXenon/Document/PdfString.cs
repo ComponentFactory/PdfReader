@@ -4,16 +4,79 @@ namespace PdfXenon.Standard
 {
     public class PdfString : PdfObject
     {
-        private ParseString _string;
+        private string _decrypedString;
+        private byte[] _decrypedBytes;
 
         public PdfString(PdfObject parent, ParseString str)
             : base(parent, str)
         {
-            _string = str;
         }
 
-        public string Value { get => _string.Value; }
-        public byte[] ValueAsBytes { get => _string.ValueAsBytes; }
-        public DateTime ValueAsDateTime { get => _string.ValueAsDateTime; }
+        public ParseString ParseString { get => ParseObject as ParseString; }
+
+        public string Value
+        {
+            get
+            {
+                if (_decrypedString == null)
+                    _decrypedString = Decrypt.DecodeString(this, ParseString.Value);
+
+                return _decrypedString;
+            }
+        }
+
+        public byte[] ValueAsBytes
+        {
+            get
+            {
+                if (_decrypedBytes == null)
+                    _decrypedBytes = Decrypt.DecodeBytes(this, ParseString.ValueAsBytes);
+
+                return _decrypedBytes;
+            }
+        }
+
+        public DateTime ValueAsDateTime
+        {
+            get
+            {
+                try
+                {
+                    string str = Value;
+                    if ((str != null) && (str.Length >= 4))
+                    {
+                        int index = 0;
+                        int length = str.Length;
+
+                        // The 'D:' prefix is optional
+                        if ((str[index] == 'D') && (str[index + 1] == ':'))
+                            index += 2;
+
+                        // Year is mandatory, all the others are optional
+                        int YYYY = int.Parse(str.Substring(index, 4));
+                        int MM = (index + 4 < length) ? int.Parse(str.Substring(index + 4, 2)) : 1;
+                        int DD = (index + 6 < length) ? int.Parse(str.Substring(index + 6, 2)) : 1;
+                        int HH = (index + 7 < length) ? int.Parse(str.Substring(index + 8, 2)) : 0;
+                        int mm = (index + 10 < length) ? int.Parse(str.Substring(index + 10, 2)) : 0;
+                        int SS = (index + 12 < length) ? int.Parse(str.Substring(index + 12, 2)) : 0;
+                        char O = (index + 14 < length) ? str[index + 14] : 'Z';
+                        int OHH = (index + 15 < length) ? int.Parse(str.Substring(index + 15, 2)) : 0;
+                        int OSS = (index + 18 < length) ? int.Parse(str.Substring(index + 18, 2)) : 0;
+                        return new DateTime(YYYY, MM, DD, HH, mm, SS, DateTimeKind.Utc);
+                    }
+                    else
+                        throw new ApplicationException($"String '{Value}' cannot be converted to a date at position {ParseObject.Position}.");
+                }
+                catch
+                {
+                    throw new ApplicationException($"String '{Value}' cannot be converted to a date at position {ParseObject.Position}.");
+                }
+            }
+        }
+
+        private PdfDecrypt Decrypt
+        {
+            get { return TypedParent<PdfDocument>().Decrypt; }
+        }
     }
 }

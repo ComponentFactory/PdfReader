@@ -4,8 +4,8 @@ namespace PdfXenon.Standard
 {
     public class PdfInfo : PdfDictionary
     {
-        public PdfInfo(PdfDocument doc, ParseDictionary parse)
-            : base(doc, parse)
+        public PdfInfo(PdfObject parent, ParseDictionary parse)
+            : base(parent, parse)
         {
         }
 

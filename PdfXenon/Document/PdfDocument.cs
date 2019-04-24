@@ -138,7 +138,7 @@ namespace PdfXenon.Standard
                 if ((_pdfCatalog == null) && (_refCatalog != null))
                 {
                     PdfDictionary dictionary = IndirectObjects.MandatoryValue<PdfDictionary>(_refCatalog);
-                    _pdfCatalog = new PdfCatalog(this, dictionary.ParseObject as ParseDictionary);
+                    _pdfCatalog = new PdfCatalog(dictionary.Parent, dictionary.ParseObject as ParseDictionary);
                 }
 
                 return _pdfCatalog;
@@ -152,7 +152,7 @@ namespace PdfXenon.Standard
                 if ((_pdfInfo == null) && (_refInfo != null))
                 {
                     PdfDictionary dictionary = IndirectObjects.MandatoryValue<PdfDictionary>(_refInfo);
-                    _pdfInfo = new PdfInfo(this, dictionary.ParseObject as ParseDictionary);
+                    _pdfInfo = new PdfInfo(dictionary.Parent, dictionary.ParseObject as ParseDictionary);
                 }
 
                 return _pdfInfo;
@@ -166,15 +166,13 @@ namespace PdfXenon.Standard
 
         public PdfObject ResolveReference(int id, int gen)
         {
-            PdfIndirectObjectGen indirect = IndirectObjects[id, gen];
+            PdfIndirectObject indirect = IndirectObjects[id, gen];
             if (indirect != null)
             {
                 if (indirect.Child == null)
                 {
                     ParseIndirectObject parseIndirectObject = _parser.ParseIndirectObject(indirect.Offset);
                     indirect.Child = indirect.WrapObject(parseIndirectObject.Object);
-
-                    //Console.WriteLine(parseIndirectObject.ToString());
                 }
 
                 return indirect.Child;

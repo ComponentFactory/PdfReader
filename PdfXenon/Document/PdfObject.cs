@@ -45,21 +45,21 @@ namespace PdfXenon.Standard
         public PdfObject WrapObject(ParseObject obj)
         {
             if (obj is ParseString)
-                return new PdfString(Parent, obj as ParseString);
+                return new PdfString(this, obj as ParseString);
             if (obj is ParseName)
-                return new PdfName(Parent, obj as ParseName);
+                return new PdfName(this, obj as ParseName);
             else if (obj is ParseInteger)
-                return new PdfInteger(Parent, obj as ParseInteger);
+                return new PdfInteger(this, obj as ParseInteger);
             else if (obj is ParseReal)
-                return new PdfReal(Parent, obj as ParseReal);
+                return new PdfReal(this, obj as ParseReal);
             else if (obj is ParseDictionary)
-                return new PdfDictionary(Parent, obj as ParseDictionary);
+                return new PdfDictionary(this, obj as ParseDictionary);
             else if (obj is ParseObjectReference)
-                return new PdfObjectReference(Parent, obj as ParseObjectReference);
+                return new PdfObjectReference(this, obj as ParseObjectReference);
             else if (obj is ParseStream)
-                return new PdfStream(Parent, obj as ParseStream);
+                return new PdfStream(this, obj as ParseStream);
             else if (obj is ParseArray)
-                return new PdfArray(Parent, obj as ParseArray);
+                return new PdfArray(this, obj as ParseArray);
 
             throw new ApplicationException($"Cannot wrap object '{obj.GetType().Name}' as a pdf object .");
         }

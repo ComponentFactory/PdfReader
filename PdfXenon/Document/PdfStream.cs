@@ -4,16 +4,14 @@ namespace PdfXenon.Standard
 {
     public class PdfStream : PdfObject
     {
-        private ParseStream _stream;
-
         public PdfStream(PdfObject parent, ParseStream stream)
             : base(parent, stream)
         {
-            _stream = stream;
         }
 
-        public bool HasFilter { get => _stream.HasFilter; }
-        public byte[] ContentAsBytes { get => _stream.ContentAsBytes; }
-        public string ContentAsString { get => _stream.ContentAsString; }
+        public ParseStream ParseStream { get => ParseObject as ParseStream; }
+        public bool HasFilter { get => ParseStream.HasFilter; }
+        public byte[] ContentAsBytes { get => ParseStream.ContentAsBytes; }
+        public string ContentAsString { get => ParseStream.ContentAsString; }
     }
 }

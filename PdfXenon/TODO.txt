@@ -1,7 +1,4 @@
-﻿Resolving string bytes should go through the descrypt
-Finish the decrypt implementation
-
-Update PdfContent to return a sequence of tokens aggregated from all its streams
+﻿Update PdfContent to return a sequence of tokens aggregated from all its streams
 Allow parsing of unknown keyword
 
 PDFClown

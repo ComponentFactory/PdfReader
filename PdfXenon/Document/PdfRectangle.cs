@@ -13,10 +13,10 @@ namespace PdfXenon.Standard
             : base(parent, array)
         {
             // Extract raw values
-            float lx = ObjcetToFloat(array.Objects[0]);
-            float ly = ObjcetToFloat(array.Objects[1]);
-            float ux = ObjcetToFloat(array.Objects[2]);
-            float uy = ObjcetToFloat(array.Objects[3]);
+            float lx = ObjectToFloat(array.Objects[0]);
+            float ly = ObjectToFloat(array.Objects[1]);
+            float ux = ObjectToFloat(array.Objects[2]);
+            float uy = ObjectToFloat(array.Objects[3]);
 
             // Normalize so the lower-left and upper-right are actually those values, because this is not guaranteed
             _lowerLeftX = Math.Min(lx, ux);
@@ -25,7 +25,12 @@ namespace PdfXenon.Standard
             _upperRightY = Math.Min(ly, uy);
         }
 
-        private float ObjcetToFloat(ParseObject obj)
+        public override string ToString()
+        {
+            return $"({_lowerLeftX}.{_lowerLeftY}),({_upperRightX}.{_upperRightY})";
+        }
+
+        private float ObjectToFloat(ParseObject obj)
         {
             // Might be an integer if the value has no fractional part
             if (obj is ParseInteger)

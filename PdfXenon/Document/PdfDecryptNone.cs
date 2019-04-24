@@ -9,14 +9,14 @@ namespace PdfXenon.Standard
         {
         }
 
-        public override string DecodeString(PdfObject obj, string str)
+        public override string DecodeString(PdfString obj)
         {
-            return str;
+            return obj.ParseString.Value;
         }
 
-        public override byte[] DecodeBytes(PdfObject obj, byte[] bytes)
+        public override byte[] DecodeStringAsBytes(PdfString obj)
         {
-            return bytes;
+            return obj.ParseString.ValueAsBytes;
         }
     }
 }

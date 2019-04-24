@@ -9,6 +9,11 @@ namespace PdfXenon.Standard
         {
         }
 
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
+
         public ParseInteger ParseInteger { get => ParseObject as ParseInteger; }
         public int Value { get => ParseInteger.Value; }
     }

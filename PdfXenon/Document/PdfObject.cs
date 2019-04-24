@@ -17,9 +17,6 @@ namespace PdfXenon.Standard
 
         public override string ToString()
         {
-            if (ParseObject != null)
-                return ParseObject.ToString();
-
             return $"({GetType().Name})";
         }
 

@@ -9,6 +9,11 @@ namespace PdfXenon.Standard
         {
         }
 
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
+
         public ParseReal ParseReal { get => ParseObject as ParseReal; }
         public float Value { get => ParseReal.Value; }
     }

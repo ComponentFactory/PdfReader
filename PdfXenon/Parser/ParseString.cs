@@ -21,13 +21,18 @@ namespace PdfXenon.Standard
 
         public string Value
         {
-            get { return Token.ResolvedAsString; }
+            get { return Token.Resolved; }
         }
 
         public byte[] ValueAsBytes
         {
             get { return Token.ResolvedAsBytes; }
-        }      
+        }
+
+        public string BytesToString(byte[] bytes)
+        {
+            return Token.BytesToString(bytes);
+        }
 
         private TokenString Token { get; set; }
     }

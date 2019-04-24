@@ -4,36 +4,26 @@ namespace PdfXenon.Standard
 {
     public class PdfString : PdfObject
     {
-        private string _decrypedString;
-        private byte[] _decrypedBytes;
-
         public PdfString(PdfObject parent, ParseString str)
             : base(parent, str)
         {
+        }
+
+        public override string ToString()
+        {
+            return Value;
         }
 
         public ParseString ParseString { get => ParseObject as ParseString; }
 
         public string Value
         {
-            get
-            {
-                if (_decrypedString == null)
-                    _decrypedString = Decrypt.DecodeString(this, ParseString.Value);
-
-                return _decrypedString;
-            }
+            get { return Decrypt.DecodeString(this); }
         }
 
         public byte[] ValueAsBytes
         {
-            get
-            {
-                if (_decrypedBytes == null)
-                    _decrypedBytes = Decrypt.DecodeBytes(this, ParseString.ValueAsBytes);
-
-                return _decrypedBytes;
-            }
+            get { return Decrypt.DecodeStringAsBytes(this); }
         }
 
         public DateTime ValueAsDateTime

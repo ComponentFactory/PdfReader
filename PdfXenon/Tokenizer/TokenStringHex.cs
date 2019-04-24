@@ -5,29 +5,17 @@ namespace PdfXenon.Standard
 {
     public class TokenStringHex : TokenString
     {
-        public TokenStringHex(long position, string rawString)
-            : base(position, rawString)
+        public TokenStringHex(long position, string raw)
+            : base(position)
         {
+            Raw = raw;
         }
 
-        public override string ResolvedAsString
-        {
-            get
-            {
-                // Convert from hex to bytes
-                byte[] raw = ResolvedAsBytes;
+        public string Raw { get; private set; }
 
-                // Check for the UTF16 Byte Order Mark (little endian or big endian versions)
-                if ((raw.Length > 2) && (raw[0] == 0xFE) && (raw[1] == 0xFF))
-                    return GetStringLiteralUTF16(raw, true);
-                else if ((raw.Length > 2) && (raw[0] == 0xFF) && (raw[1] == 0xFE))
-                    return GetStringLiteralUTF16(raw, false);
-                else
-                {
-                    // Not unicode, so treat as ASCII
-                    return Encoding.ASCII.GetString(raw);
-                }
-            }
+        public override string Resolved
+        {
+            get { return BytesToString(ResolvedAsBytes); }
         }
 
         public override byte[] ResolvedAsBytes
@@ -51,26 +39,9 @@ namespace PdfXenon.Standard
             }
         }
 
-        private string GetStringLiteralUTF16(byte[] raw, bool bigEndian)
+        public override string BytesToString(byte[] bytes)
         {
-            int index = 0;
-            int last = raw.Length - 1;
-
-            if (bigEndian)
-            {
-                // Swap byte ordering
-                byte temp;
-                while (index < last)
-                {
-                    // Switch byte order of each character pair
-                    temp = raw[index];
-                    raw[index] = raw[index + 1];
-                    raw[index + 1] = temp;
-                    index += 2;
-                }
-            }
-
-            return Encoding.Unicode.GetString(raw);
+            return EncodedBytesToString(bytes);
         }
     }
 }

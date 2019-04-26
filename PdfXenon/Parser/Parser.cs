@@ -346,7 +346,8 @@ namespace PdfXenon.Standard
             }
             else if (t is TokenDictionaryOpen)
             {
-                Dictionary<string, ParseObject> dictionary = new Dictionary<string, ParseObject>();
+                List<string> names = new List<string>();
+                List<ParseObject> entries = new List<ParseObject>();
 
                 ParseObject value1 = null;
                 ParseObject value2 = null;
@@ -369,12 +370,12 @@ namespace PdfXenon.Standard
                     else
                         ThrowOnEmptyOrError(t);
 
-                    // If key already exists then simply overwrite it with latest value
-                    dictionary[name.Value] = value2;
+                    names.Add(name.Value);
+                    entries.Add(value2);
                 }
 
                 ThrowIfNot<TokenDictionaryClose>(Tokenizer.GetToken());
-                return new ParseDictionary(t.Position, dictionary);
+                return new ParseDictionary(t.Position, names, entries);
             }
             else if (t is TokenKeyword)
             {

@@ -12,7 +12,8 @@ namespace ConsoleApp
             Stopwatch sw = new Stopwatch();
             sw.Start();
             PdfDocument document = new PdfDocument();
-            document.Load(@"d:\Blank.pdf", false);
+            document.Load(@"d:\PDF17.pdf", true);
+            document.Close();
             sw.Stop();
 
             Console.WriteLine($"Process {sw.ElapsedMilliseconds}ms\n");

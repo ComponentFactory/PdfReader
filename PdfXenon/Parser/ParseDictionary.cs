@@ -6,16 +6,20 @@ namespace PdfXenon.Standard
 {
     public class ParseDictionary : ParseObject
     {
+        private List<string> _names;
+        private List<ParseObject> _values;
         private Dictionary<string, ParseObject> _dictionary;
 
-        public ParseDictionary(long position, Dictionary<string, ParseObject> dictionary)
+        public ParseDictionary(long position, List<string> names, List<ParseObject> values)
             : base(position)
         {
-            _dictionary = dictionary;
+            _names = names;
+            _values = values;
         }
 
         public override int Output(StringBuilder sb, int indent)
         {
+            BuildDictionary();
             string blank = new string(' ', indent);
 
             sb.Append("<<");
@@ -47,20 +51,57 @@ namespace PdfXenon.Standard
             return indent;
         }
 
-        public int Count { get => _dictionary.Count; }
-        public bool ContainsName(string name) { return _dictionary.ContainsKey(name); }
-        public Dictionary<string, ParseObject>.KeyCollection Names { get => _dictionary.Keys; }
-        public Dictionary<string, ParseObject>.ValueCollection Values { get => _dictionary.Values; }
-        public Dictionary<string, ParseObject>.Enumerator GetEnumerator() => _dictionary.GetEnumerator();
+        public int Count { get => _names.Count; }
+
+        public bool ContainsName(string name)
+        {
+            BuildDictionary();
+            return _dictionary.ContainsKey(name);
+        }
+
+        public Dictionary<string, ParseObject>.KeyCollection Names
+        {
+            get
+            {
+                BuildDictionary();
+                return _dictionary.Keys;
+            }
+        }
+
+        public Dictionary<string, ParseObject>.ValueCollection Values
+        {
+            get
+            {
+                BuildDictionary();
+                return _dictionary.Values;
+            }
+        }
+
+        public Dictionary<string, ParseObject>.Enumerator GetEnumerator()
+        {
+            BuildDictionary();
+            return _dictionary.GetEnumerator();
+        }
 
         public ParseObject this[string name]
         {
-            get { return _dictionary[name]; }
-            set { _dictionary[name] = value; }
+            get
+            {
+                BuildDictionary();
+                return _dictionary[name];
+            }
+
+            set
+            {
+                BuildDictionary();
+                _dictionary[name] = value;
+            }
         }
 
         public T OptionalValue<T>(string name) where T : ParseObject
         {
+            BuildDictionary();
+
             ParseObject entry;
             if (_dictionary.TryGetValue(name, out entry))
             {
@@ -75,6 +116,8 @@ namespace PdfXenon.Standard
 
         public T MandatoryValue<T>(string name) where T : ParseObject
         {
+            BuildDictionary();
+
             ParseObject entry;
             if (_dictionary.TryGetValue(name, out entry))
             {
@@ -85,6 +128,21 @@ namespace PdfXenon.Standard
             }
             else
                 throw new ApplicationException($"Dictionary is missing mandatory name '{name}'.");
+        }
+
+        private void BuildDictionary()
+        {
+            if (_dictionary == null)
+            {
+                _dictionary = new Dictionary<string, ParseObject>();
+
+                int count = Count;
+                for(int i=0; i<count; i++)
+                    _dictionary.Add(_names[i], _values[i]);
+
+                _names = null;
+                _values = null;
+            }
         }
     }
 }

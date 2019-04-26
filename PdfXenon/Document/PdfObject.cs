@@ -23,7 +23,7 @@ namespace PdfXenon.Standard
         public ParseObject ParseObject { get; private set; }
         public PdfObject Parent { get; private set; }
         public PdfDocument Document { get => TypedParent<PdfDocument>(); }
-        public PdfDecrypt Decrypt { get => TypedParent<PdfDocument>().Decrypt; }
+        public PdfDecrypt Decrypt { get => TypedParent<PdfDocument>().DecryptHandler; }
 
         public T TypedParent<T>() where T : PdfObject
         {

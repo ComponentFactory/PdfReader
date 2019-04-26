@@ -11,7 +11,6 @@ namespace PdfXenon.Standard
         private ParseDictionary _dictionary;
 
         public ParseStream(ParseDictionary dictionary, byte[] streamBytes)
-            : base(dictionary.Position)
         {
             _dictionary = dictionary;
             StreamBytes = streamBytes;
@@ -61,7 +60,7 @@ namespace PdfXenon.Standard
                 ParseObject obj = _dictionary["Filter"];
                 ParseArray filters = obj as ParseArray;
                 if ((filters == null) && (obj is ParseName))
-                    filters = new ParseArray(obj.Position, new List<ParseObject>() { obj });
+                    filters = new ParseArray(new List<ParseObject>() { obj });
 
                 foreach (ParseName filter in filters.Objects)
                 {
@@ -74,7 +73,7 @@ namespace PdfXenon.Standard
                             bytes = DCTDecode(bytes);
                             break;
                         default:
-                            throw new ApplicationException($"Cannot process unrecognized stream filter '{filter.Value}' at {Position}.");
+                            throw new ApplicationException($"Cannot process unrecognized stream filter '{filter.Value}'.");
                     }
                 }
             }
@@ -100,7 +99,7 @@ namespace PdfXenon.Standard
 
             // TODO
             if (_dictionary.ContainsName("Predictor"))
-                throw new ApplicationException($"Cannot process FlatDecode predictors at {Position}.");
+                throw new ApplicationException($"Cannot process FlatDecode predictors.");
 
             return bytes;
         }

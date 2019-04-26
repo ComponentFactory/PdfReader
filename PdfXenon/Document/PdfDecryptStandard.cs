@@ -77,7 +77,7 @@ namespace PdfXenon.Standard
         {
             PdfIndirectObject indirectObject = obj.TypedParent<PdfIndirectObject>();
             if (indirectObject == null)
-                throw new ApplicationException($"Cannot decrypt a string that is not inside an indirect object at position {obj.ParseObject.Position}.");
+                throw new ApplicationException($"Cannot decrypt a string that is not inside an indirect object.");
 
             // Create bytes that need hashing by combining the encryption key with the indirect object numbers
             byte[] key = new byte[_encryptionKey.Length + 5];

@@ -5,12 +5,9 @@ namespace PdfXenon.Standard
     public class TokenStringLiteral : TokenString
     {
         public TokenStringLiteral(long position, string raw)
-            : base(position)
+            : base(position, raw)
         {
-            Raw = raw;
         }
-
-        public string Raw { get; private set; }
 
         public override string Resolved
         {

@@ -105,6 +105,21 @@ namespace PdfXenon.Standard
             }
         }
 
+        public void ResolveAllReferences(PdfDocument document)
+        {
+            if (_gens == null)
+            {
+                if ((_single != null) && (_single.Child == null))
+                    document.ResolveReference(_single);
+            }
+            else
+            {
+                foreach(PdfIndirectObject indirect in _gens.Values)
+                    if (indirect.Child != null)
+                        document.ResolveReference(indirect);
+            }
+        }
+
         public void AddXRef(TokenXRefEntry xref)
         {
             PdfIndirectObject indirect = new PdfIndirectObject(this, xref);

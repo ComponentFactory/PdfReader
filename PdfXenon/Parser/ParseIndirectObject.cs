@@ -5,7 +5,6 @@ namespace PdfXenon.Standard
     public class ParseIndirectObject : ParseObject
     {
         public ParseIndirectObject(TokenInteger id, TokenInteger gen, ParseObject obj)
-            : base(id.Position)
         {
             Id = id.Value;
             Gen = gen.Value;

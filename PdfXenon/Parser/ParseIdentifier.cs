@@ -4,10 +4,9 @@ namespace PdfXenon.Standard
 {
     public class ParseIdentifier : ParseObject
     {
-        public ParseIdentifier(TokenIdentifier token)
-            : base(token.Position)
+        public ParseIdentifier(string value)
         {
-            Value = token.Value;
+            Value = value;
         }
 
         public override int Output(StringBuilder sb, int indent)

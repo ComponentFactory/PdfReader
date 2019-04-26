@@ -5,7 +5,6 @@ namespace PdfXenon.Standard
     public class ParseReal : ParseObject
     {
         public ParseReal(TokenReal token)
-            : base(token.Position)
         {
             Value = token.Value;
         }

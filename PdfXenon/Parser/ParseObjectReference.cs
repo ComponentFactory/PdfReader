@@ -5,7 +5,6 @@ namespace PdfXenon.Standard
     public class ParseObjectReference : ParseObject
     {
         public ParseObjectReference(TokenInteger id, TokenInteger gen)
-            : base(id.Position)
         {
             Id = id.Value;
             Gen = gen.Value;

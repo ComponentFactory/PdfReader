@@ -6,6 +6,9 @@ namespace PdfXenon.Standard
 {
     public class Parser : IDisposable
     {
+        private static Dictionary<string, ParseName> _uniqueNames = new Dictionary<string, ParseName>();
+        private static Dictionary<string, ParseIdentifier> _uniqueIdentifiers = new Dictionary<string, ParseIdentifier>();
+
         private bool _disposed;
 
         public event EventHandler<ParseResolveEventArgs> ResolveReference;
@@ -19,6 +22,7 @@ namespace PdfXenon.Standard
         {
             Dispose(true);
         }
+
         public void ParseHeader(out int major, out int minor)
         {
             // The header is a comment token
@@ -296,7 +300,17 @@ namespace PdfXenon.Standard
                 ThrowOnEmptyOrError(t);
 
             if (t is TokenName)
-                return new ParseName(t as TokenName);
+            {
+                // Store one instance of each unique name to minimize memory footprint
+                TokenName tokenName = (TokenName)t;
+                if (!_uniqueNames.TryGetValue(tokenName.Value, out ParseName parseName))
+                {
+                    parseName = new ParseName(tokenName.Value);
+                    _uniqueNames.Add(tokenName.Value, parseName);
+                }
+
+                return parseName;
+            }
             else if (t is TokenInteger)
             {
                 TokenObject t2 = Tokenizer.GetToken();
@@ -342,7 +356,7 @@ namespace PdfXenon.Standard
                 }
 
                 ThrowIfNot<TokenArrayClose>(Tokenizer.GetToken());
-                return new ParseArray(t.Position, objects);
+                return new ParseArray(objects);
             }
             else if (t is TokenDictionaryOpen)
             {
@@ -362,11 +376,11 @@ namespace PdfXenon.Standard
                     // Key value must be a Name
                     ParseName name = value1 as ParseName;
                     if (name == null)
-                        throw new ApplicationException($"Dictionary key must be a name instead of {name.GetType().Name} at position {name.Position}.");
+                        throw new ApplicationException($"Dictionary key must be a name instead of {name.GetType().Name}.");
 
                     value2 = ParseObject();
                     if (value2 == null)
-                        throw new ApplicationException($"Dictionary value missing for key {name.Value} at position {name.Position}.");
+                        throw new ApplicationException($"Dictionary value missing for key {name.Value}.");
                     else
                         ThrowOnEmptyOrError(t);
 
@@ -375,7 +389,7 @@ namespace PdfXenon.Standard
                 }
 
                 ThrowIfNot<TokenDictionaryClose>(Tokenizer.GetToken());
-                return new ParseDictionary(t.Position, names, entries);
+                return new ParseDictionary(names, entries);
             }
             else if (t is TokenKeyword)
             {
@@ -385,11 +399,22 @@ namespace PdfXenon.Standard
                     case ParseKeyword.False:
                         return new ParseBoolean(t as TokenKeyword);
                     case ParseKeyword.Null:
-                        return new ParseNull(t as TokenKeyword);
+                        return new ParseNull();
                 }
             }
             else if (t is TokenIdentifier)
-                return new ParseIdentifier(t as TokenIdentifier);
+            {
+                // Store one instance of each unique identifier to minimize memory footprint
+                TokenIdentifier tokenIdentifier = (TokenIdentifier)t;
+                if (!_uniqueIdentifiers.TryGetValue(tokenIdentifier.Value, out ParseIdentifier parseIdentifier))
+                {
+                    parseIdentifier = new ParseIdentifier(tokenIdentifier.Value);
+                    _uniqueIdentifiers.Add(tokenIdentifier.Value, parseIdentifier);
+
+                }
+
+                return parseIdentifier;
+            }
 
             // Token is not one that starts an object, so put the token back
             Tokenizer.PushToken(t);

@@ -21,12 +21,12 @@ namespace PdfXenon.Standard
         {
             Version = new PdfVersion(this, 0, 0);
             IndirectObjects = new PdfIndirectObjects(this);
-            Decrypt = new PdfDecryptNone(this);
+            DecryptHandler = new PdfDecryptNone(this);
         }
 
         public PdfVersion Version { get; private set; }
         public PdfIndirectObjects IndirectObjects { get; private set; }
-        public PdfDecrypt Decrypt { get; private set; }
+        public PdfDecrypt DecryptHandler { get; private set; }
 
         public void Load(string filename, bool immediate = false)
         {
@@ -72,7 +72,7 @@ namespace PdfXenon.Standard
                 if (lastHeader)
                 {
                     // Replace the default decryption handler with one from the document settings
-                    Decrypt = PdfDecrypt.CreateDecrypt(this, trailer);
+                    DecryptHandler = PdfDecrypt.CreateDecrypt(this, trailer);
 
                     // We only care about the latest defined catalog and information dictionary
                     _refCatalog = trailer.MandatoryValue<PdfObjectReference>("Root");
@@ -95,12 +95,7 @@ namespace PdfXenon.Standard
             if (immediate)
             {
                 // Must load all objects immediately so the stream can then be closed
-                foreach (var id in IndirectObjects.Values)
-                {
-                    foreach (var gen in id.Values)
-                        ResolveReference(gen.Id, gen.Gen);
-                }
-
+                IndirectObjects.ResolveAllReferences(this);
                 Close();
             }
         }
@@ -166,7 +161,11 @@ namespace PdfXenon.Standard
 
         public PdfObject ResolveReference(int id, int gen)
         {
-            PdfIndirectObject indirect = IndirectObjects[id, gen];
+            return ResolveReference(IndirectObjects[id, gen]);
+        }
+
+        public PdfObject ResolveReference(PdfIndirectObject indirect)
+        {
             if (indirect != null)
             {
                 if (indirect.Child == null)

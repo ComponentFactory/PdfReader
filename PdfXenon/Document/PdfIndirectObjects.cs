@@ -28,7 +28,7 @@ namespace PdfXenon.Standard
             if (obj != null)
             {
                 if (!(obj is T))
-                    throw new ApplicationException($"Optional indirect object ({reference.Id},{reference.Gen}) incorrect type at position {reference.ParseObject.Position}.");
+                    throw new ApplicationException($"Optional indirect object ({reference.Id},{reference.Gen}) incorrect type.");
 
                 return (T)obj;
             }
@@ -41,9 +41,15 @@ namespace PdfXenon.Standard
             PdfObject obj = Document.ResolveReference(reference.Id, reference.Gen);
 
             if ((obj == null) ||  !(obj is T))
-                throw new ApplicationException($"Mandatory indirect object ({reference.Id},{reference.Gen}) missing or incorrect type at position {reference.ParseObject.Position}.");
+                throw new ApplicationException($"Mandatory indirect object ({reference.Id},{reference.Gen}) missing or incorrect type.");
 
             return (T)obj;
+        }
+
+        public void ResolveAllReferences(PdfDocument document)
+        {
+            foreach (var id in Values)
+                id.ResolveAllReferences(document);
         }
 
         public void AddXRef(TokenXRefEntry xref)

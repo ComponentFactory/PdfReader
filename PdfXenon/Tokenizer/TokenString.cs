@@ -4,10 +4,13 @@ namespace PdfXenon.Standard
 {
     public abstract class TokenString : TokenObject
     {
-        public TokenString(long position)
+        public TokenString(long position, string raw)
             : base(position)
         {
+            Raw = raw;
         }
+
+        public string Raw { get; private set; }
 
         public abstract string Resolved { get; }
         public abstract byte[] ResolvedAsBytes { get; }

@@ -7,19 +7,9 @@ namespace PdfXenon.Standard
 {
     public class ParseName : ParseObject
     {
-        private static Dictionary<string, string> _unique = new Dictionary<string, string>();
-
-        public ParseName(TokenName token)
-            : base(token.Position)
+        public ParseName(string value)
         {
-            // Only keep a single instance of the same Name value
-            if (_unique.TryGetValue(token.Value, out string unique))
-                Value = unique;
-            else
-            {
-                Value = token.Value;
-                _unique.Add(token.Value, token.Value);
-            }
+            Value = value;
         }
 
         public override int Output(StringBuilder sb, int indent)

@@ -17,7 +17,6 @@ namespace TokenizerUnitTesting
             Assert.NotNull(k);
             Assert.True(k is TokenError);
             Assert.True(k.Position == 0);
-            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         [Fact]
@@ -49,7 +48,6 @@ namespace TokenizerUnitTesting
             TokenError e = t.GetToken() as TokenError;
             Assert.NotNull(e);
             Assert.True(e.Position == 0);
-            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         [Fact]
@@ -70,7 +68,6 @@ namespace TokenizerUnitTesting
             TokenError e = t.GetToken() as TokenError;
             Assert.NotNull(e);
             Assert.True(e.Position == 0);
-            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         [Fact]
@@ -91,7 +88,6 @@ namespace TokenizerUnitTesting
             TokenError e = t.GetToken() as TokenError;
             Assert.NotNull(e);
             Assert.True(e.Position == 0);
-            Assert.True(t.GetToken() is TokenEmpty);
         }
 
         [Fact]

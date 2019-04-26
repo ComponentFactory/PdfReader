@@ -8,6 +8,6 @@
             Value = integer;
         }
 
-        public int Value { get; set; }
+        public int Value { get; private set; }
     }
 }

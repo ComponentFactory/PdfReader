@@ -5,8 +5,7 @@ namespace PdfXenon.Standard
 {
     public class ParseArray : ParseObject
     {
-        public ParseArray(long position, List<ParseObject> objects)
-            : base(position)
+        public ParseArray(List<ParseObject> objects)
         {
             Objects = objects;
         }

@@ -5,7 +5,6 @@ namespace PdfXenon.Standard
     public class ParseBoolean : ParseObject
     {
         public ParseBoolean(TokenKeyword token)
-            : base(token.Position)
         {
             Value = (token.Value == ParseKeyword.True);
         }

@@ -7,6 +7,6 @@
             Position = position;
         }
 
-        public long Position { get; protected set; }
+        public long Position { get; private set; }
     }
 }

@@ -8,6 +8,6 @@
             Value = real;
         }
 
-        public float Value { get; set; }
+        public float Value { get; private set; }
     }
 }

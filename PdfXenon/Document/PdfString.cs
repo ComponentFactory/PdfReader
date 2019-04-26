@@ -55,11 +55,11 @@ namespace PdfXenon.Standard
                         return new DateTime(YYYY, MM, DD, HH, mm, SS, DateTimeKind.Utc);
                     }
                     else
-                        throw new ApplicationException($"String '{Value}' cannot be converted to a date at position {ParseObject.Position}.");
+                        throw new ApplicationException($"String '{Value}' cannot be converted to a date.");
                 }
                 catch
                 {
-                    throw new ApplicationException($"String '{Value}' cannot be converted to a date at position {ParseObject.Position}.");
+                    throw new ApplicationException($"String '{Value}' cannot be converted to a date.");
                 }
             }
         }

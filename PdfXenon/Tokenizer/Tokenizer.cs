@@ -18,6 +18,7 @@ namespace PdfXenon.Standard
         private static bool[] _hexadecimalWhitespaceLookup;
         private static bool[] _isNumericLookup;
         private static bool[] _keywordLookup;
+        private static Dictionary<string, string> _uniqueStrings = new Dictionary<string, string>();
         private static readonly byte[] _whitespace = new byte[] { 0, 9, 10, 12, 13, 32 };
         private static readonly byte[] _delimiter = new byte[] { 40, 41, 60, 62, 91, 93, 123, 125, 47, 37 };
         private static readonly byte[] _hexadecimal = new byte[] { 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 97, 98, 99, 100, 101, 102 };
@@ -215,14 +216,14 @@ namespace PdfXenon.Standard
                 throw new ApplicationException($"Could not find %%EOF comment at end of the stream.");
 
             // Skip any whitespace
-            while (IsWhitespace(bytes[index]))
+            while (_whitespaceLookup[bytes[index]])
                 index--;
 
             if (index == 0)
                 throw new ApplicationException($"Could not find offset of the cross-reference table.");
 
             int end = index;
-            while (IsNumeric(bytes[end]))
+            while (_isNumericLookup[bytes[end]])
                 end--;
 
             if (index == 0)
@@ -255,46 +256,6 @@ namespace PdfXenon.Standard
 
                 return _reader;
             }
-        }
-
-        private bool IsWhitespace(byte c)
-        {
-            return _whitespaceLookup[c];
-        }
-
-        private bool IsDelimiter(byte c)
-        {
-            return _delimiterLookup[c];
-        }
-
-        private bool IsRegular(byte c)
-        {
-            return !_delimiterWhitespaceLookup[c];
-        }
-
-        private bool IsKeyword(byte c)
-        {
-            return _keywordLookup[c];
-        }
-
-        private bool IsHexadecimal(byte c)
-        {
-            return _hexadecimalLookup[c];
-        }
-
-        private bool IsHexadecimalOrWhitespace(byte c)
-        {
-            return _hexadecimalWhitespaceLookup[c];
-        }
-
-        private bool IsNumeric(byte c)
-        {
-            return _isNumericLookup[c];
-        }
-
-        private int ConvertHexToDecimal(byte c)
-        {
-            return _hexToDecimalLookup[c];
         }
 
         private int ConvertDecimalToInteger(int start, int length)
@@ -350,7 +311,7 @@ namespace PdfXenon.Standard
                 // Skip all whitespace characters
                 while (_index < _length)
                 {
-                    if (IsWhitespace(_line[_index]))
+                    if (_whitespaceLookup[_line[_index]])
                         _index++;
                     else
                         return;
@@ -372,13 +333,13 @@ namespace PdfXenon.Standard
 
                 // Find the run of regular characters
                 int end = _index;
-                while ((end < _length) && IsRegular(_line[end]))
+                while ((end < _length) && !_delimiterWhitespaceLookup[_line[end]])
                     end++;
 
                 // If at least one regular character
                 if (end > _index)
                 {
-                    if (IsNumeric(_line[_index]))
+                    if (_isNumericLookup[_line[_index]])
                         return GetNumber(end);
                     else
                         return GetKeywordOrIdentifier(end);
@@ -386,7 +347,7 @@ namespace PdfXenon.Standard
                 else
                 {
                     // Must have found a delimiter instead
-                    if (IsDelimiter(_line[_index]))
+                    if (_delimiterLookup[_line[_index]])
                     {
                         switch (_line[_index])
                         {
@@ -421,10 +382,10 @@ namespace PdfXenon.Standard
 
             // Rescan looking for the more restrictive set of numeric characters
             int key = _index;
-            while ((key < end) && IsNumeric(_line[key]))
+            while ((key < end) && _isNumericLookup[_line[key]])
                 key++;
 
-            string text = new string(Encoding.ASCII.GetChars(_line, _index, key - _index));
+            string text = Encoding.ASCII.GetString(_line, _index, key - _index);
             _index = key;
 
             if (int.TryParse(text, out int integer))
@@ -447,10 +408,10 @@ namespace PdfXenon.Standard
 
             // Rescan looking for the more restrictive set of keyword characters
             int key = _index;
-            while ((key < end) && IsKeyword(_line[key]))
+            while ((key < end) && _keywordLookup[_line[key]])
                 key++;
 
-            string text = new string(Encoding.ASCII.GetChars(_line, _index, key - _index));
+            string text = Encoding.ASCII.GetString(_line, _index, key - _index);
             TokenKeyword token = TokenKeyword.CheckKeywords(position, text);
             if (token != null)
             {
@@ -462,13 +423,13 @@ namespace PdfXenon.Standard
             {
                 // Identifiers can include any character except whitespace or delimiter
                 key = _index;
-                while ((key < end) && IsRegular(_line[key]))
+                while ((key < end) && !_delimiterWhitespaceLookup[_line[key]])
                     key++;
 
-                text = new string(Encoding.ASCII.GetChars(_line, _index, key - _index));
+                text = Encoding.ASCII.GetString(_line, _index, key - _index);
                 _index = key;
 
-                return new TokenIdentifier(position, text);
+                return new TokenIdentifier(position, UniqueString(text));
             }
             else
                 return new TokenError(position, $"Cannot parse '{text}' as a keyword.");
@@ -479,7 +440,7 @@ namespace PdfXenon.Standard
             long position = _position + _index;
 
             // Everything till end of the line is the comment
-            string comment = new string(Encoding.ASCII.GetChars(_line, _index, _length - _index));
+            string comment = Encoding.ASCII.GetString(_line, _index, _length - _index);
 
             // Continue processing at start of the next line
             _line = null;
@@ -487,16 +448,17 @@ namespace PdfXenon.Standard
             return new TokenComment(position, comment);
         }
 
+
         private TokenObject GetName()
         {
             long position = _position + _index;
 
             // Find the run of regular characters
             int end = _index + 1;
-            while ((end < _length) && IsRegular(_line[end]))
+            while ((end < _length) && !_delimiterWhitespaceLookup[_line[end]])
                 end++;
 
-            string name = new string(Encoding.ASCII.GetChars(_line, _index + 1, end - _index - 1));
+            string name = Encoding.ASCII.GetString(_line, _index + 1, end - _index - 1);
             _index = end;
 
             // Convert any escape sequences
@@ -507,14 +469,14 @@ namespace PdfXenon.Standard
                     break;
 
                 // Check there are two digits after it
-                if ((escape > (name.Length - 3)) || !IsHexadecimal((byte)name[escape + 1]) || !IsHexadecimal((byte)name[escape + 2]))
+                if ((escape > (name.Length - 3)) || !_hexadecimalLookup[(byte)name[escape + 1]] || !_hexadecimalLookup[(byte)name[escape + 2]])
                     return new TokenError(position + escape, $"Escaped character inside name is not followed by two hex digits.");
 
-                char val = (char)(ConvertHexToDecimal((byte)name[escape + 1]) * 16 + ConvertHexToDecimal((byte)name[escape + 2]));
+                char val = (char)(_hexToDecimalLookup[(byte)name[escape + 1]] * 16 + _hexToDecimalLookup[(byte)name[escape + 2]]);
                 name = name.Replace(name.Substring(escape, 3), $"{val}");
             }
 
-            return new TokenName(position, name);
+            return new TokenName(position, UniqueString(name));
         }
 
         private TokenObject GetDictionaryOpenOrHexString()
@@ -535,7 +497,7 @@ namespace PdfXenon.Standard
             {
                 // Find the run of hexadecimal characters and whitespace
                 int end = _index;
-                while ((end < _length) && IsHexadecimalOrWhitespace(_line[end]))
+                while ((end < _length) && _hexadecimalWhitespaceLookup[_line[end]])
                     end++;
 
                 if (end == _length)
@@ -544,7 +506,7 @@ namespace PdfXenon.Standard
                 if (_line[end] != '>')
                     return new TokenError(position, $"Invalid character '{_line[end]}' found in hexadecimal string.");
 
-                string str = new string(Encoding.ASCII.GetChars(_line, _index, end - _index));
+                string str = Encoding.ASCII.GetString(_line, _index, end - _index);
                 _index = end + 1;
 
                 return new TokenStringHex(position, str);
@@ -694,6 +656,18 @@ namespace PdfXenon.Standard
 
             // End of content before end of string literal
             return new TokenError(position, $"End of content before end of UTF16 literal string character.");
+        }
+
+        private string UniqueString(string str)
+        {
+            // Only keep a single instance of the same string value
+            if (_uniqueStrings.TryGetValue(str, out string unique))
+                return unique;
+            else
+            {
+                _uniqueStrings.Add(str, str);
+                return str;
+            }
         }
 
         private Stream Stream { get; set; }

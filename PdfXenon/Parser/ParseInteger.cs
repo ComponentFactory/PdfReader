@@ -5,7 +5,6 @@ namespace PdfXenon.Standard
     public class ParseInteger : ParseObject
     {
         public ParseInteger(TokenInteger token)
-            : base(token.Position)
         {
             Value = token.Value;
         }

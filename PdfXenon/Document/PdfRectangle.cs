@@ -38,7 +38,7 @@ namespace PdfXenon.Standard
             else if (obj is ParseReal)
                 return (obj as ParseReal).Value;
             else
-                throw new ApplicationException($"Array does not contain numbers that can be converted to a rectangle at position {obj.Position}.");
+                throw new ApplicationException($"Array does not contain numbers that can be converted to a rectangle.");
         }
     }
 }

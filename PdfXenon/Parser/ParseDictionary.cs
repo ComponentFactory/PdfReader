@@ -10,8 +10,7 @@ namespace PdfXenon.Standard
         private List<ParseObject> _values;
         private Dictionary<string, ParseObject> _dictionary;
 
-        public ParseDictionary(long position, List<string> names, List<ParseObject> values)
-            : base(position)
+        public ParseDictionary(List<string> names, List<ParseObject> values)
         {
             _names = names;
             _values = values;

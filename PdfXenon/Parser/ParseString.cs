@@ -7,7 +7,6 @@ namespace PdfXenon.Standard
     public class ParseString : ParseObject
     {
         public ParseString(TokenString token)
-            : base(token.Position)
         {
             Token = token;
         }

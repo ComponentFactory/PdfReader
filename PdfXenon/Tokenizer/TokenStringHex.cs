@@ -6,12 +6,9 @@ namespace PdfXenon.Standard
     public class TokenStringHex : TokenString
     {
         public TokenStringHex(long position, string raw)
-            : base(position)
+            : base(position, raw)
         {
-            Raw = raw;
         }
-
-        public string Raw { get; private set; }
 
         public override string Resolved
         {

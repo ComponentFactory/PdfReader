@@ -18,5 +18,15 @@ namespace PdfXenon.Standard
         {
             return obj.ParseString.ValueAsBytes;
         }
+
+        public override string DecodeStream(PdfStream stream)
+        {
+            return stream.ParseStream.Value;
+        }
+
+        public override byte[] DecodeStreamAsBytes(PdfStream stream)
+        {
+            return stream.ParseStream.ValueAsBytes;
+        }
     }
 }

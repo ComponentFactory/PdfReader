@@ -63,10 +63,5 @@ namespace PdfXenon.Standard
                 }
             }
         }
-
-        private PdfDecrypt Decrypt
-        {
-            get { return TypedParent<PdfDocument>().Decrypt; }
-        }
     }
 }

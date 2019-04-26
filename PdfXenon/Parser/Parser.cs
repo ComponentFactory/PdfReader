@@ -10,16 +10,15 @@ namespace PdfXenon.Standard
 
         public event EventHandler<ParseResolveEventArgs> ResolveReference;
 
-        public Parser(Stream stream)
+        public Parser(Stream stream, bool allowIdentifiers = false)
         {
-            Tokenizer = new Tokenizer(stream);
+            Tokenizer = new Tokenizer(stream) { AllowIdentifiers = allowIdentifiers };
         }
 
         public void Dispose()
         {
             Dispose(true);
         }
-
         public void ParseHeader(out int major, out int minor)
         {
             // The header is a comment token
@@ -286,11 +285,15 @@ namespace PdfXenon.Standard
                 throw new ApplicationException($"Indirect object has unexpected keyword {keyword.Value} at position {v.Position}.");
         }
 
-        public ParseObject ParseObject()
+        public ParseObject ParseObject(bool allowEmpty = false)
         {
             Tokenizer.IgnoreComments = true;
             TokenObject t = Tokenizer.GetToken();
-            ThrowOnEmptyOrError(t);
+
+            if (allowEmpty && (t is TokenEmpty))
+                return null;
+            else
+                ThrowOnEmptyOrError(t);
 
             if (t is TokenName)
                 return new ParseName(t as TokenName);
@@ -384,6 +387,8 @@ namespace PdfXenon.Standard
                         return new ParseNull(t as TokenKeyword);
                 }
             }
+            else if (t is TokenIdentifier)
+                return new ParseIdentifier(t as TokenIdentifier);
 
             // Token is not one that starts an object, so put the token back
             Tokenizer.PushToken(t);

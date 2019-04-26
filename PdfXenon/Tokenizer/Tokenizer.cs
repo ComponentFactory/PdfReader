@@ -97,6 +97,7 @@ namespace PdfXenon.Standard
             Dispose(true);
         }
 
+        public bool AllowIdentifiers { get; set; } = false;
         public bool IgnoreComments { get; set; } = true;
 
         public long Position
@@ -380,7 +381,7 @@ namespace PdfXenon.Standard
                     if (IsNumeric(_line[_index]))
                         return GetNumber(end);
                     else
-                        return GetKeyword(end);
+                        return GetKeywordOrIdentifier(end);
                 }
                 else
                 {
@@ -440,7 +441,7 @@ namespace PdfXenon.Standard
             }
         }
 
-        private TokenObject GetKeyword(int end)
+        private TokenObject GetKeywordOrIdentifier(int end)
         {
             long position = _position + _index;
 
@@ -450,14 +451,27 @@ namespace PdfXenon.Standard
                 key++;
 
             string text = new string(Encoding.ASCII.GetChars(_line, _index, key - _index));
-            _index = key;
-
             TokenKeyword token = TokenKeyword.CheckKeywords(position, text);
             if (token != null)
+            {
+                _index = key;
                 return token;
+            }
 
-            // String is not a recognized keyword
-            return new TokenError(position, $"Cannot parse '{text}' as a keyword.");
+            if (AllowIdentifiers)
+            {
+                // Identifiers can include any character except whitespace or delimiter
+                key = _index;
+                while ((key < end) && IsRegular(_line[key]))
+                    key++;
+
+                text = new string(Encoding.ASCII.GetChars(_line, _index, key - _index));
+                _index = key;
+
+                return new TokenIdentifier(position, text);
+            }
+            else
+                return new TokenError(position, $"Cannot parse '{text}' as a keyword.");
         }
 
         private TokenObject GetComment()

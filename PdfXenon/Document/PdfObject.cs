@@ -23,6 +23,7 @@ namespace PdfXenon.Standard
         public ParseObject ParseObject { get; private set; }
         public PdfObject Parent { get; private set; }
         public PdfDocument Document { get => TypedParent<PdfDocument>(); }
+        public PdfDecrypt Decrypt { get => TypedParent<PdfDocument>().Decrypt; }
 
         public T TypedParent<T>() where T : PdfObject
         {
@@ -57,6 +58,8 @@ namespace PdfXenon.Standard
                 return new PdfStream(this, obj as ParseStream);
             else if (obj is ParseArray)
                 return new PdfArray(this, obj as ParseArray);
+            else if (obj is ParseIdentifier)
+                return new PdfIdentifier(this, obj as ParseIdentifier);
 
             throw new ApplicationException($"Cannot wrap object '{obj.GetType().Name}' as a pdf object .");
         }

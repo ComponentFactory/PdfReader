@@ -9,15 +9,12 @@ namespace PdfXenon.Standard
     public class ParseStream : ParseObject
     {
         private ParseDictionary _dictionary;
-        private byte[] _streamBytes;
-        private byte[] _byteContent;
-        private string _stringContent;
 
         public ParseStream(ParseDictionary dictionary, byte[] streamBytes)
             : base(dictionary.Position)
         {
             _dictionary = dictionary;
-            _streamBytes = streamBytes;
+            StreamBytes = streamBytes;
         }
 
         public override int Output(StringBuilder sb, int indent)
@@ -30,7 +27,7 @@ namespace PdfXenon.Standard
             sb.Append("stream\n");
 
             sb.Append(blank);
-            sb.Append(ContentAsString);
+            sb.Append(Value);
 
             sb.Append("\n");
             sb.Append(blank);
@@ -39,47 +36,25 @@ namespace PdfXenon.Standard
             return indent;
         }
 
+        public byte[] StreamBytes { get; private set; }
+
         public bool HasFilter
         {
             get { return _dictionary.ContainsName("Filter"); }
         }
 
-        public byte[] ContentAsBytes
+        public string Value
         {
-            get
-            {
-                if (_byteContent == null)
-                {
-                    if (_streamBytes == null)
-                        return null;
-                    else
-                        _byteContent = DecodedBytes();
-                }
-
-                return _byteContent;
-            }
+            get { return Encoding.ASCII.GetString(DecodeBytes(StreamBytes)); }
         }
 
-        public string ContentAsString
+        public byte[] ValueAsBytes
         {
-            get
-            {
-                if (_stringContent == null)
-                {
-                    if (_streamBytes == null)
-                        return string.Empty;
-                    else
-                        _stringContent = Encoding.ASCII.GetString(DecodedBytes());
-                }
-
-                return _stringContent;
-            }
+            get { return DecodeBytes(StreamBytes); }
         }
 
-        private byte[] DecodedBytes()
+        public byte[] DecodeBytes(byte[] bytes)
         {
-            byte[] bytes = _streamBytes;
-
             if (HasFilter)
             {
                 // Get the filtering as an array to be applied in order (if a single filter then convert from Name to an Array of one entry)

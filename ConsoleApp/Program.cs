@@ -12,8 +12,7 @@ namespace ConsoleApp
             Stopwatch sw = new Stopwatch();
             sw.Start();
             PdfDocument document = new PdfDocument();
-            document.Load(@"d:\PDF17.pdf", true);
-            document.Close();
+            document.Load(@"d:\Blank.pdf", false);
             sw.Stop();
 
             Console.WriteLine($"Process {sw.ElapsedMilliseconds}ms\n");
@@ -27,6 +26,20 @@ namespace ConsoleApp
             Console.WriteLine($"Producer: {document.Info.Producer}");
             Console.WriteLine($"Subject: {document.Info.Subject}");
             Console.WriteLine($"Title: {document.Info.Title}");
+
+            PdfPage page = document.Catalog.Pages[0];
+            PdfContents contents = page.Contents;
+            PdfContentsParser parser = contents.CreateParser();
+
+            PdfObject obj = null;
+            do
+            {
+                obj = parser.GetToken();
+                if (obj != null)
+                    Console.WriteLine(obj.ToString());
+
+            } while (obj != null);
+
 
             Console.ReadLine();
         }

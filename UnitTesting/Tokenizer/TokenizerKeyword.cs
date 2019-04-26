@@ -21,6 +21,17 @@ namespace TokenizerUnitTesting
         }
 
         [Fact]
+        public void KeywordFailIdentifiers()
+        {
+            Tokenizer t = new Tokenizer(StringToStream("random")) { AllowIdentifiers = true };
+            TokenObject k = t.GetToken();
+            Assert.NotNull(k);
+            Assert.True(k is TokenIdentifier);
+            Assert.True(k.Position == 0);
+            Assert.True(t.GetToken() is TokenEmpty);
+        }
+
+        [Fact]
         public void KeywordTrue()
         {
             Tokenizer t = new Tokenizer(StringToStream("true"));

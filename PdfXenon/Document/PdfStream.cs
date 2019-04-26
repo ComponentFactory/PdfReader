@@ -11,7 +11,15 @@ namespace PdfXenon.Standard
 
         public ParseStream ParseStream { get => ParseObject as ParseStream; }
         public bool HasFilter { get => ParseStream.HasFilter; }
-        public byte[] ContentAsBytes { get => ParseStream.ContentAsBytes; }
-        public string ContentAsString { get => ParseStream.ContentAsString; }
+
+        public string Value
+        {
+            get { return Decrypt.DecodeStream(this); }
+        }
+
+        public byte[] ValueAsBytes
+        {
+            get { return Decrypt.DecodeStreamAsBytes(this); }
+        }
     }
 }

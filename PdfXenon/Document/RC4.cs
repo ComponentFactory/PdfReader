@@ -7,21 +7,33 @@ namespace PdfXenon.Standard
 {
     public static class RC4
     {
-        public static byte[] Encrypt(byte[] key, byte[] data)
+        public static byte[] Transform(byte[] key, byte[] data)
         {
-            return EncryptOutput(key, data).ToArray();
-        }
+            byte[] s = EncryptInitalize(key);
+            byte[] ret = new byte[data.Length];
 
-        public static byte[] Decrypt(byte[] key, byte[] data)
-        {
-            return EncryptOutput(key, data).ToArray();
+            int i = 0;
+            int j = 0;
+            for(int k = 0; k < data.Length; k++)
+            {
+                i = (i + 1) & 255;
+                j = (j + s[i]) & 255;
+                Swap(s, i, j);
+
+                ret[k] = (byte)(data[k] ^ s[(s[i] + s[j]) & 255]);
+            }
+
+            return ret;
         }
 
         private static byte[] EncryptInitalize(byte[] key)
         {
-            byte[] s = Enumerable.Range(0, 256).Select(i => (byte)i).ToArray();
+            byte[] s = new byte[256];
+            for (int i = 0; i < s.Length; i++)
+                s[i] = (byte)i;
 
-            for (int i = 0, j = 0; i < 256; i++)
+            int j = 0;
+            for (int i = 0; i < 256; i++)
             {
                 j = (j + key[i % key.Length] + s[i]) & 255;
                 Swap(s, i, j);
@@ -30,28 +42,9 @@ namespace PdfXenon.Standard
             return s;
         }
 
-        private static IEnumerable<byte> EncryptOutput(byte[] key, IEnumerable<byte> data)
-        {
-            byte[] s = EncryptInitalize(key);
-
-            int i = 0;
-            int j = 0;
-
-            return data.Select((b) =>
-            {
-                i = (i + 1) & 255;
-                j = (j + s[i]) & 255;
-
-                Swap(s, i, j);
-
-                return (byte)(b ^ s[(s[i] + s[j]) & 255]);
-            });
-        }
-
         private static void Swap(byte[] s, int i, int j)
         {
             byte c = s[i];
-
             s[i] = s[j];
             s[j] = c;
         }

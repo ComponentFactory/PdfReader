@@ -55,15 +55,25 @@ namespace PdfXenon.Standard
 
         public override string DecodeString(PdfString obj)
         {
-            return obj.ParseString.BytesToString(DecodeStringFromBytes(obj, obj.ParseString.ValueAsBytes));
+            return obj.ParseString.BytesToString(DecodeBytes(obj, obj.ParseString.ValueAsBytes));
         }
 
         public override byte[] DecodeStringAsBytes(PdfString obj)
         {
-            return DecodeStringFromBytes(obj, obj.ParseString.ValueAsBytes);
+            return DecodeBytes(obj, obj.ParseString.ValueAsBytes);
         }
 
-        private byte[] DecodeStringFromBytes(PdfString obj, byte[] bytes)
+        public override string DecodeStream(PdfStream stream)
+        {
+            return Encoding.ASCII.GetString(stream.ParseStream.DecodeBytes(DecodeBytes(stream, stream.ParseStream.StreamBytes)));
+        }
+
+        public override byte[] DecodeStreamAsBytes(PdfStream stream)
+        {
+            return stream.ParseStream.DecodeBytes(DecodeBytes(stream, stream.ParseStream.StreamBytes));
+        }
+
+        private byte[] DecodeBytes(PdfObject obj, byte[] bytes)
         {
             PdfIndirectObject indirectObject = obj.TypedParent<PdfIndirectObject>();
             if (indirectObject == null)
@@ -92,7 +102,7 @@ namespace PdfXenon.Standard
             // Create the RC4 key
             byte[] rc4Key = new Byte[keyLength];
             Array.Copy(key, 0, rc4Key, 0, keyLength);
-            return RC4.Decrypt(rc4Key, bytes);
+            return RC4.Transform(rc4Key, bytes);
         }
 
         private byte[] ComputeEncryptionKey(int keyLength, byte[] documentId, byte[] ownerPasswordValue, byte[] ownerKey, int permissions)
@@ -154,7 +164,7 @@ namespace PdfXenon.Standard
                 for (int j = 0; j < blockLength; ++j)
                     rc4Key[j] = (byte)(block[j] ^ i);
 
-                ownerKey = RC4.Encrypt(rc4Key, ownerKey);
+                ownerKey = RC4.Transform(rc4Key, ownerKey);
             }
 
             return ownerKey;
@@ -179,7 +189,7 @@ namespace PdfXenon.Standard
                 for (int j = 0; j < encryptionKey.Length; ++j)
                     rc4Key[j] = (byte)(encryptionKey[j] ^ i);
 
-                hash = RC4.Encrypt(rc4Key, hash);
+                hash = RC4.Transform(rc4Key, hash);
             }
 
             // (6) First 16 bytes is the hash result and the remainder is zero's

@@ -22,7 +22,7 @@ namespace ParserUnitTesting
 
             ParseStream o = i.Object as ParseStream;
             Assert.NotNull(o);
-            Assert.True(o.ContentAsString == "de");
+            Assert.True(o.Value == "de");
         }
 
         [Fact]
@@ -38,7 +38,7 @@ namespace ParserUnitTesting
 
             ParseStream o = i.Object as ParseStream;
             Assert.NotNull(o);
-            Assert.True(o.ContentAsString == "de");
+            Assert.True(o.Value == "de");
         }
     }
 }

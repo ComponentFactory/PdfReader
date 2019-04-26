@@ -11,6 +11,8 @@ namespace PdfXenon.Standard
 
         public abstract string DecodeString(PdfString str);
         public abstract byte[] DecodeStringAsBytes(PdfString str);
+        public abstract string DecodeStream(PdfStream stream);
+        public abstract byte[] DecodeStreamAsBytes(PdfStream stream);
 
         public static PdfDecrypt CreateDecrypt(PdfDocument doc, PdfDictionary trailer)
         {
@@ -27,8 +29,8 @@ namespace PdfXenon.Standard
                 // We only implement the simple Standard, Version 1 scheme
                 if ((filter.Value == "Standard") && (v != null) && (v.Value == 1))
                     ret = new PdfDecryptStandard(doc, trailer, encryptDict);
-
-              //  throw new ApplicationException("Can only decrypt the standard handler with version 1.");
+                else
+                    throw new ApplicationException("Can only decrypt the standard handler with version 1.");
             }
 
             return ret;

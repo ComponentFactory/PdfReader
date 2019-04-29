@@ -10,7 +10,6 @@ namespace PdfXenon.Standard
         public PdfDictionary(PdfObject parent, ParseDictionary dictionary)
             : base(parent, dictionary)
         {
-            _wrapped = new Dictionary<string, PdfObject>();
         }
 
         public ParseDictionary ParseDictionary { get => ParseObject as ParseDictionary; }
@@ -97,12 +96,18 @@ namespace PdfXenon.Standard
     
         private void WrapName(string name)
         {
+            if (_wrapped == null)
+                _wrapped = new Dictionary<string, PdfObject>();
+
             if (!_wrapped.ContainsKey(name))
                 _wrapped.Add(name, WrapObject(ParseDictionary[name]));
         }
 
         private void WrapAllNames()
         {
+            if (_wrapped == null)
+                _wrapped = new Dictionary<string, PdfObject>();
+
             // Are there any dictionary entries that still need wrapping?
             if (ParseDictionary.Count > _wrapped.Count)
             {

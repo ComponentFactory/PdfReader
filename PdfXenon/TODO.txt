@@ -1,5 +1,4 @@
 ﻿Can bytes be converted to string faster than Encoding.ASCII.GetString from ASCII set of bytes?
-Can we avoid called Stream.Position some of the time
 
 PDFClown
 iTextShar-Develop

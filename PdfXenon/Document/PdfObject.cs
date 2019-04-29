@@ -60,6 +60,8 @@ namespace PdfXenon.Standard
                 return new PdfArray(this, obj as ParseArray);
             else if (obj is ParseIdentifier)
                 return new PdfIdentifier(this, obj as ParseIdentifier);
+            else if (obj is ParseBoolean)
+                return new PdfBoolean(this, obj as ParseBoolean);
 
             throw new ApplicationException($"Cannot wrap object '{obj.GetType().Name}' as a pdf object .");
         }

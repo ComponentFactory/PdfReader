@@ -13,7 +13,7 @@ namespace ConsoleApp
             sw.Start();
 
             PdfDocument document = new PdfDocument();
-            document.Load(@"d:\PDF17.pdf", true);
+            document.Load(@"d:\Magazine.pdf", true);
             document.Close();
             sw.Stop();
 
@@ -29,18 +29,22 @@ namespace ConsoleApp
             Console.WriteLine($"Subject: {document.Info.Subject}");
             Console.WriteLine($"Title: {document.Info.Title}");
 
-            PdfPage page = document.Catalog.Pages[0];
-            PdfContents contents = page.Contents;
-            PdfContentsParser parser = contents.CreateParser();
-
-            PdfObject obj = null;
-            do
+            foreach(PdfPage page in document.Catalog.Pages)
             {
-                obj = parser.GetToken();
-                if (obj != null)
-                    Console.WriteLine(obj.ToString());
+                Console.WriteLine(document.Catalog.Pages.IndexOf(page));
 
-            } while (obj != null);
+                PdfContents contents = page.Contents;
+                PdfContentsParser parser = contents.CreateParser();
+
+                PdfObject obj = null;
+                do
+                {
+                    obj = parser.GetToken();
+                    if (obj != null)
+                        Console.WriteLine(obj.ToString());
+
+                } while (obj != null);
+            }
 
 
             Console.ReadLine();

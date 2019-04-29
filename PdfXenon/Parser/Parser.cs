@@ -322,7 +322,6 @@ namespace PdfXenon.Standard
                 }
 
                 Tokenizer.PushToken(t2);
-
                 return new ParseInteger(t as TokenInteger);
             }
             else if (t is TokenReal)

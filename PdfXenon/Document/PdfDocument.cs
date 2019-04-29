@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -33,8 +34,16 @@ namespace PdfXenon.Standard
             if (_open)
                 throw new ApplicationException("Document already has a stream open.");
 
-            _reader = new StreamReader(filename);
-            Load(_reader.BaseStream, immediate);
+            if (immediate)
+            {
+                // Faster to read all of the file contents at once and then parse, rather than read progressively during parsing
+                Load(new MemoryStream(File.ReadAllBytes(filename)), immediate);
+            }
+            else
+            {
+                _reader = new StreamReader(filename);
+                Load(_reader.BaseStream, immediate);
+            }
         }
 
         public void Load(Stream stream, bool immediate = false)

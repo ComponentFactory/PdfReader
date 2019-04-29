@@ -171,12 +171,14 @@ namespace PdfXenon.Standard
         public bool GotoNextLine()
         {
             _position = Reader.Position;
-            _line = Reader.ReadLine();
+
+            TokenByteSplice splice = Reader.ReadLine();
+            _line = splice.Bytes;
 
             if (_line != null)
             {
-                _length = _line.Length;
-                _index = 0;
+                _length = splice.Start + splice.Length;
+                _index = splice.Start;
                 return true;
             }
             else
@@ -193,15 +195,17 @@ namespace PdfXenon.Standard
             // Ignore zero or more whitespace characters
             SkipWhitespace();
 
-            if (_length < 18)
-                return new TokenError(_position, $"Cross-reference entry data is {_length} bytes instead of the expected 18.");
+            if ((_length - _index) < 18)
+                return new TokenError(_position, $"Cross-reference entry data is {_length - _index} bytes instead of the expected 18.");
+
+            TokenXRefEntry ret = new TokenXRefEntry(id,
+                                                    ConvertDecimalToInteger(11, 5),
+                                                    ConvertDecimalToInteger(0, 10),
+                                                    (_line[_index + 17] == 110));       // 'n' = used, otherwise free
 
             _index = _length;
 
-            return new TokenXRefEntry(id,
-                                      ConvertDecimalToInteger(11, 5),
-                                      ConvertDecimalToInteger(0, 10),
-                                      (_line[17] == 110)); // 'n'
+            return ret;
         }
 
         public long GetXRefOffset()
@@ -301,7 +305,7 @@ namespace PdfXenon.Standard
         private int ConvertDecimalToInteger(int start, int length)
         {
             int ret = 0;
-            int index = start;
+            int index = _index + start;
 
             for (int i = 0; i < length; i++)
             {
@@ -334,12 +338,14 @@ namespace PdfXenon.Standard
                 if ((_line == null) || (_index == _length))
                 {
                     _position = Reader.Position;
-                    _line = Reader.ReadLine();
+
+                    TokenByteSplice splice = Reader.ReadLine();
+                    _line = splice.Bytes;
 
                     if (_line != null)
                     {
-                        _length = _line.Length;
-                        _index = 0;
+                        _length = splice.Start + splice.Length;
+                        _index = splice.Start;
                     }
                     else
                     {
@@ -676,11 +682,13 @@ namespace PdfXenon.Standard
                     sb.Append("\n");
                 }
 
-                _line = Reader.ReadLine();
+                TokenByteSplice splice = Reader.ReadLine();
+                _line = splice.Bytes;
+
                 if (_line != null)
                 {
-                    _length = _line.Length;
-                    _index = 0;
+                    _length = splice.Start + splice.Length;
+                    _index = splice.Start;
                     first = _index;
                     continuation = false;
                 }

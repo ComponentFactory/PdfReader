@@ -9,20 +9,21 @@ namespace PdfXenon.Standard
         private byte[] _bytes;
         private int _start;
         private int _end;
+        private long _position;
 
         public TokenReader(Stream stream)
         {
             _stream = stream;
-            Position = stream.Position;
+            _position = stream.Position;
             _bytes = new byte[1024];
         }
 
-        public long Position { get; private set; }
+        public long Position { get => _position; }
 
         public byte[] GetBytes(int length)
         {
             // Make sure we have some data to process
-            if ((_start == _end) && (ReadBytes() == 0))
+            if ((_start == _end) && (ReadBytes(false) == 0))
                 return null;
 
             // Skip over any line feed at end of preceding line
@@ -39,14 +40,14 @@ namespace PdfXenon.Standard
                 Array.Copy(_bytes, _start, ret, 0, copy);
                 index += copy;
                 _start += copy;
-                Position += copy;
+                _position += copy;
             }
 
             // Read remaining bytes directly from the stream
             if (index < length)
             {
                 int copied = _stream.Read(ret, index, length - index);
-                Position += copied;
+                _position += copied;
 
                 if (copied < (length - index))
                     return null;
@@ -55,13 +56,13 @@ namespace PdfXenon.Standard
             return ret;
         }
 
-        public byte[] ReadLine()
+        public TokenByteSplice ReadLine()
         {
             // If there is no more content to return, then return null
-            if ((_start == _end) && (ReadBytes() == 0))
-                return null;
+            if ((_start == _end) && (ReadBytes(false) == 0))
+                return new TokenByteSplice();
 
-            byte[] ret = null;
+            TokenByteSplice ret = new TokenByteSplice();
 
             do
             {
@@ -75,20 +76,20 @@ namespace PdfXenon.Standard
                     if ((c == '\r') || (c == '\n'))
                     {
                         // Append the unprocessed characters before the end of line marker
-                        ret = AppendBytes(_bytes, _start, index - _start, ret);
+                        AppendBytes(_bytes, _start, index - _start, ref ret);
 
                         // Processing continues after the first end of line marker
                         _start = index + 1;
-                        Position++;
+                        _position++;
 
                         // Check if newline has a linefeed afterwards
-                        if ((c == '\r') && ((_start < _end) || (ReadBytes() > 0)))
+                        if ((c == '\r') && ((_start < _end) || (ReadBytes(true) > 0)))
                         {
                             if (_bytes[_start] == '\n')
                             {
                                 // Skip over the linefeed
                                 _start++;
-                                Position++;
+                                _position++;
                             }
                         }
 
@@ -96,14 +97,14 @@ namespace PdfXenon.Standard
                     }
 
                     index++;
-                    Position++;
+                    _position++;
 
                 } while (index < _end);
 
                 // Append the unprocessed characters
-                ret = AppendBytes(_bytes, _start, index - _start, ret);
+                AppendBytes(_bytes, _start, index - _start, ref ret);
 
-            } while (ReadBytes() > 0);
+            } while (ReadBytes(true) > 0);
 
             return ret;
         }
@@ -112,32 +113,39 @@ namespace PdfXenon.Standard
         {
             _start = 0;
             _end = 0;
+            _position = _stream.Position;
         }
 
-        private int ReadBytes()
+        private int ReadBytes(bool newBuffer)
         {
             // Read in a buffer of ASCII characters
             _start = 0;
+
+            if (newBuffer)
+                _bytes = new byte[1024];
+
             _end = _stream.Read(_bytes, 0, _bytes.Length);
             return _end;
         }
 
-        private byte[] AppendBytes(byte[] bytes, int start, int length, byte[] existing)
+        private void AppendBytes(byte[] bytes, int start, int length, ref TokenByteSplice existing)
         {
-            if (existing == null)
+            if (existing.Bytes == null)
             {
-                byte[] ret = new byte[length];
-                Array.Copy(bytes, start, ret, 0, length);
-                return ret;
+                existing.Bytes = bytes;
+                existing.Start = start;
+                existing.Length = length;
             }
             else
             {
                 byte[] ret = new byte[existing.Length + length];
-                Array.Copy(existing, 0, ret, 0, existing.Length);
+                Array.Copy(existing.Bytes, existing.Start, ret, 0, existing.Length);
                 Array.Copy(bytes, start, ret, existing.Length, length);
-                return ret;
+
+                existing.Bytes = ret;
+                existing.Start = 0;
+                existing.Length = ret.Length;
             }
         }
-
     }
 }

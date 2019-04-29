@@ -1,5 +1,5 @@
-﻿Tokenizer::GetNumber, parse number to int/float directly instead of using builtin parse methods = 743 time units
-Can bytes be converted to string faster than Encoding.ASCII.GetString from ASCII set of bytes?
+﻿Can bytes be converted to string faster than Encoding.ASCII.GetString from ASCII set of bytes?
+Can we avoid called Stream.Position some of the time
 
 PDFClown
 iTextShar-Develop

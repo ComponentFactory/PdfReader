@@ -50,7 +50,7 @@ namespace PdfXenon.Standard
             return indent;
         }
 
-        public int Count { get => _names.Count; }
+        public int Count { get => _names != null ? _names.Count : _dictionary.Count; }
 
         public bool ContainsName(string name)
         {

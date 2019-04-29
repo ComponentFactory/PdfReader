@@ -90,6 +90,17 @@ namespace TokenizerUnitTesting
         }
 
         [Fact]
+        public void NumericIntegerOneKeyword()
+        {
+            Tokenizer t = new Tokenizer(StringToStream("1true"));
+            TokenInteger n = t.GetToken() as TokenInteger;
+            Assert.NotNull(n);
+            Assert.True(n.Position == 0);
+            Assert.True(n.Value == 1);
+            Assert.True(t.GetToken() is TokenKeyword);
+        }
+
+        [Fact]
         public void NumericIntegerMax()
         {
             Tokenizer t = new Tokenizer(StringToStream(int.MaxValue.ToString()));
@@ -211,6 +222,17 @@ namespace TokenizerUnitTesting
         }
 
         [Fact]
+        public void NumericRealOneKeyword()
+        {
+            Tokenizer t = new Tokenizer(StringToStream("1.0true"));
+            TokenReal n = t.GetToken() as TokenReal;
+            Assert.NotNull(n);
+            Assert.True(n.Position == 0);
+            Assert.True(n.Value == 1f);
+            Assert.True(t.GetToken() is TokenKeyword);
+        }
+
+        [Fact]
         public void NumericRealDecimals()
         {
             Tokenizer t = new Tokenizer(StringToStream(RealPos.ToString()));
@@ -240,6 +262,28 @@ namespace TokenizerUnitTesting
             Assert.NotNull(n);
             Assert.True(n.Position == 0);
             Assert.True(n.Value == RealPos);
+            Assert.True(t.GetToken() is TokenEmpty);
+        }
+
+        [Fact]
+        public void NumericRealPI()
+        {
+            Tokenizer t = new Tokenizer(StringToStream("3.14"));
+            TokenReal n = t.GetToken() as TokenReal;
+            Assert.NotNull(n);
+            Assert.True(n.Position == 0);
+            Assert.True(n.Value == 3.14f);
+            Assert.True(t.GetToken() is TokenEmpty);
+        }
+
+        [Fact]
+        public void NumericRealPINegative()
+        {
+            Tokenizer t = new Tokenizer(StringToStream("-3.14"));
+            TokenReal n = t.GetToken() as TokenReal;
+            Assert.NotNull(n);
+            Assert.True(n.Position == 0);
+            Assert.True(n.Value == -3.14f);
             Assert.True(t.GetToken() is TokenEmpty);
         }
     }

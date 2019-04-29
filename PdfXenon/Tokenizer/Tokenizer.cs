@@ -10,20 +10,34 @@ namespace PdfXenon.Standard
         private const int EOF_SCAN_LENGTH = 1024;
 
         // Lookup arrays are fast and small because the source is ASCII characters, so limimted to a possible 256 values
-        private static bool[] _whitespaceLookup;
-        private static bool[] _delimiterLookup;
-        private static bool[] _delimiterWhitespaceLookup;
-        private static int[] _hexToDecimalLookup;
-        private static bool[] _hexadecimalLookup;
-        private static bool[] _hexadecimalWhitespaceLookup;
-        private static bool[] _isNumericLookup;
-        private static bool[] _keywordLookup;
+        private static bool[] _lookupWhitespace;
+        private static bool[] _lookupDelimiter;
+        private static bool[] _lookupDelimiterWhitespace;
+        private static int[]  _lookupHexToDecimal;
+        private static bool[] _lookupHexadecimal;
+        private static bool[] _lookupHexadecimalWhitespace;
+        private static bool[] _lookupIsNumeric;
+        private static bool[] _lookupIsNumericStart;
+        private static bool[] _lookupKeyword;
         private static Dictionary<string, string> _uniqueStrings = new Dictionary<string, string>();
-        private static readonly byte[] _whitespace = new byte[] { 0, 9, 10, 12, 13, 32 };
-        private static readonly byte[] _delimiter = new byte[] { 40, 41, 60, 62, 91, 93, 123, 125, 47, 37 };
+
+        private static readonly byte[] _whitespace = new byte[] { 0, 9, 10, 12, 13, 32 }; 
+        //                                                       \0  \t \n  \f  \r  (SPACE)
+
+        private static readonly byte[] _delimiter = new byte[] { 40, 41, 60, 62, 91, 93, 123, 125, 47, 37 }; 
+        //                                                       (   )   <   >   [   ]   {    }    /   %
+
         private static readonly byte[] _hexadecimal = new byte[] { 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 97, 98, 99, 100, 101, 102 };
+        //                                                         0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F   a   b   c   d    e    f
+
+        private static readonly byte[] _isNumeric = new byte[] { 48, 49, 50, 51, 52, 53, 54, 55, 56, 57 };
+        //                                                       0   1   2   3   4   5   6   7   8   9
+
         private static readonly byte[] _isNumericStart = new byte[] { 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 43, 45, 46 };
-        private static readonly byte[] EOF_COMMENT = new byte[] { 70, 79, 69, 37, 37 };
+        //                                                            0   1   2   3   4   5   6   7   8   9   +   -   .
+
+        private static readonly byte[] EOF_COMMENT = new byte[] { 70, 79, 69, 37, 37 }; 
+        //                                                        F   O   E   %   %
 
         private int _index;
         private int _length;
@@ -35,48 +49,52 @@ namespace PdfXenon.Standard
 
         static Tokenizer()
         {
-            _whitespaceLookup = new bool[256];
+            _lookupWhitespace = new bool[256];
             foreach (byte code in _whitespace)
-                _whitespaceLookup[code] = true;
+                _lookupWhitespace[code] = true;
 
-            _delimiterLookup = new bool[256];
+            _lookupDelimiter = new bool[256];
             foreach (byte code in _delimiter)
-                _delimiterLookup[code] = true;
+                _lookupDelimiter[code] = true;
 
-            _hexadecimalLookup = new bool[256];
+            _lookupHexadecimal = new bool[256];
             foreach (byte code in _hexadecimal)
-                _hexadecimalLookup[code] = true;
+                _lookupHexadecimal[code] = true;
 
-            _isNumericLookup = new bool[256];
+            _lookupIsNumeric = new bool[256];
+            foreach (byte code in _isNumeric)
+                _lookupIsNumeric[code] = true;
+
+            _lookupIsNumericStart = new bool[256];
             foreach (byte code in _isNumericStart)
-                _isNumericLookup[code] = true;
+                _lookupIsNumericStart[code] = true;
 
-            _hexadecimalWhitespaceLookup = new bool[256];
+            _lookupHexadecimalWhitespace = new bool[256];
             foreach (byte code in _whitespace)
-                _hexadecimalWhitespaceLookup[code] = true;
+                _lookupHexadecimalWhitespace[code] = true;
             foreach (byte code in _hexadecimal)
-                _hexadecimalWhitespaceLookup[code] = true;
+                _lookupHexadecimalWhitespace[code] = true;
 
-            _delimiterWhitespaceLookup = new bool[256];
+            _lookupDelimiterWhitespace = new bool[256];
             foreach (byte code in _whitespace)
-                _delimiterWhitespaceLookup[code] = true;
+                _lookupDelimiterWhitespace[code] = true;
             foreach (byte code in _delimiter)
-                _delimiterWhitespaceLookup[code] = true;
+                _lookupDelimiterWhitespace[code] = true;
 
-            _hexToDecimalLookup = new int[256];
+            _lookupHexToDecimal = new int[256];
             for (int i = 0; i < 10; i++)
-                _hexToDecimalLookup[48 + i] = i;    // '0' + i
+                _lookupHexToDecimal[48 + i] = i;    // '0' + i
             for (int i = 0; i < 6; i++)
             {
-                _hexToDecimalLookup[65 + i] = i;    // 'a' + i
-                _hexToDecimalLookup[97 + i] = i;    // 'A' + i
+                _lookupHexToDecimal[65 + i] = i;    // 'a' + i
+                _lookupHexToDecimal[97 + i] = i;    // 'A' + i
             }
 
-            _keywordLookup = new bool[256];
-            for (int i = 65; i <= 90; i++)  // a -> z
-                _keywordLookup[i] = true;
-            for (int i = 97; i <= 122; i++) // A -> Z
-                _keywordLookup[i] = true;
+            _lookupKeyword = new bool[256];
+            for (int i = 65; i <= 90; i++)  // 'a' -> 'z'
+                _lookupKeyword[i] = true;
+            for (int i = 97; i <= 122; i++) // 'A' -> 'Z'
+                _lookupKeyword[i] = true;
         }
 
         public Tokenizer(Stream stream)
@@ -182,7 +200,7 @@ namespace PdfXenon.Standard
             if (Stream.Length < EOF_SCAN_LENGTH)
                 throw new ApplicationException($"Stream must be at least {EOF_SCAN_LENGTH} bytes.");
 
-            // Load a section of byte from the end, enough to discover the location of the 'xref' section
+            // Load bytes from the end, enough to discover the location of the 'xref' section
             byte[] bytes = new byte[EOF_SCAN_LENGTH];
             Stream.Position = Stream.Length - bytes.Length;
             if (Stream.Read(bytes, 0, bytes.Length) != bytes.Length)
@@ -216,14 +234,14 @@ namespace PdfXenon.Standard
                 throw new ApplicationException($"Could not find %%EOF comment at end of the stream.");
 
             // Skip any whitespace
-            while (_whitespaceLookup[bytes[index]])
+            while (_lookupWhitespace[bytes[index]])
                 index--;
 
             if (index == 0)
                 throw new ApplicationException($"Could not find offset of the cross-reference table.");
 
             int end = index;
-            while (_isNumericLookup[bytes[end]])
+            while (_lookupIsNumericStart[bytes[end]])
                 end--;
 
             if (index == 0)
@@ -311,7 +329,7 @@ namespace PdfXenon.Standard
                 // Skip all whitespace characters
                 while (_index < _length)
                 {
-                    if (_whitespaceLookup[_line[_index]])
+                    if (_lookupWhitespace[_line[_index]])
                         _index++;
                     else
                         return;
@@ -331,43 +349,30 @@ namespace PdfXenon.Standard
             {
                 long position = _position + _index;
 
-                // Find the run of regular characters
-                int end = _index;
-                while ((end < _length) && !_delimiterWhitespaceLookup[_line[end]])
-                    end++;
-
-                // If at least one regular character
-                if (end > _index)
-                {
-                    if (_isNumericLookup[_line[_index]])
-                        return GetNumber(end);
-                    else
-                        return GetKeywordOrIdentifier(end);
-                }
+                if (_lookupIsNumericStart[_line[_index]])
+                    return GetNumber();
+                else if (!_lookupDelimiter[_line[_index]])
+                    return GetKeywordOrIdentifier();
                 else
                 {
-                    // Must have found a delimiter instead
-                    if (_delimiterLookup[_line[_index]])
+                    switch (_line[_index])
                     {
-                        switch (_line[_index])
-                        {
-                            case 37: // '%'
-                                return GetComment();
-                            case 47: // '/'
-                                return GetName();
-                            case 60: // '<'
-                                return GetDictionaryOpenOrHexString();
-                            case 62: // '>'
-                                return GetDictionaryClose();
-                            case 40://  '('
-                                return GetStringLiteral();
-                            case 91: // '['
-                                _index++;
-                                return new TokenArrayOpen(position);
-                            case 93: // ']'
-                                _index++;
-                                return new TokenArrayClose(position);
-                        }
+                        case 37: // '%'
+                            return GetComment();
+                        case 47: // '/'
+                            return GetName();
+                        case 60: // '<'
+                            return GetDictionaryOpenOrHexString();
+                        case 62: // '>'
+                            return GetDictionaryClose();
+                        case 40://  '('
+                            return GetStringLiteral();
+                        case 91: // '['
+                            _index++;
+                            return new TokenArrayOpen(position);
+                        case 93: // ']'
+                            _index++;
+                            return new TokenArrayClose(position);
                     }
 
                     // Found invalid character for this position
@@ -376,39 +381,80 @@ namespace PdfXenon.Standard
             }
         }
 
-        private TokenObject GetNumber(int end)
+        private TokenObject GetNumber()
         {
             long position = _position + _index;
 
-            // Rescan looking for the more restrictive set of numeric characters
-            int key = _index;
-            while ((key < end) && _isNumericLookup[_line[key]])
-                key++;
+            bool positive = true;
+            int start = _index;
+            byte current = _line[_index++];
 
-            string text = Encoding.ASCII.GetString(_line, _index, key - _index);
-            _index = key;
-
-            if (int.TryParse(text, out int integer))
-                return new TokenInteger(position, integer);
-            else
+            // Check for sign
+            if (current == 43) // '+'
             {
-                if (float.TryParse(text, out float real))
-                    return new TokenReal(position, real);
+                if (_index < _length)
+                    current = _line[_index++];
                 else
-                {
-                    // String is not a recognized number format
-                    return new TokenError(position, $"Cannot parse '{text}' as a number.");
-                }
+                    return new TokenError(position, $"Cannot parse number because unexpected end-of-line encountered after '+'.");
             }
+            else if (current == 45) // '-'
+            {
+                positive = false;
+
+                if (_index < _length)
+                    current = _line[_index++];
+                else
+                    return new TokenError(position, $"Cannot parse number because unexpected end-of-line encountered after '-'.");
+            }
+
+            // Convert whole number part
+            int whole = 0;
+            while(true)
+            {
+                if (_lookupIsNumeric[current])
+                {
+                    whole = (whole * 10) + (current - 48);
+
+                    if (_index < _length)
+                        current = _line[_index++];
+                    else
+                        return new TokenInteger(position, positive ? whole : -whole);
+                }
+                else
+                    break;
+            }
+
+            // Is there is no fractional part then it must be an integer
+            if (current != 46)
+            {
+                _index--;
+                return new TokenInteger(position, positive ? whole : -whole);
+            }
+
+            if (_index < _length)
+                current = _line[_index++];
+            else
+                return new TokenReal(position, positive ? whole : -whole);
+
+            // Find end of the fractional part
+            while ((_index < _length) && _lookupIsNumeric[_line[_index]])
+                _index++;
+
+            string text = Encoding.ASCII.GetString(_line, start, _index - start);
+            if (float.TryParse(text, out float convert))
+                return new TokenReal(position, convert);
+
+            // String is not a recognized number format
+            return new TokenError(position, $"Cannot parse text as a real number.");
         }
 
-        private TokenObject GetKeywordOrIdentifier(int end)
+        private TokenObject GetKeywordOrIdentifier()
         {
             long position = _position + _index;
 
-            // Rescan looking for the more restrictive set of keyword characters
+            // Scan looking for the end of the keyword characters
             int key = _index;
-            while ((key < end) && _keywordLookup[_line[key]])
+            while ((key < _length) && _lookupKeyword[_line[key]])
                 key++;
 
             string text = Encoding.ASCII.GetString(_line, _index, key - _index);
@@ -421,9 +467,9 @@ namespace PdfXenon.Standard
 
             if (AllowIdentifiers)
             {
-                // Identifiers can include any character except whitespace or delimiter
+                // Scan looking for the end of the identifier
                 key = _index;
-                while ((key < end) && !_delimiterWhitespaceLookup[_line[key]])
+                while ((key < _length) && !_lookupDelimiterWhitespace[_line[key]])
                     key++;
 
                 text = Encoding.ASCII.GetString(_line, _index, key - _index);
@@ -455,7 +501,7 @@ namespace PdfXenon.Standard
 
             // Find the run of regular characters
             int end = _index + 1;
-            while ((end < _length) && !_delimiterWhitespaceLookup[_line[end]])
+            while ((end < _length) && !_lookupDelimiterWhitespace[_line[end]])
                 end++;
 
             string name = Encoding.ASCII.GetString(_line, _index + 1, end - _index - 1);
@@ -469,10 +515,10 @@ namespace PdfXenon.Standard
                     break;
 
                 // Check there are two digits after it
-                if ((escape > (name.Length - 3)) || !_hexadecimalLookup[(byte)name[escape + 1]] || !_hexadecimalLookup[(byte)name[escape + 2]])
+                if ((escape > (name.Length - 3)) || !_lookupHexadecimal[(byte)name[escape + 1]] || !_lookupHexadecimal[(byte)name[escape + 2]])
                     return new TokenError(position + escape, $"Escaped character inside name is not followed by two hex digits.");
 
-                char val = (char)(_hexToDecimalLookup[(byte)name[escape + 1]] * 16 + _hexToDecimalLookup[(byte)name[escape + 2]]);
+                char val = (char)(_lookupHexToDecimal[(byte)name[escape + 1]] * 16 + _lookupHexToDecimal[(byte)name[escape + 2]]);
                 name = name.Replace(name.Substring(escape, 3), $"{val}");
             }
 
@@ -497,7 +543,7 @@ namespace PdfXenon.Standard
             {
                 // Find the run of hexadecimal characters and whitespace
                 int end = _index;
-                while ((end < _length) && _hexadecimalWhitespaceLookup[_line[end]])
+                while ((end < _length) && _lookupHexadecimalWhitespace[_line[end]])
                     end++;
 
                 if (end == _length)

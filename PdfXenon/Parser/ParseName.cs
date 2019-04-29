@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Collections.Concurrent;
 
 namespace PdfXenon.Standard
 {
     public class ParseName : ParseObject
     {
-        private static Dictionary<string, ParseName> _lookup = new Dictionary<string, ParseName>();
+        private static ConcurrentDictionary<string, ParseName> _lookup = new ConcurrentDictionary<string, ParseName>();
+        private static Func<string, ParseName, ParseName> _nullUpdate = (x, y) => y;
 
         public ParseName(string value)
         {
@@ -28,7 +30,7 @@ namespace PdfXenon.Standard
             if (!_lookup.TryGetValue(name, out ParseName parseName))
             {
                 parseName = new ParseName(name);
-                _lookup.Add(name, parseName);
+                _lookup.AddOrUpdate(name, parseName, _nullUpdate);
             }
 
             return parseName;

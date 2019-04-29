@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace PdfXenon.Standard
 {
     public class TokenIdentifier : TokenObject
     {
-        private static Dictionary<string, TokenIdentifier> _lookup = new Dictionary<string, TokenIdentifier>();
+        private static ConcurrentDictionary<string, TokenIdentifier> _lookup = new ConcurrentDictionary<string, TokenIdentifier>();
+        private static Func<string, TokenIdentifier, TokenIdentifier> _nullUpdate = (x, y) => y;
 
         public TokenIdentifier(string identifier)
         {
@@ -18,7 +21,7 @@ namespace PdfXenon.Standard
             if (!_lookup.TryGetValue(identifier, out TokenIdentifier tokenIdentifier))
             {
                 tokenIdentifier = new TokenIdentifier(identifier);
-                _lookup.Add(identifier, tokenIdentifier);
+                _lookup.AddOrUpdate(identifier, tokenIdentifier, _nullUpdate);
             }
 
             return tokenIdentifier;

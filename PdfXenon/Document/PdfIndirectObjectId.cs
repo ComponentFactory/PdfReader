@@ -142,7 +142,7 @@ namespace PdfXenon.Standard
             }
 
             if (_gens.ContainsKey(xref.Gen))
-                throw new ApplicationException($"Indirect object with Id:{xref.Id} Gen:{xref.Gen} already exists, at position {xref.Position}.");
+                throw new ApplicationException($"Indirect object with Id:{xref.Id} Gen:{xref.Gen} already exists.");
 
             _gens.Add(indirect.Gen, indirect);
         }

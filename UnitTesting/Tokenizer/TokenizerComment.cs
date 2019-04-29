@@ -26,7 +26,6 @@ namespace TokenizerUnitTesting
             TokenComment c = t.GetToken() as TokenComment;
             Assert.NotNull(c);
             Assert.True(c.Value == "%comment");
-            Assert.True(c.Position == 0);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -39,7 +38,6 @@ namespace TokenizerUnitTesting
             TokenComment c = t.GetToken() as TokenComment;
             Assert.NotNull(c);
             Assert.True(c.Value == "%comment");
-            Assert.True(c.Position == 2);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -52,7 +50,6 @@ namespace TokenizerUnitTesting
             TokenComment c = t.GetToken() as TokenComment;
             Assert.NotNull(c);
             Assert.True(c.Value == "%comment");
-            Assert.True(c.Position == 5);
             Assert.True(t.GetToken() is TokenEmpty);
         }
 
@@ -65,17 +62,14 @@ namespace TokenizerUnitTesting
             TokenComment c = t.GetToken() as TokenComment;
             Assert.NotNull(c);
             Assert.True(c.Value == "%one");
-            Assert.True(c.Position == 0);
 
             c = t.GetToken() as TokenComment;
             Assert.NotNull(c);
             Assert.True(c.Value == "%two");
-            Assert.True(c.Position == 5);
 
             c = t.GetToken() as TokenComment;
             Assert.NotNull(c);
             Assert.True(c.Value == "%three");
-            Assert.True(c.Position == 10);
 
             Assert.True(t.GetToken() is TokenEmpty);
         }

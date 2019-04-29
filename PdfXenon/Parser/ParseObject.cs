@@ -5,6 +5,10 @@ namespace PdfXenon.Standard
 {
     public abstract class ParseObject
     {
+        public static readonly ParseBoolean True = new ParseBoolean(true);
+        public static readonly ParseBoolean False = new ParseBoolean(false);
+        public static readonly ParseNull Null = new ParseNull();
+
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();

@@ -4,8 +4,8 @@ namespace PdfXenon.Standard
 {
     public class TokenStringLiteral : TokenString
     {
-        public TokenStringLiteral(long position, string raw)
-            : base(position, raw)
+        public TokenStringLiteral(string raw)
+            : base(raw)
         {
         }
 

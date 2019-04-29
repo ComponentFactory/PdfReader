@@ -15,7 +15,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("<20>"));
             TokenStringHex s = t.GetToken() as TokenStringHex;
             Assert.NotNull(s);
-            Assert.True(s.Position == 0);
             Assert.True(s.Raw == "20");
             Assert.True(s.Resolved == " ");
             Assert.True(t.GetToken() is TokenEmpty);
@@ -27,13 +26,11 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("<20><64>"));
             TokenStringHex s = t.GetToken() as TokenStringHex;
             Assert.NotNull(s);
-            Assert.True(s.Position == 0);
             Assert.True(s.Raw == "20");
             Assert.True(s.Resolved == " ");
 
             s = t.GetToken() as TokenStringHex;
             Assert.NotNull(s);
-            Assert.True(s.Position == 4);
             Assert.True(s.Raw == "64");
             Assert.True(s.Resolved == "d");
             Assert.True(t.GetToken() is TokenEmpty);
@@ -45,7 +42,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("<20 >"));
             TokenStringHex s = t.GetToken() as TokenStringHex;
             Assert.NotNull(s);
-            Assert.True(s.Position == 0);
             Assert.True(s.Raw == "20 ");
             Assert.True(s.Resolved == " ");
             Assert.True(t.GetToken() is TokenEmpty);
@@ -57,7 +53,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("<2 0 >"));
             TokenStringHex s = t.GetToken() as TokenStringHex;
             Assert.NotNull(s);
-            Assert.True(s.Position == 0);
             Assert.True(s.Raw == "2 0 ");
             Assert.True(s.Resolved == " ");
             Assert.True(t.GetToken() is TokenEmpty);
@@ -69,7 +64,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("< 2 0 >"));
             TokenStringHex s = t.GetToken() as TokenStringHex;
             Assert.NotNull(s);
-            Assert.True(s.Position == 0);
             Assert.True(s.Raw == " 2 0 ");
             Assert.True(s.Resolved == " ");
             Assert.True(t.GetToken() is TokenEmpty);
@@ -81,7 +75,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("< 20 >"));
             TokenStringHex s = t.GetToken() as TokenStringHex;
             Assert.NotNull(s);
-            Assert.True(s.Position == 0);
             Assert.True(s.Raw == " 20 ");
             Assert.True(s.Resolved == " ");
             Assert.True(t.GetToken() is TokenEmpty);
@@ -93,7 +86,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("< 20>"));
             TokenStringHex s = t.GetToken() as TokenStringHex;
             Assert.NotNull(s);
-            Assert.True(s.Position == 0);
             Assert.True(s.Raw == " 20");
             Assert.True(s.Resolved == " ");
             Assert.True(t.GetToken() is TokenEmpty);
@@ -105,7 +97,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("<6465>"));
             TokenStringHex s = t.GetToken() as TokenStringHex;
             Assert.NotNull(s);
-            Assert.True(s.Position == 0);
             Assert.True(s.Raw == "6465");
             Assert.True(s.Resolved == "de");
             Assert.True(t.GetToken() is TokenEmpty);
@@ -118,7 +109,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("<64 65 >"));
             TokenStringHex s = t.GetToken() as TokenStringHex;
             Assert.NotNull(s);
-            Assert.True(s.Position == 0);
             Assert.True(s.Raw == "64 65 ");
             Assert.True(s.Resolved == "de");
             Assert.True(t.GetToken() is TokenEmpty);

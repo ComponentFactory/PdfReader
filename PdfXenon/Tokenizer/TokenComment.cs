@@ -2,8 +2,7 @@
 {
     public class TokenComment : TokenObject
     {
-        public TokenComment(long position, string comment)
-            : base(position)
+        public TokenComment(string comment)
         {
             Value = comment;
         }

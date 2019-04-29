@@ -2,8 +2,7 @@
 {
     public class TokenXRefEntry : TokenObject
     {
-        public TokenXRefEntry(long position, int id, int gen, long offset, bool used)
-            : base(position)
+        public TokenXRefEntry(int id, int gen, long offset, bool used)
         {
             Id = id;
             Gen = gen;

@@ -108,6 +108,13 @@ namespace PdfXenon.Standard
             return ret;
         }
 
+        public void Reset()
+        {
+            _start = 0;
+            _end = 0;
+            Position = _stream.Position;
+        }
+
         private int ReadBytes()
         {
             // Read in a buffer of ASCII characters

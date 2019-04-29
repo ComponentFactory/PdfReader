@@ -148,11 +148,22 @@ namespace PdfXenon.Standard
 
         public TokenObject GetToken()
         {
-            TokenObject t = _stack.Count > 0 ? _stack.Pop() : GetAnyToken();
+            TokenObject t = null;
+            if (_stack.Count > 0)
+                t = _stack.Pop();
+            else
+                t = GetAnyToken();
 
             if (IgnoreComments)
+            {
                 while (t is TokenComment)
-                    t = _stack.Count > 0 ? _stack.Pop() : GetAnyToken();
+                {
+                    if (_stack.Count > 0)
+                        t = _stack.Pop();
+                    else
+                        t = GetAnyToken();
+                }
+            }
 
             return t;
         }
@@ -187,8 +198,7 @@ namespace PdfXenon.Standard
 
             _index = _length;
 
-            return new TokenXRefEntry(_position,
-                                      id,
+            return new TokenXRefEntry(id,
                                       ConvertDecimalToInteger(11, 5),
                                       ConvertDecimalToInteger(0, 10),
                                       (_line[17] == 110)); // 'n'
@@ -344,7 +354,7 @@ namespace PdfXenon.Standard
 
             // Have we run out of content?
             if ((_line == null) || (_index == _length))
-                return new TokenEmpty(_position);
+                return TokenObject.Empty;
             else
             {
                 long position = _position + _index;
@@ -369,10 +379,10 @@ namespace PdfXenon.Standard
                             return GetStringLiteral();
                         case 91: // '['
                             _index++;
-                            return new TokenArrayOpen(position);
+                            return TokenObject.ArrayOpen;
                         case 93: // ']'
                             _index++;
-                            return new TokenArrayClose(position);
+                            return TokenObject.ArrayClose;
                     }
 
                     // Found invalid character for this position
@@ -418,7 +428,7 @@ namespace PdfXenon.Standard
                     if (_index < _length)
                         current = _line[_index++];
                     else
-                        return new TokenInteger(position, positive ? whole : -whole);
+                        return new TokenInteger(positive ? whole : -whole);
                 }
                 else
                     break;
@@ -428,13 +438,13 @@ namespace PdfXenon.Standard
             if (current != 46)
             {
                 _index--;
-                return new TokenInteger(position, positive ? whole : -whole);
+                return new TokenInteger(positive ? whole : -whole);
             }
 
             if (_index < _length)
                 current = _line[_index++];
             else
-                return new TokenReal(position, positive ? whole : -whole);
+                return new TokenReal(positive ? whole : -whole);
 
             // Find end of the fractional part
             while ((_index < _length) && _lookupIsNumeric[_line[_index]])
@@ -442,7 +452,7 @@ namespace PdfXenon.Standard
 
             string text = Encoding.ASCII.GetString(_line, start, _index - start);
             if (float.TryParse(text, out float convert))
-                return new TokenReal(position, convert);
+                return new TokenReal(convert);
 
             // String is not a recognized number format
             return new TokenError(position, $"Cannot parse text as a real number.");
@@ -458,7 +468,7 @@ namespace PdfXenon.Standard
                 key++;
 
             string text = Encoding.ASCII.GetString(_line, _index, key - _index);
-            TokenKeyword token = TokenKeyword.CheckKeywords(position, text);
+            TokenKeyword token = TokenKeyword.GetToken(text);
             if (token != null)
             {
                 _index = key;
@@ -475,7 +485,7 @@ namespace PdfXenon.Standard
                 text = Encoding.ASCII.GetString(_line, _index, key - _index);
                 _index = key;
 
-                return new TokenIdentifier(position, UniqueString(text));
+                return new TokenIdentifier(UniqueString(text));
             }
             else
                 return new TokenError(position, $"Cannot parse '{text}' as a keyword.");
@@ -491,7 +501,7 @@ namespace PdfXenon.Standard
             // Continue processing at start of the next line
             _line = null;
 
-            return new TokenComment(position, comment);
+            return new TokenComment(comment);
         }
 
 
@@ -522,7 +532,7 @@ namespace PdfXenon.Standard
                 name = name.Replace(name.Substring(escape, 3), $"{val}");
             }
 
-            return new TokenName(position, UniqueString(name));
+            return TokenName.GetToken(UniqueString(name));
         }
 
         private TokenObject GetDictionaryOpenOrHexString()
@@ -537,7 +547,7 @@ namespace PdfXenon.Standard
             if (_line[_index] == '<')
             {
                 _index++;
-                return new TokenDictionaryOpen(position);
+                return TokenObject.DictionaryOpen;
             }
             else
             {
@@ -555,7 +565,7 @@ namespace PdfXenon.Standard
                 string str = Encoding.ASCII.GetString(_line, _index, end - _index);
                 _index = end + 1;
 
-                return new TokenStringHex(position, str);
+                return new TokenStringHex(str);
             }
         }
 
@@ -567,7 +577,7 @@ namespace PdfXenon.Standard
             if (((_index + 1) < _length) && (_line[_index + 1] == 62))
             {
                 _index += 2;
-                return new TokenDictionaryClose(position);
+                return TokenObject.DictionaryClose;
             }
             else
             {
@@ -619,7 +629,7 @@ namespace PdfXenon.Standard
                             // Move past the ')' marker
                             _index++;
 
-                            return new TokenStringLiteral(position, sb.ToString());
+                            return new TokenStringLiteral(sb.ToString());
                         }
                         else
                             nesting--;
@@ -686,7 +696,7 @@ namespace PdfXenon.Standard
                     // Move past the ')' marker
                     _index++;
 
-                    return new TokenStringLiteral(position, literal);
+                    return new TokenStringLiteral(literal);
                 }
 
                 _index += 2;

@@ -2,8 +2,7 @@
 {
     public class TokenInteger : TokenObject
     {
-        public TokenInteger(long position, int integer)
-            : base(position)
+        public TokenInteger(int integer)
         {
             Value = integer;
         }

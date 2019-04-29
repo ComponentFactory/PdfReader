@@ -18,7 +18,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("0"));
             TokenInteger n = t.GetToken() as TokenInteger;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == 0);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -29,7 +28,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("   0"));
             TokenInteger n = t.GetToken() as TokenInteger;
             Assert.NotNull(n);
-            Assert.True(n.Position == 3);
             Assert.True(n.Value == 0);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -40,7 +38,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("-0"));
             TokenInteger n = t.GetToken() as TokenInteger;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == 0);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -51,7 +48,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("+0"));
             TokenInteger n = t.GetToken() as TokenInteger;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == 0);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -62,7 +58,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("1"));
             TokenInteger n = t.GetToken() as TokenInteger;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == 1);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -73,7 +68,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("-1"));
             TokenInteger n = t.GetToken() as TokenInteger;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == -1);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -84,7 +78,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("+1"));
             TokenInteger n = t.GetToken() as TokenInteger;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == 1);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -95,7 +88,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("1true"));
             TokenInteger n = t.GetToken() as TokenInteger;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == 1);
             Assert.True(t.GetToken() is TokenKeyword);
         }
@@ -106,7 +98,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream(int.MaxValue.ToString()));
             TokenInteger n = t.GetToken() as TokenInteger;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == int.MaxValue);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -117,7 +108,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream(int.MinValue.ToString()));
             TokenInteger n = t.GetToken() as TokenInteger;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == int.MinValue);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -128,7 +118,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("0.0"));
             TokenReal n = t.GetToken() as TokenReal;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == 0);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -139,7 +128,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("-0.0"));
             TokenReal n = t.GetToken() as TokenReal;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == 0);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -150,7 +138,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("+0.0"));
             TokenReal n = t.GetToken() as TokenReal;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == 0);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -161,7 +148,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("1.0"));
             TokenReal n = t.GetToken() as TokenReal;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == 1);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -172,7 +158,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("-1.0"));
             TokenReal n = t.GetToken() as TokenReal;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == -1);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -183,7 +168,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("+1.0"));
             TokenReal n = t.GetToken() as TokenReal;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == 1);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -194,7 +178,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream(".1"));
             TokenReal n = t.GetToken() as TokenReal;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == 0.1f);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -205,7 +188,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("-.1"));
             TokenReal n = t.GetToken() as TokenReal;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == -0.1f);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -216,7 +198,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("+.1"));
             TokenReal n = t.GetToken() as TokenReal;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == 0.1f);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -227,7 +208,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("1.0true"));
             TokenReal n = t.GetToken() as TokenReal;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == 1f);
             Assert.True(t.GetToken() is TokenKeyword);
         }
@@ -238,7 +218,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream(RealPos.ToString()));
             TokenReal n = t.GetToken() as TokenReal;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == RealPos);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -249,7 +228,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream(RealNeg.ToString()));
             TokenReal n = t.GetToken() as TokenReal;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == RealNeg);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -260,7 +238,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("+" + RealPos.ToString()));
             TokenReal n = t.GetToken() as TokenReal;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == RealPos);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -271,7 +248,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("3.14"));
             TokenReal n = t.GetToken() as TokenReal;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == 3.14f);
             Assert.True(t.GetToken() is TokenEmpty);
         }
@@ -282,7 +258,6 @@ namespace TokenizerUnitTesting
             Tokenizer t = new Tokenizer(StringToStream("-3.14"));
             TokenReal n = t.GetToken() as TokenReal;
             Assert.NotNull(n);
-            Assert.True(n.Position == 0);
             Assert.True(n.Value == -3.14f);
             Assert.True(t.GetToken() is TokenEmpty);
         }

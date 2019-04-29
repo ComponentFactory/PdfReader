@@ -2,8 +2,7 @@
 {
     public class TokenReal : TokenObject
     {
-        public TokenReal(long position, float real)
-            : base(position)
+        public TokenReal(float real)
         {
             Value = real;
         }

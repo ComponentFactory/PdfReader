@@ -7,6 +7,8 @@ namespace PdfXenon.Standard
 {
     public class ParseName : ParseObject
     {
+        private static Dictionary<string, ParseName> _lookup = new Dictionary<string, ParseName>();
+
         public ParseName(string value)
         {
             Value = value;
@@ -20,5 +22,16 @@ namespace PdfXenon.Standard
         }
 
         public string Value { get; private set; }
+
+        public static ParseName GetParse(string name)
+        {
+            if (!_lookup.TryGetValue(name, out ParseName parseName))
+            {
+                parseName = new ParseName(name);
+                _lookup.Add(name, parseName);
+            }
+
+            return parseName;
+        }
     }
 }

@@ -6,11 +6,11 @@ namespace PdfXenon.Standard
 {
     public class TokenKeyword : TokenObject
     {
-        private static Dictionary<string, ParseKeyword> _lookup;
+        private static Dictionary<string, TokenKeyword> _lookup;
 
         static TokenKeyword()
         {
-            _lookup = new Dictionary<string, ParseKeyword>();
+            _lookup = new Dictionary<string, TokenKeyword>();
 
             foreach (object val in Enum.GetValues(typeof(ParseKeyword)))
             {
@@ -21,24 +21,21 @@ namespace PdfXenon.Standard
                 if ((attrs != null) && (attrs.Length > 0))
                     keyword = ((DescriptionAttribute)attrs[0]).Description;
 
-                _lookup.Add(keyword, (ParseKeyword)val);
+                _lookup.Add(keyword, new TokenKeyword((ParseKeyword)val));
             }
         }
 
-        public TokenKeyword(long position, ParseKeyword keyword)
-            : base(position)
+        public TokenKeyword(ParseKeyword keyword)
         {
             Value = keyword;
         }
 
-        public static TokenKeyword CheckKeywords(long position, string keyword)
-        {
-            if (_lookup.TryGetValue(keyword, out ParseKeyword pdfKeyword))
-                return new TokenKeyword(position, pdfKeyword);
-
-            return null;
-        }
-
         public ParseKeyword Value { get; private set; }
+
+        public static TokenKeyword GetToken(string keyword)
+        {
+            _lookup.TryGetValue(keyword, out TokenKeyword tokenKeyword);
+            return tokenKeyword;
+        }
     }
 }

@@ -5,8 +5,8 @@ namespace PdfXenon.Standard
 {
     public class TokenStringHex : TokenString
     {
-        public TokenStringHex(long position, string raw)
-            : base(position, raw)
+        public TokenStringHex(string raw)
+            : base(raw)
         {
         }
 

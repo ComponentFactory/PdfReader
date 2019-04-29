@@ -4,9 +4,9 @@ namespace PdfXenon.Standard
 {
     public class ParseBoolean : ParseObject
     {
-        public ParseBoolean(TokenKeyword token)
+        public ParseBoolean(bool value)
         {
-            Value = (token.Value == ParseKeyword.True);
+            Value = value;
         }
 
         public override int Output(StringBuilder sb, int indent)

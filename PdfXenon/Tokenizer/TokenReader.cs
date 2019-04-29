@@ -112,7 +112,6 @@ namespace PdfXenon.Standard
         {
             _start = 0;
             _end = 0;
-            Position = _stream.Position;
         }
 
         private int ReadBytes()

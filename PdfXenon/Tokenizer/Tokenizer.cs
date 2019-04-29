@@ -19,7 +19,6 @@ namespace PdfXenon.Standard
         private static bool[] _lookupIsNumeric;
         private static bool[] _lookupIsNumericStart;
         private static bool[] _lookupKeyword;
-        private static Dictionary<string, string> _uniqueStrings = new Dictionary<string, string>();
 
         private static readonly byte[] _whitespace = new byte[] { 0, 9, 10, 12, 13, 32 }; 
         //                                                       \0  \t \n  \f  \r  (SPACE)
@@ -45,6 +44,7 @@ namespace PdfXenon.Standard
         private byte[] _line;
         private bool _disposed;
         private TokenReader _reader;
+        private TokenReader _cachedReader;
         private Stack<TokenObject> _stack = new Stack<TokenObject>();
 
         static Tokenizer()
@@ -267,6 +267,7 @@ namespace PdfXenon.Standard
                 if (disposing)
                 {
                     _reader = null;
+                    _cachedReader = null;
                     Stream.Dispose();
                     Stream = null;
                 }
@@ -280,7 +281,18 @@ namespace PdfXenon.Standard
             get
             {
                 if (_reader == null)
-                    _reader = new TokenReader(Stream);
+                {
+                    if (_cachedReader == null)
+                    {
+                        _reader = new TokenReader(Stream);
+                        _cachedReader = _reader;
+                    }
+                    else
+                    {
+                        _reader = _cachedReader;
+                        _reader.Reset();
+                    }
+                }
 
                 return _reader;
             }
@@ -485,7 +497,7 @@ namespace PdfXenon.Standard
                 text = Encoding.ASCII.GetString(_line, _index, key - _index);
                 _index = key;
 
-                return new TokenIdentifier(UniqueString(text));
+                return new TokenIdentifier(text);
             }
             else
                 return new TokenError(position, $"Cannot parse '{text}' as a keyword.");
@@ -532,7 +544,7 @@ namespace PdfXenon.Standard
                 name = name.Replace(name.Substring(escape, 3), $"{val}");
             }
 
-            return TokenName.GetToken(UniqueString(name));
+            return TokenName.GetToken(name);
         }
 
         private TokenObject GetDictionaryOpenOrHexString()
@@ -712,18 +724,6 @@ namespace PdfXenon.Standard
 
             // End of content before end of string literal
             return new TokenError(position, $"End of content before end of UTF16 literal string character.");
-        }
-
-        private string UniqueString(string str)
-        {
-            // Only keep a single instance of the same string value
-            if (_uniqueStrings.TryGetValue(str, out string unique))
-                return unique;
-            else
-            {
-                _uniqueStrings.Add(str, str);
-                return str;
-            }
         }
 
         private Stream Stream { get; set; }

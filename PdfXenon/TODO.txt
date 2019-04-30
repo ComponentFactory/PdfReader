@@ -1,4 +1,7 @@
-﻿Can bytes be converted to string faster than Encoding.ASCII.GetString from ASCII set of bytes?
+﻿TODO
+    FlatDecode
+	    Implement Predictors
+		Implement less-common algorithm found in PDF17
 
 PDFClown
 iTextShar-Develop

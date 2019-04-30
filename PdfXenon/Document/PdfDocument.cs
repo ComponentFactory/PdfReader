@@ -2,12 +2,26 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading;
+
 
 namespace PdfXenon.Standard
 {
     public class PdfDocument : PdfObject
     {
+        private class BackgroundArgs
+        {
+            public Parser Parser { get; set; }
+            public List<int> Ids { get; set; }
+            public int Index { get; set; }
+            public int Count { get; set; }
+        }
+
+        private static readonly int BACKGROUND_TRIGGER = 5000;
+        private static readonly int NUM_BACKGROUND_ITEMS = 50;
+
         private bool _open;
         private Stream _stream;
         private StreamReader _reader;
@@ -16,6 +30,8 @@ namespace PdfXenon.Standard
         private PdfObjectReference _refInfo;
         private PdfCatalog _pdfCatalog;
         private PdfInfo _pdfInfo;
+        private int _backgroundCount;
+        private ManualResetEvent _backgroundEvent;
 
         public PdfDocument()
             : base(null)
@@ -37,7 +53,8 @@ namespace PdfXenon.Standard
             if (immediate)
             {
                 // Faster to read all of the file contents at once and then parse, rather than read progressively during parsing
-                Load(new MemoryStream(File.ReadAllBytes(filename)), immediate);
+                byte[] bytes = File.ReadAllBytes(filename);
+                Load(new MemoryStream(bytes), immediate, bytes);
             }
             else
             {
@@ -46,10 +63,13 @@ namespace PdfXenon.Standard
             }
         }
 
-        public void Load(Stream stream, bool immediate = false)
+        public void Load(Stream stream, bool immediate = false, byte[] bytes = null)
         {
             if (_open)
                 throw new ApplicationException("Document already has a stream open.");
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
 
             _stream = stream;
             _parser = new Parser(_stream);
@@ -101,10 +121,43 @@ namespace PdfXenon.Standard
 
             _open = true;
 
+            // Must load all objects immediately so the stream can then be closed
             if (immediate)
             {
-                // Must load all objects immediately so the stream can then be closed
-                IndirectObjects.ResolveAllReferences(this);
+                // Is there enough work to justify using multiple threads
+                if ((bytes != null) && (IndirectObjects.Count > BACKGROUND_TRIGGER))
+                {
+                    // Setup the synchronization event so we wait until all work is completed
+                    _backgroundCount = NUM_BACKGROUND_ITEMS;
+                    _backgroundEvent = new ManualResetEvent(false);
+
+                    List<int> ids = IndirectObjects.Ids.ToList();
+                    int idCount = ids.Count;
+                    int batchSize = idCount / NUM_BACKGROUND_ITEMS;
+
+                    for(int i=0, index = 0; i<NUM_BACKGROUND_ITEMS; i++, index += batchSize)
+                    {
+                        // Create a parser per unit of work, so they can work in parallel
+                        MemoryStream memoryStream = new MemoryStream(bytes);
+                        Parser parser = new Parser(memoryStream);
+
+                        // Make sure the last batch includes all the remaining Ids
+                        ThreadPool.QueueUserWorkItem(BackgroundResolveReference, new BackgroundArgs()
+                        {
+                            Parser = parser,
+                            Ids = ids,
+                            Index = index,
+                            Count = (i == (NUM_BACKGROUND_ITEMS - 1)) ? idCount - index : batchSize
+                        });
+                    }
+
+                    _backgroundEvent.WaitOne();
+                    _backgroundEvent.Dispose();
+                    _backgroundEvent = null;
+                }
+                else
+                    IndirectObjects.ResolveAllReferences(this);
+
                 Close();
             }
         }
@@ -175,11 +228,16 @@ namespace PdfXenon.Standard
 
         public PdfObject ResolveReference(PdfIndirectObject indirect)
         {
+            return ResolveReference(_parser, indirect);
+        }
+
+        public PdfObject ResolveReference(Parser parser, PdfIndirectObject indirect)
+        {
             if (indirect != null)
             {
                 if (indirect.Child == null)
                 {
-                    ParseIndirectObject parseIndirectObject = _parser.ParseIndirectObject(indirect.Offset);
+                    ParseIndirectObject parseIndirectObject = parser.ParseIndirectObject(indirect.Offset);
                     indirect.Child = indirect.WrapObject(parseIndirectObject.Object);
                 }
 
@@ -192,6 +250,26 @@ namespace PdfXenon.Standard
         private void Parser_ResolveReference(object sender, ParseResolveEventArgs e)
         {
             e.Object = ResolveReference(e.Id, e.Gen).ParseObject;
+        }
+
+        private void BackgroundResolveReference(object state)
+        {
+            BackgroundArgs args = (BackgroundArgs)state;
+
+            try
+            {
+                for (int i=0, index=args.Index; i<args.Count; i++, index++)
+                {
+                    int id = args.Ids[index];
+                    PdfIndirectObjectId gens = IndirectObjects[id];
+                    gens.ResolveAllReferences(args.Parser, this);
+                }
+            }
+            finally
+            {
+                if (Interlocked.Decrement(ref _backgroundCount) == 0)
+                    _backgroundEvent.Set();
+            }
         }
     }
 }

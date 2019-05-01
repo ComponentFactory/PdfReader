@@ -375,8 +375,6 @@ namespace PdfXenon.Standard
                 return TokenObject.Empty;
             else
             {
-                long position = _position + _index;
-
                 if (_lookupIsNumericStart[_line[_index]])
                     return GetNumber();
                 else if (!_lookupDelimiter[_line[_index]])
@@ -404,7 +402,7 @@ namespace PdfXenon.Standard
                     }
 
                     // Found invalid character for this position
-                    return new TokenError(position, $"Cannot parse '{_line[_index]}' as a delimiter or regular character.");
+                    return new TokenError(_position + _index, $"Cannot parse '{_line[_index]}' as a delimiter or regular character.");
                 }
             }
         }

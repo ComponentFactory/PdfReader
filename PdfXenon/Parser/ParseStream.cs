@@ -69,9 +69,6 @@ namespace PdfXenon.Standard
                         case "FlateDecode":
                             bytes = FlateDecode(bytes);
                             break;
-                        case "DCTDecode":
-                            bytes = DCTDecode(bytes);
-                            break;
                         default:
                             throw new ApplicationException($"Cannot process unrecognized stream filter '{filter.Value}'.");
                     }
@@ -89,7 +86,7 @@ namespace PdfXenon.Standard
                 {
                     using (DeflateStream decodeStream = new DeflateStream(inputStream, CompressionMode.Decompress))
                     {
-                        // Skip the two byte zlib header
+                        // Skip the zlib 2 byte header
                         inputStream.Position = 2;
                         decodeStream.CopyTo(outputStream);
                         bytes = outputStream.GetBuffer();
@@ -101,12 +98,6 @@ namespace PdfXenon.Standard
             if (_dictionary.ContainsName("Predictor"))
                 throw new ApplicationException($"Cannot process FlatDecode predictors.");
 
-            return bytes;
-        }
-
-        private byte[] DCTDecode(byte[] bytes)
-        {
-            // TODO
             return bytes;
         }
     }

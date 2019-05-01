@@ -26,10 +26,6 @@ namespace PdfXenon.Standard
             if ((_start == _end) && (ReadBytes(false) == 0))
                 return null;
 
-            // Skip over any line feed at end of preceding line
-            if (_bytes[_start] == '\r')
-                _start++;
-
             byte[] ret = new byte[length];
             int index = 0;
 

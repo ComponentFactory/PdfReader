@@ -1,7 +1,6 @@
 ﻿TODO
     FlatDecode
 	    Implement Predictors
-		Implement less-common algorithm found in PDF17
 
 PDFClown
 iTextShar-Develop

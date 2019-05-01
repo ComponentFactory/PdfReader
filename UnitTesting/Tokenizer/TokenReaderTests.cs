@@ -9,161 +9,211 @@ namespace TokenizerUnitTesting
 {
     public class TokenReaderTests : HelperMethods
     {
-        //[Fact]
-        //public void Single1()
-        //{
-        //    MemoryStream ms = StringToStream("");
-        //    TokenReader r = new TokenReader(ms);
+        [Fact]
+        public void Single1()
+        {
+            MemoryStream ms = StringToStream("");
+            TokenReader r = new TokenReader(ms);
+            TokenByteSplice splice = r.ReadLine();
+            Assert.Null(splice.Bytes);
+            Assert.True(splice.Start == 0);
+            Assert.True(splice.Length == 0);
+        }
 
-        //    Assert.True(r.Position == 0);
-        //    Assert.True(r.ReadLine() == null);
-        //    Assert.True(r.Position == 0);
-        //}
+        [Fact]
+        public void Single2()
+        {
+            MemoryStream ms = StringToStream("123");
+            TokenReader r = new TokenReader(ms);
+            TokenByteSplice splice = r.ReadLine();
 
-        //[Fact]
-        //public void Single2()
-        //{
-        //    MemoryStream ms = StringToStream("123");
-        //    TokenReader r = new TokenReader(ms);
-        //    Assert.True(r.Position == 0);
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 0);
+            Assert.True(splice.Length == 3);
+            Assert.True(splice.Bytes[splice.Start + 0] == 49);
+            Assert.True(splice.Bytes[splice.Start + 1] == 50);
+            Assert.True(splice.Bytes[splice.Start + 2] == 51);
+        }
 
-        //    byte[] line = r.ReadLine();
-        //    Assert.NotNull(line);
-        //    Assert.True(line.Length == 3);
-        //    Assert.True(line[0] == 49);
-        //    Assert.True(line[1] == 50);
-        //    Assert.True(line[2] == 51);
-        //    Assert.True(r.Position == 3);
-        //}
+        [Fact]
+        public void TwoCarriageReturn()
+        {
+            MemoryStream ms = StringToStream("123\r456");
+            TokenReader r = new TokenReader(ms);
+            TokenByteSplice splice = r.ReadLine();
 
-        //[Fact]
-        //public void TwoCarriageReturn()
-        //{
-        //    MemoryStream ms = StringToStream("123\r456");
-        //    TokenReader r = new TokenReader(ms);
-        //    Assert.True(r.Position == 0);
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 0);
+            Assert.True(splice.Length == 3);
+            Assert.True(splice.Bytes[splice.Start + 0] == 49);
+            Assert.True(splice.Bytes[splice.Start + 1] == 50);
+            Assert.True(splice.Bytes[splice.Start + 2] == 51);
 
-        //    byte[] line = r.ReadLine();
-        //    Assert.NotNull(line);
-        //    Assert.True(line.Length == 3);
-        //    Assert.True(line[0] == 49);
-        //    Assert.True(line[1] == 50);
-        //    Assert.True(line[2] == 51);
-        //    Assert.True(r.Position == 4);
+            splice = r.ReadLine();
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 4);
+            Assert.True(splice.Length == 3);
+            Assert.True(splice.Bytes[splice.Start + 0] == 52);
+            Assert.True(splice.Bytes[splice.Start + 1] == 53);
+            Assert.True(splice.Bytes[splice.Start + 2] == 54);
+        }
 
-        //    line = r.ReadLine();
-        //    Assert.NotNull(line);
-        //    Assert.True(line.Length == 3);
-        //    Assert.True(line[0] == 52);
-        //    Assert.True(line[1] == 53);
-        //    Assert.True(line[2] == 54);
-        //    Assert.True(r.Position == 7);
-        //}
+        [Fact]
+        public void TwoLineFeed()
+        {
+            MemoryStream ms = StringToStream("123\n456");
+            TokenReader r = new TokenReader(ms);
+            TokenByteSplice splice = r.ReadLine();
 
-        //[Fact]
-        //public void TwoLineFeed()
-        //{
-        //    MemoryStream ms = StringToStream("123\n456");
-        //    TokenReader r = new TokenReader(ms);
-        //    Assert.True(r.Position == 0);
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 0);
+            Assert.True(splice.Length == 3);
+            Assert.True(splice.Bytes[splice.Start + 0] == 49);
+            Assert.True(splice.Bytes[splice.Start + 1] == 50);
+            Assert.True(splice.Bytes[splice.Start + 2] == 51);
 
-        //    byte[] line = r.ReadLine();
-        //    Assert.NotNull(line);
-        //    Assert.True(line.Length == 3);
-        //    Assert.True(line[0] == 49);
-        //    Assert.True(line[1] == 50);
-        //    Assert.True(line[2] == 51);
-        //    Assert.True(r.Position == 4);
+            splice = r.ReadLine();
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 4);
+            Assert.True(splice.Length == 3);
+            Assert.True(splice.Bytes[splice.Start + 0] == 52);
+            Assert.True(splice.Bytes[splice.Start + 1] == 53);
+            Assert.True(splice.Bytes[splice.Start + 2] == 54);
+        }
 
-        //    line = r.ReadLine();
-        //    Assert.NotNull(line);
-        //    Assert.True(line.Length == 3);
-        //    Assert.True(line[0] == 52);
-        //    Assert.True(line[1] == 53);
-        //    Assert.True(line[2] == 54);
-        //    Assert.True(r.Position == 7);
-        //}
+        [Fact]
+        public void TwoBoth()
+        {
+            MemoryStream ms = StringToStream("123\r\n456");
+            TokenReader r = new TokenReader(ms);
+            TokenByteSplice splice = r.ReadLine();
 
-        //[Fact]
-        //public void TwoBoth()
-        //{
-        //    MemoryStream ms = StringToStream("123\r\n456");
-        //    TokenReader r = new TokenReader(ms);
-        //    Assert.True(r.Position == 0);
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 0);
+            Assert.True(splice.Length == 3);
+            Assert.True(splice.Bytes[splice.Start + 0] == 49);
+            Assert.True(splice.Bytes[splice.Start + 1] == 50);
+            Assert.True(splice.Bytes[splice.Start + 2] == 51);
 
-        //    byte[] line = r.ReadLine();
-        //    Assert.NotNull(line);
-        //    Assert.True(line.Length == 3);
-        //    Assert.True(line[0] == 49);
-        //    Assert.True(line[1] == 50);
-        //    Assert.True(line[2] == 51);
-        //    Assert.True(r.Position == 5);
+            splice = r.ReadLine();
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 5);
+            Assert.True(splice.Length == 3);
+            Assert.True(splice.Bytes[splice.Start + 0] == 52);
+            Assert.True(splice.Bytes[splice.Start + 1] == 53);
+            Assert.True(splice.Bytes[splice.Start + 2] == 54);
+        }
 
-        //    line = r.ReadLine();
-        //    Assert.NotNull(line);
-        //    Assert.True(line.Length == 3);
-        //    Assert.True(line[0] == 52);
-        //    Assert.True(line[1] == 53);
-        //    Assert.True(line[2] == 54);
-        //    Assert.True(r.Position == 8);
-        //}
+        [Fact]
+        public void TwoBothReorder()
+        {
+            MemoryStream ms = StringToStream("123\n\r456");
+            TokenReader r = new TokenReader(ms);
+            TokenByteSplice splice = r.ReadLine();
 
-        //[Fact]
-        //public void ThreeCarriageReturn()
-        //{
-        //    MemoryStream ms = StringToStream("123\r\r456");
-        //    TokenReader r = new TokenReader(ms);
-        //    Assert.True(r.Position == 0);
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 0);
+            Assert.True(splice.Length == 3);
+            Assert.True(splice.Bytes[splice.Start + 0] == 49);
+            Assert.True(splice.Bytes[splice.Start + 1] == 50);
+            Assert.True(splice.Bytes[splice.Start + 2] == 51);
 
-        //    byte[] line = r.ReadLine();
-        //    Assert.NotNull(line);
-        //    Assert.True(line.Length == 3);
-        //    Assert.True(line[0] == 49);
-        //    Assert.True(line[1] == 50);
-        //    Assert.True(line[2] == 51);
-        //    Assert.True(r.Position == 4);
+            splice = r.ReadLine();
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 4);
+            Assert.True(splice.Length == 0);
 
-        //    line = r.ReadLine();
-        //    Assert.NotNull(line);
-        //    Assert.True(line.Length == 0);
-        //    Assert.True(r.Position == 5);
+            splice = r.ReadLine();
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 5);
+            Assert.True(splice.Length == 3);
+            Assert.True(splice.Bytes[splice.Start + 0] == 52);
+            Assert.True(splice.Bytes[splice.Start + 1] == 53);
+            Assert.True(splice.Bytes[splice.Start + 2] == 54);
+        }
 
-        //    line = r.ReadLine();
-        //    Assert.NotNull(line);
-        //    Assert.True(line.Length == 3);
-        //    Assert.True(line[0] == 52);
-        //    Assert.True(line[1] == 53);
-        //    Assert.True(line[2] == 54);
-        //    Assert.True(r.Position == 8);
-        //}
+        [Fact]
+        public void ThreeCarriageReturn()
+        {
+            MemoryStream ms = StringToStream("123\r\r456");
+            TokenReader r = new TokenReader(ms);
+            TokenByteSplice splice = r.ReadLine();
 
-        //[Fact]
-        //public void ThreeLineFeed()
-        //{
-        //    MemoryStream ms = StringToStream("123\n\n456");
-        //    TokenReader r = new TokenReader(ms);
-        //    Assert.True(r.Position == 0);
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 0);
+            Assert.True(splice.Length == 3);
+            Assert.True(splice.Bytes[splice.Start + 0] == 49);
+            Assert.True(splice.Bytes[splice.Start + 1] == 50);
+            Assert.True(splice.Bytes[splice.Start + 2] == 51);
 
-        //    byte[] line = r.ReadLine();
-        //    Assert.NotNull(line);
-        //    Assert.True(line.Length == 3);
-        //    Assert.True(line[0] == 49);
-        //    Assert.True(line[1] == 50);
-        //    Assert.True(line[2] == 51);
-        //    Assert.True(r.Position == 4);
+            splice = r.ReadLine();
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 4);
+            Assert.True(splice.Length == 0);
 
-        //    line = r.ReadLine();
-        //    Assert.NotNull(line);
-        //    Assert.True(line.Length == 0);
-        //    Assert.True(r.Position == 5);
+            splice = r.ReadLine();
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 5);
+            Assert.True(splice.Length == 3);
+            Assert.True(splice.Bytes[splice.Start + 0] == 52);
+            Assert.True(splice.Bytes[splice.Start + 1] == 53);
+            Assert.True(splice.Bytes[splice.Start + 2] == 54);
+        }
 
-        //    line = r.ReadLine();
-        //    Assert.NotNull(line);
-        //    Assert.True(line.Length == 3);
-        //    Assert.True(line[0] == 52);
-        //    Assert.True(line[1] == 53);
-        //    Assert.True(line[2] == 54);
-        //    Assert.True(r.Position == 8);
-        //}
+        [Fact]
+        public void ThreeLineFeed()
+        {
+            MemoryStream ms = StringToStream("123\n\n456");
+            TokenReader r = new TokenReader(ms);
+            TokenByteSplice splice = r.ReadLine();
+
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 0);
+            Assert.True(splice.Length == 3);
+            Assert.True(splice.Bytes[splice.Start + 0] == 49);
+            Assert.True(splice.Bytes[splice.Start + 1] == 50);
+            Assert.True(splice.Bytes[splice.Start + 2] == 51);
+
+            splice = r.ReadLine();
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 4);
+            Assert.True(splice.Length == 0);
+
+            splice = r.ReadLine();
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 5);
+            Assert.True(splice.Length == 3);
+            Assert.True(splice.Bytes[splice.Start + 0] == 52);
+            Assert.True(splice.Bytes[splice.Start + 1] == 53);
+            Assert.True(splice.Bytes[splice.Start + 2] == 54);
+        }
+
+        [Fact]
+        public void ThreeBoth()
+        {
+            MemoryStream ms = StringToStream("123\r\n\r\n456");
+            TokenReader r = new TokenReader(ms);
+            TokenByteSplice splice = r.ReadLine();
+
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 0);
+            Assert.True(splice.Length == 3);
+            Assert.True(splice.Bytes[splice.Start + 0] == 49);
+            Assert.True(splice.Bytes[splice.Start + 1] == 50);
+            Assert.True(splice.Bytes[splice.Start + 2] == 51);
+
+            splice = r.ReadLine();
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 5);
+            Assert.True(splice.Length == 0);
+
+            splice = r.ReadLine();
+            Assert.NotNull(splice.Bytes);
+            Assert.True(splice.Start == 7);
+            Assert.True(splice.Length == 3);
+            Assert.True(splice.Bytes[splice.Start + 0] == 52);
+            Assert.True(splice.Bytes[splice.Start + 1] == 53);
+            Assert.True(splice.Bytes[splice.Start + 2] == 54);
+        }
     }
 }

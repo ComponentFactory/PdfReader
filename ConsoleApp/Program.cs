@@ -19,29 +19,30 @@ namespace ConsoleApp
 
             Console.WriteLine($"Process: {sw.ElapsedMilliseconds}ms\n");
 
-            Console.WriteLine($"Pages: {document.Catalog.Pages.Count}");
-            Console.WriteLine($"Author: {document.Info.Author}");
-            Console.WriteLine($"CreationDate: {document.Info.CreationDate}");
-            Console.WriteLine($"Creator: {document.Info.Creator}");
-            Console.WriteLine($"Keywords: {document.Info.Keywords}");
-            Console.WriteLine($"ModDate: {document.Info.ModDate}");
-            Console.WriteLine($"Producer: {document.Info.Producer}");
-            Console.WriteLine($"Subject: {document.Info.Subject}");
-            Console.WriteLine($"Title: {document.Info.Title}");
+            //Console.WriteLine($"Pages: {document.Catalog.Pages.Count}");
+            //Console.WriteLine($"Author: {document.Info.Author}");
+            //Console.WriteLine($"CreationDate: {document.Info.CreationDate}");
+            //Console.WriteLine($"Creator: {document.Info.Creator}");
+            //Console.WriteLine($"Keywords: {document.Info.Keywords}");
+            //Console.WriteLine($"ModDate: {document.Info.ModDate}");
+            //Console.WriteLine($"Producer: {document.Info.Producer}");
+            //Console.WriteLine($"Subject: {document.Info.Subject}");
+            //Console.WriteLine($"Title: {document.Info.Title}");
 
-            PdfPage page = document.Catalog.Pages[0];
-            PdfContents contents = page.Contents;
-            PdfContentsParser parser = contents.CreateParser();
-
-            PdfObject obj = null;
-            do
+            foreach(PdfPage page in document.Catalog.Pages)
             {
-                obj = parser.GetToken();
-                if (obj != null)
-                    Console.WriteLine(obj.ToString());
+                Console.WriteLine($"Page {document.Catalog.Pages.IndexOf(page)}");
 
-            } while (obj != null);
+                PdfContents contents = page.Contents;
+                PdfContentsParser parser = contents.CreateParser();
 
+                PdfObject obj = null;
+                do
+                {
+                    obj = parser.GetToken();
+
+                } while (obj != null);
+            }
 
             Console.ReadLine();
         }

@@ -26,7 +26,8 @@ namespace ConsoleApp
             sw.Start();
 
             PdfDocument document = new PdfDocument();
-            document.Load(filename, false);
+            document.Load(filename, true);
+            document.Close();
 
             foreach (PdfPage page in document.Catalog.Pages)
             {
@@ -62,7 +63,11 @@ namespace ConsoleApp
             //Console.WriteLine($"URI: {document.Catalog.URI}");
             //Console.WriteLine($"AcroForm: {document.Catalog.AcroForm}");
             //Console.WriteLine($"Metadata: {document.Catalog.Metadata}");
-            Console.WriteLine($"StructTreeRoot: {document.Catalog.StructTreeRoot}");
+            //Console.WriteLine($"IdTree: {document.Catalog.StructTreeRoot.IDTree}");
+            //Console.WriteLine($"ParentTree: {document.Catalog.StructTreeRoot.ParentTree}");
+            //Console.WriteLine($"ParentTreeNextKey: {document.Catalog.StructTreeRoot.ParentTreeNextKey}");
+            //Console.WriteLine($"RoleMap: {document.Catalog.StructTreeRoot.RoleMap}");
+            //Console.WriteLine($"ClassMap: {document.Catalog.StructTreeRoot.ClassMap}");
         }
     }
 }

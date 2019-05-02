@@ -8,13 +8,13 @@ namespace PdfXenon.Standard
         private List<PdfPage> _pages;
         private PdfNumberTree _pageLabels;
         private PdfOutlineLevel _outlineRoot;
+        private PdfStructTreeRoot _structTreeRoot;
 
         public PdfCatalog(PdfObject parent, ParseDictionary dictionary)
             : base(parent, dictionary)
         {
         }
 
-        public PdfName Type { get => MandatoryValue<PdfName>("Type"); }
         public PdfName Version { get => OptionalValue<PdfName>("Version"); }
 
         public List<PdfPage> Pages
@@ -72,24 +72,25 @@ namespace PdfXenon.Standard
         }
 
         public PdfArray Threads { get => OptionalValueRef<PdfArray>("Threads"); }
-
-        public PdfObject OpenAction
-        {
-            get
-            {
-                // Can be either an array or dictionary
-                PdfObject ret = OptionalValueRef<PdfArray>("OpenAction");
-                if (ret == null)
-                    ret = OptionalValueRef<PdfDictionary>("OpenAction");
-
-                return ret;
-            }
-        }
-
+        public PdfObject OpenAction { get => OptionalValueRef<PdfObject>("OpenAction"); }
         public PdfDictionary AA { get => OptionalValueRef<PdfDictionary>("AA"); }
         public PdfDictionary URI { get => OptionalValueRef<PdfDictionary>("URI"); }
         public PdfDictionary AcroForm { get => OptionalValueRef<PdfDictionary>("AcroForm"); }
         public PdfStream Metadata { get => OptionalValueRef<PdfStream>("Metadata"); }
-        public PdfDictionary StructTreeRoot { get => OptionalValueRef<PdfDictionary>("StructTreeRoot"); }
+
+        public PdfStructTreeRoot StructTreeRoot
+        {
+            get
+            {
+                if (_structTreeRoot == null)
+                {
+                    PdfDictionary dictionary = OptionalValueRef<PdfDictionary>("StructTreeRoot");
+                    if (dictionary != null)
+                        _structTreeRoot = new PdfStructTreeRoot(this, dictionary.ParseDictionary);
+                }
+
+                return _structTreeRoot;
+            }
+        }
     }
 }

@@ -52,26 +52,28 @@ namespace PdfXenon.Standard
 
         public PdfObject WrapObject(ParseObject obj)
         {
-            if (obj is ParseString)
-                return new PdfString(this, obj as ParseString);
-            if (obj is ParseName)
-                return new PdfName(this, obj as ParseName);
-            else if (obj is ParseInteger)
-                return new PdfInteger(this, obj as ParseInteger);
-            else if (obj is ParseReal)
-                return new PdfReal(this, obj as ParseReal);
-            else if (obj is ParseDictionary)
-                return new PdfDictionary(this, obj as ParseDictionary);
-            else if (obj is ParseObjectReference)
-                return new PdfObjectReference(this, obj as ParseObjectReference);
-            else if (obj is ParseStream)
-                return new PdfStream(this, obj as ParseStream);
-            else if (obj is ParseArray)
-                return new PdfArray(this, obj as ParseArray);
-            else if (obj is ParseIdentifier)
-                return new PdfIdentifier(this, obj as ParseIdentifier);
-            else if (obj is ParseBoolean)
-                return new PdfBoolean(this, obj as ParseBoolean);
+            if (obj is ParseString str)
+                return new PdfString(this, str);
+            if (obj is ParseName name)
+                return new PdfName(this, name);
+            else if (obj is ParseInteger integer)
+                return new PdfInteger(this, integer);
+            else if (obj is ParseReal real)
+                return new PdfReal(this, real);
+            else if (obj is ParseDictionary dictionary)
+                return new PdfDictionary(this, dictionary);
+            else if (obj is ParseObjectReference reference)
+                return new PdfObjectReference(this, reference);
+            else if (obj is ParseStream stream)
+                return new PdfStream(this, stream);
+            else if (obj is ParseArray array)
+                return new PdfArray(this, array);
+            else if (obj is ParseIdentifier identifier)
+                return new PdfIdentifier(this, identifier);
+            else if (obj is ParseBoolean boolean)
+                return new PdfBoolean(this, boolean);
+            if (obj is ParseNull nul)
+                return new PdfNull(this);
 
             throw new ApplicationException($"Cannot wrap object '{obj.GetType().Name}' as a pdf object .");
         }

@@ -7,11 +7,5 @@ namespace PdfXenon.Standard
         public ParseNull()
         {
         }
-
-        public override int Output(StringBuilder sb, int indent)
-        {
-            sb.Append("null");
-            return indent + 4;
-        }
     }
 }

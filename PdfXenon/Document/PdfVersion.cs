@@ -1,4 +1,6 @@
-﻿namespace PdfXenon.Standard
+﻿using System.Text;
+
+namespace PdfXenon.Standard
 {
     public class PdfVersion : PdfObject
     {
@@ -9,9 +11,11 @@
             Minor = minor;
         }
 
-        public override string ToString()
+        public override int Output(StringBuilder sb, int indent)
         {
-            return $"{Major}.{Minor}";
+            string output = $"{Major}.{Minor}";
+            sb.Append(output);
+            return indent + output.Length;
         }
 
         public int Major { get; private set; }

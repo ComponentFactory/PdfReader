@@ -14,6 +14,19 @@ namespace PdfXenon.Standard
             Offset = xref.Offset;
         }
 
+        public override int Output(StringBuilder sb, int indent)
+        {
+            string blank = new string(' ', indent);
+
+            sb.Append($"{Id} {Gen} obj\n");
+            Child.Output(sb, indent);
+            sb.Append("\n");
+            sb.Append(blank);
+            sb.Append("endobj\n");
+            sb.Append(blank);
+            return indent;
+        }
+
         public int Id { get; private set; }
         public int Gen { get; private set; }
         public long Offset { get; private set; }

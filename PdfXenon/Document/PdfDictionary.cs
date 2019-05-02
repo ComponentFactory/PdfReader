@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace PdfXenon.Standard
 {
@@ -12,11 +13,45 @@ namespace PdfXenon.Standard
         {
         }
 
+        public override int Output(StringBuilder sb, int indent)
+        {
+            WrapAllNames();
+            string blank = new string(' ', indent);
+
+            sb.Append("<<");
+            indent += 2;
+
+            int index = 0;
+            int count = _wrapped.Count;
+            foreach (KeyValuePair<string, PdfObject> entry in _wrapped)
+            {
+                if ((index == 1) && (count == 2))
+                    sb.Append(" ");
+                else if (index > 0)
+                    sb.Append("  ");
+
+                sb.Append($"{entry.Key} ");
+                int entryIndent = entry.Key.Length + 1;
+                entry.Value.Output(sb, entryIndent);
+
+                if (count > 2)
+                {
+                    sb.Append("\n");
+                    sb.Append(blank);
+                }
+
+                index++;
+            }
+
+            sb.Append(">>");
+            return indent;
+        }
+
         public ParseDictionary ParseDictionary { get => ParseObject as ParseDictionary; }
         public int Count { get => ParseDictionary.Count; }
         public bool ContainsName(string name) { return ParseDictionary.ContainsName(name); }
 
-        public Dictionary<string, PdfObject>.KeyCollection Names
+        public Dictionary<string, PdfObject>.KeyCollection Keys
         {
             get
             {
@@ -66,6 +101,29 @@ namespace PdfXenon.Standard
             return null;
         }
 
+        public T OptionalValueRef<T>(string name) where T : PdfObject
+        {
+            if (ParseDictionary.ContainsName(name))
+            {
+                WrapName(name);
+                if (_wrapped.TryGetValue(name, out PdfObject entry))
+                {
+                    if (entry is T)
+                        return (T)entry;
+                    else if (entry is PdfObjectReference reference)
+                    {
+                        entry = Document.ResolveReference(reference);
+                        if (entry is T)
+                            return (T)entry;
+                    }
+
+                    throw new ApplicationException($"Dictionary entry is type '{entry.GetType().Name}' instead of mandatory type of '{typeof(T).Name}'.");
+                }
+            }
+
+            return null;
+        }
+
         public PdfDateTime OptionalDateTime(string name)
         {
             PdfString str = OptionalValue<PdfString>(name);
@@ -93,7 +151,32 @@ namespace PdfXenon.Standard
             else
                 throw new ApplicationException($"Dictionary is missing mandatory name '{name}'.");
         }
-    
+
+        public T MandatoryValueRef<T>(string name) where T : PdfObject
+        {
+            if (ParseDictionary.ContainsName(name))
+            {
+                WrapName(name);
+                if (_wrapped.TryGetValue(name, out PdfObject entry))
+                {
+                    if (entry is T)
+                        return (T)entry;
+                    else if (entry is PdfObjectReference reference)
+                    {
+                        entry = Document.ResolveReference(reference);
+                        if (entry is T)
+                            return (T)entry;
+                    }
+
+                    throw new ApplicationException($"Dictionary entry is type '{entry.GetType().Name}' instead of mandatory type of '{typeof(T).Name}'.");
+                }
+                else
+                    throw new ApplicationException($"Dictionary is missing mandatory name '{name}'.");
+            }
+            else
+                throw new ApplicationException($"Dictionary is missing mandatory name '{name}'.");
+        }
+
         private void WrapName(string name)
         {
             if (_wrapped == null)
@@ -111,7 +194,7 @@ namespace PdfXenon.Standard
             // Are there any dictionary entries that still need wrapping?
             if (ParseDictionary.Count > _wrapped.Count)
             {
-                foreach (var name in ParseDictionary.Names)
+                foreach (var name in ParseDictionary.Keys)
                 {
                     if (!_wrapped.ContainsKey(name))
                         _wrapped.Add(name, WrapObject(ParseDictionary[name]));

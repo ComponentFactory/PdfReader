@@ -16,40 +16,6 @@ namespace PdfXenon.Standard
             _values = values;
         }
 
-        public override int Output(StringBuilder sb, int indent)
-        {
-            BuildDictionary();
-            string blank = new string(' ', indent);
-
-            sb.Append("<<");
-            indent += 2;
-
-            int index = 0;
-            int count = _dictionary.Count;
-            foreach (KeyValuePair<string, ParseObject> entry in _dictionary)
-            {
-                if ((index == 1) && (count == 2))
-                    sb.Append(" ");
-                else if (index > 0)
-                    sb.Append("  ");
-
-                sb.Append($"{entry.Key} ");
-                int entryIndent = entry.Key.Length + 1;
-                entry.Value.Output(sb, entryIndent);
-
-                if (count > 2)
-                {
-                    sb.Append("\n");
-                    sb.Append(blank);
-                }
-
-                index++;
-            }
-
-            sb.Append(">>");
-            return indent;
-        }
-
         public int Count { get => _names != null ? _names.Count : _dictionary.Count; }
 
         public bool ContainsName(string name)
@@ -58,7 +24,7 @@ namespace PdfXenon.Standard
             return _dictionary.ContainsKey(name);
         }
 
-        public Dictionary<string, ParseObject>.KeyCollection Names
+        public Dictionary<string, ParseObject>.KeyCollection Keys
         {
             get
             {

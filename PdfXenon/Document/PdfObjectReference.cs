@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace PdfXenon.Standard
 {
@@ -9,9 +10,11 @@ namespace PdfXenon.Standard
         {
         }
 
-        public override string ToString()
+        public override int Output(StringBuilder sb, int indent)
         {
-            return $"{Id} {Gen} R";
+            string output = $"{Id} {Gen} R";
+            sb.Append(output);
+            return indent + output.Length;
         }
 
         public ParseObjectReference ParseObjectReference { get => ParseObject as ParseObjectReference; }

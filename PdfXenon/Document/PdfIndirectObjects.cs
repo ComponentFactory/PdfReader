@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace PdfXenon.Standard
 {
@@ -10,6 +11,18 @@ namespace PdfXenon.Standard
         public PdfIndirectObjects(PdfObject parent)
             : base(parent)
         {
+        }
+
+        public override int Output(StringBuilder sb, int indent)
+        {
+            foreach (var id in Values)
+            {
+                foreach(var gen in id.Values)
+                {
+                    gen.Output(sb, indent);
+                }
+            }
+            return indent;
         }
 
         public int Count { get => _ids.Count; }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace PdfXenon.Standard
 {
@@ -10,9 +11,11 @@ namespace PdfXenon.Standard
             DateTime = str.ValueAsDateTime;
         }
 
-        public override string ToString()
+        public override int Output(StringBuilder sb, int indent)
         {
-            return DateTime.ToString();
+            string output = DateTime.ToString();
+            sb.Append(output);
+            return indent + output.Length;
         }
 
         public DateTime DateTime { get; private set; }

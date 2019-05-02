@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Text;
 
 namespace PdfXenon.Standard
 {
     public class PdfRectangle : PdfObject
     {
-        private float _lowerLeftX;
-        private float _lowerLeftY;
-        private float _upperRightX;
-        private float _upperRightY;
+        private readonly float _lowerLeftX;
+        private readonly float _lowerLeftY;
+        private readonly float _upperRightX;
+        private readonly float _upperRightY;
 
         public PdfRectangle(PdfObject parent, ParseArray array)
             : base(parent, array)
@@ -25,9 +26,11 @@ namespace PdfXenon.Standard
             _upperRightY = Math.Min(ly, uy);
         }
 
-        public override string ToString()
+        public override int Output(StringBuilder sb, int indent)
         {
-            return $"({_lowerLeftX}.{_lowerLeftY}),({_upperRightX}.{_upperRightY})";
+            string output = $"({_lowerLeftX}.{_lowerLeftY}),({_upperRightX}.{_upperRightY})";
+            sb.Append(output);
+            return indent + output.Length;
         }
 
         private float ObjectToFloat(ParseObject obj)

@@ -15,7 +15,7 @@ namespace PdfXenon.Standard
             : base(parent)
         {
             _streams = streams;
-        }
+        }    
 
         public PdfObject GetToken()
         {

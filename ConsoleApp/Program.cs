@@ -14,18 +14,8 @@ namespace ConsoleApp
             TestFileLoads(@"d:\FSharp.pdf");
             TestFileLoads(@"d:\Magazine.pdf");
             TestFileLoads(@"d:\Maths.pdf");
-            TestFileLoads(@"d:\PDF17.pdf");
             TestFileLoads(@"d:\Slides.pdf");
-
-            //Console.WriteLine($"Pages: {document.Catalog.Pages.Count}");
-            //Console.WriteLine($"Author: {document.Info.Author}");
-            //Console.WriteLine($"CreationDate: {document.Info.CreationDate}");
-            //Console.WriteLine($"Creator: {document.Info.Creator}");
-            //Console.WriteLine($"Keywords: {document.Info.Keywords}");
-            //Console.WriteLine($"ModDate: {document.Info.ModDate}");
-            //Console.WriteLine($"Producer: {document.Info.Producer}");
-            //Console.WriteLine($"Subject: {document.Info.Subject}");
-            //Console.WriteLine($"Title: {document.Info.Title}");
+            TestFileLoads(@"d:\PDF17.pdf");
 
             Console.ReadLine();
         }
@@ -36,8 +26,7 @@ namespace ConsoleApp
             sw.Start();
 
             PdfDocument document = new PdfDocument();
-            document.Load(filename, true);
-            document.Close();
+            document.Load(filename, false);
 
             foreach (PdfPage page in document.Catalog.Pages)
             {
@@ -52,7 +41,26 @@ namespace ConsoleApp
             }
 
             sw.Stop();
+
+            Console.WriteLine("");
             Console.WriteLine($"{filename}: {sw.ElapsedMilliseconds}ms");
+            Console.WriteLine($"Catalog: {document.Catalog}");
+
+            Console.WriteLine($"Type: {document.Catalog.Type}");
+            Console.WriteLine($"Version: {document.Catalog.Version}");
+            Console.WriteLine($"Pages: {document.Catalog.Pages.Count}");
+            Console.WriteLine($"PageLabels: {document.Catalog.PageLabels}");
+            Console.WriteLine($"Names: {document.Catalog.Names}");
+            Console.WriteLine($"Dests: {document.Catalog.Dests}");
+            Console.WriteLine($"ViewerPreferences: {document.Catalog.ViewerPreferences}");
+            Console.WriteLine($"PageLayout: {document.Catalog.PageLayout}");
+            Console.WriteLine($"PageMode: {document.Catalog.PageMode}");
+            Console.WriteLine($"Outlines: {document.Catalog.Outlines}");
+            Console.WriteLine($"Threads: {document.Catalog.Threads}");
+            Console.WriteLine($"OpenAction: {document.Catalog.OpenAction}");
+            Console.WriteLine($"AA: {document.Catalog.AA}");
+            Console.WriteLine($"URI: {document.Catalog.URI}");
+            Console.WriteLine($"AcroForm: {document.Catalog.AcroForm}");
         }
     }
 }

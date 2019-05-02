@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace PdfXenon.Standard
 {
@@ -17,7 +18,16 @@ namespace PdfXenon.Standard
 
         public override string ToString()
         {
-            return $"({GetType().Name})";
+            StringBuilder sb = new StringBuilder();
+            Output(sb, 0);
+            return sb.ToString();
+        }
+
+        public virtual int Output(StringBuilder sb, int indent)
+        {
+            string output = $"({GetType().Name})";
+            sb.Append(output);
+            return indent + output.Length;
         }
 
         public ParseObject ParseObject { get; private set; }

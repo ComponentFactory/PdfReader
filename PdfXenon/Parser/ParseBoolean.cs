@@ -9,13 +9,6 @@ namespace PdfXenon.Standard
             Value = value;
         }
 
-        public override int Output(StringBuilder sb, int indent)
-        {
-            string output = Value.ToString();
-            sb.Append(output);
-            return indent + output.Length;
-        }
-
         public bool Value { get; private set; }
     }
 }

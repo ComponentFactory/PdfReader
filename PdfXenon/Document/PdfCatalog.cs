@@ -5,13 +5,16 @@ namespace PdfXenon.Standard
 {
     public class PdfCatalog : PdfDictionary
     {
-        private PdfPages _pageTree;
         private List<PdfPage> _pages;
+        private PdfNumberTree _pageLabels;
 
         public PdfCatalog(PdfObject parent, ParseDictionary dictionary)
             : base(parent, dictionary)
         {
         }
+
+        public PdfName Type { get => MandatoryValue<PdfName>("Type"); }
+        public PdfName Version { get => OptionalValue<PdfName>("Version"); }
 
         public List<PdfPage> Pages
         {
@@ -19,32 +22,56 @@ namespace PdfXenon.Standard
             {
                 if (_pages == null)
                 {
-                    // Accessing the root pages will cause it to generate the pages collection
-                    var temp = RootPages;
+                    PdfDictionary dictionary = MandatoryValueRef<PdfDictionary>("Pages");
+                    _pages = new List<PdfPage>();
+
+                    // Build all the objects in the page tree, we only do this to get the list of pages
+                    PdfPages rootPage = new PdfPages(this, dictionary.ParseObject as ParseDictionary);
+                    rootPage.CreatePages(_pages);
                 }
 
                 return _pages;
             }
         }
 
-        public PdfPages RootPages
+        public PdfNumberTree PageLabels
         {
             get
             {
-                if (_pageTree == null)
+                if (_pageLabels == null)
                 {
-                    // Catalog has a mandatory 'Pages' entry that is a reference to the page tree root
-                    PdfObjectReference reference = MandatoryValue<PdfObjectReference>("Pages");
-                    PdfDictionary dictionary = Document.IndirectObjects.MandatoryValue<PdfDictionary>(reference);
-
-                    // Build all the objects in the page tree
-                    _pageTree = new PdfPages(this, dictionary.ParseObject as ParseDictionary);
-                    _pages = new List<PdfPage>();
-                    _pageTree.CreatePages(_pages);
+                    PdfDictionary dictionary = OptionalValueRef<PdfDictionary>("PageLabels");
+                    if (dictionary != null)
+                        _pageLabels = new PdfNumberTree(this, dictionary);
                 }
 
-                return _pageTree;
+                return _pageLabels;
             }
         }
+
+        public PdfDictionary Names { get => OptionalValueRef<PdfDictionary>("Names"); }
+        public PdfDictionary Dests { get => OptionalValueRef<PdfDictionary>("Dests"); }
+        public PdfDictionary ViewerPreferences { get => OptionalValueRef<PdfDictionary>("ViewerPreferences"); }
+        public PdfName PageLayout { get => OptionalValueRef<PdfName>("PageLayout"); }
+        public PdfName PageMode { get => OptionalValueRef<PdfName>("PageMode"); }
+        public PdfDictionary Outlines { get => OptionalValueRef<PdfDictionary>("Outlines"); }
+        public PdfArray Threads { get => OptionalValueRef<PdfArray>("Threads"); }
+
+        public PdfObject OpenAction
+        {
+            get
+            {
+                // Can be either an array or dictionary
+                PdfObject ret = OptionalValueRef<PdfArray>("OpenAction");
+                if (ret == null)
+                    ret = OptionalValueRef<PdfDictionary>("OpenAction");
+
+                return ret;
+            }
+        }
+
+        public PdfDictionary AA { get => OptionalValueRef<PdfDictionary>("AA"); }
+        public PdfDictionary URI { get => OptionalValueRef<PdfDictionary>("URI"); }
+        public PdfDictionary AcroForm { get => OptionalValueRef<PdfDictionary>("AcroForm"); }
     }
 }

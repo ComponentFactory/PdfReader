@@ -16,25 +16,6 @@ namespace PdfXenon.Standard
             StreamBytes = streamBytes;
         }
 
-        public override int Output(StringBuilder sb, int indent)
-        {
-            _dictionary.Output(sb, indent);
-
-            string blank = new string(' ', indent);
-            sb.Append("\n");
-            sb.Append(blank);
-            sb.Append("stream\n");
-
-            sb.Append(blank);
-            sb.Append(Value);
-
-            sb.Append("\n");
-            sb.Append(blank);
-            sb.Append("endstream");
-
-            return indent;
-        }
-
         public byte[] StreamBytes { get; private set; }
 
         public bool HasFilter

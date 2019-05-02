@@ -9,15 +9,13 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            PdfDocument document = new PdfDocument();
-            document.Load(@"d:\PDF17.pdf", true);
-            document.Close();
-            sw.Stop();
-
-            Console.WriteLine($"Process: {sw.ElapsedMilliseconds}ms\n");
+            TestFileLoads(@"d:\Blank.pdf");
+            TestFileLoads(@"d:\Coffee.pdf");
+            TestFileLoads(@"d:\FSharp.pdf");
+            TestFileLoads(@"d:\Magazine.pdf");
+            TestFileLoads(@"d:\Maths.pdf");
+            TestFileLoads(@"d:\PDF17.pdf");
+            TestFileLoads(@"d:\Slides.pdf");
 
             //Console.WriteLine($"Pages: {document.Catalog.Pages.Count}");
             //Console.WriteLine($"Author: {document.Info.Author}");
@@ -29,10 +27,20 @@ namespace ConsoleApp
             //Console.WriteLine($"Subject: {document.Info.Subject}");
             //Console.WriteLine($"Title: {document.Info.Title}");
 
-            foreach(PdfPage page in document.Catalog.Pages)
-            {
-                Console.WriteLine($"Page {document.Catalog.Pages.IndexOf(page)}");
+            Console.ReadLine();
+        }
 
+        static private void TestFileLoads(string filename)
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            PdfDocument document = new PdfDocument();
+            document.Load(filename, true);
+            document.Close();
+
+            foreach (PdfPage page in document.Catalog.Pages)
+            {
                 PdfContents contents = page.Contents;
                 PdfContentsParser parser = contents.CreateParser();
 
@@ -40,11 +48,11 @@ namespace ConsoleApp
                 do
                 {
                     obj = parser.GetToken();
-
                 } while (obj != null);
             }
 
-            Console.ReadLine();
+            sw.Stop();
+            Console.WriteLine($"{filename}: {sw.ElapsedMilliseconds}ms");
         }
     }
 }

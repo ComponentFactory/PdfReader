@@ -12,7 +12,7 @@ namespace ParserUnitTesting
         [Fact]
         public void Unfiltered1()
         {
-            Parser p = new Parser(StringToStream("1 0 obj<</Length 2>>stream\n\rdeendstream\nendobj"));
+            Parser p = new Parser(StringToStream("1 0 obj<</Length 2>>stream\r\ndeendstream\nendobj"));
             ParseIndirectObject i = p.ParseIndirectObject() as ParseIndirectObject;
 
             Assert.NotNull(i);

@@ -7,6 +7,7 @@ namespace PdfXenon.Standard
     {
         private List<PdfPage> _pages;
         private PdfNumberTree _pageLabels;
+        private PdfOutlineLevel _outlineRoot;
 
         public PdfCatalog(PdfObject parent, ParseDictionary dictionary)
             : base(parent, dictionary)
@@ -54,7 +55,25 @@ namespace PdfXenon.Standard
         public PdfDictionary ViewerPreferences { get => OptionalValueRef<PdfDictionary>("ViewerPreferences"); }
         public PdfName PageLayout { get => OptionalValueRef<PdfName>("PageLayout"); }
         public PdfName PageMode { get => OptionalValueRef<PdfName>("PageMode"); }
-        public PdfDictionary Outlines { get => OptionalValueRef<PdfDictionary>("Outlines"); }
+
+        public PdfOutlineLevel Outlines
+        {
+            get
+            {
+                if (_outlineRoot == null)
+                {
+                    PdfDictionary dictionary = OptionalValueRef<PdfDictionary>("Outlines");
+                    if (dictionary != null)
+                    {
+                        _outlineRoot = new PdfOutlineLevel(this);
+                        _outlineRoot.PopulateChildren(dictionary);
+                    }
+                }
+
+                return _outlineRoot;
+            }
+        }
+
         public PdfArray Threads { get => OptionalValueRef<PdfArray>("Threads"); }
 
         public PdfObject OpenAction
@@ -73,5 +92,7 @@ namespace PdfXenon.Standard
         public PdfDictionary AA { get => OptionalValueRef<PdfDictionary>("AA"); }
         public PdfDictionary URI { get => OptionalValueRef<PdfDictionary>("URI"); }
         public PdfDictionary AcroForm { get => OptionalValueRef<PdfDictionary>("AcroForm"); }
+        public PdfStream Metadata { get => OptionalValueRef<PdfStream>("Metadata"); }
+        public PdfDictionary StructTreeRoot { get => OptionalValueRef<PdfDictionary>("StructTreeRoot"); }
     }
 }

@@ -2,6 +2,8 @@
     FlatDecode
 	    Implement Predictors
 
+Convert struct tree into specific objects
+
 PDFClown
 iTextShar-Develop
 https://github.com/PDFium/PDFium

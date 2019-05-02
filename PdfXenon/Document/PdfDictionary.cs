@@ -112,12 +112,21 @@ namespace PdfXenon.Standard
                         return (T)entry;
                     else if (entry is PdfObjectReference reference)
                     {
-                        entry = Document.ResolveReference(reference);
-                        if (entry is T)
-                            return (T)entry;
+                        if (Document.IndirectObjects.ContainsId(reference.Id))
+                        {
+                            PdfIndirectObjectId id = Document.IndirectObjects[reference.Id];
+                            if (id.ContainsGen(reference.Gen))
+                            {
+                                entry = Document.ResolveReference(reference);
+                                if (entry is T)
+                                    return (T)entry;
+                                else
+                                    throw new ApplicationException($"Dictionary entry is type '{entry.GetType().Name}' instead of mandatory type of '{typeof(T).Name}'.");
+                            }
+                        }
                     }
-
-                    throw new ApplicationException($"Dictionary entry is type '{entry.GetType().Name}' instead of mandatory type of '{typeof(T).Name}'.");
+                    else
+                        throw new ApplicationException($"Dictionary entry is type '{entry.GetType().Name}' instead of mandatory type of '{typeof(T).Name}'.");
                 }
             }
 

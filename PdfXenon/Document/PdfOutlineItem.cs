@@ -8,10 +8,9 @@ namespace PdfXenon.Standard
         private PdfDictionary _dictionary;
 
         public PdfOutlineItem(PdfObject parent, PdfDictionary dictionary)
-            : base(parent)
+            : base(parent, dictionary)
         {
             _dictionary = dictionary;
-            PopulateChildren(dictionary);
         }
 
         public override int Output(StringBuilder sb, int indent)

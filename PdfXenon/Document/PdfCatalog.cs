@@ -64,10 +64,7 @@ namespace PdfXenon.Standard
                 {
                     PdfDictionary dictionary = OptionalValueRef<PdfDictionary>("Outlines");
                     if (dictionary != null)
-                    {
-                        _outlineRoot = new PdfOutlineLevel(this);
-                        _outlineRoot.PopulateChildren(dictionary);
-                    }
+                        _outlineRoot = new PdfOutlineLevel(this, dictionary);
                 }
 
                 return _outlineRoot;

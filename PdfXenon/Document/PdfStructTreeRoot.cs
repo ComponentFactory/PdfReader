@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace PdfXenon.Standard
 {
     public class PdfStructTreeRoot : PdfDictionary
     {
+        private List<PdfStructTreeElement> _elements;
         private PdfNameTree _IdTree;
         private PdfNumberTree _parentTree;
 
@@ -13,12 +15,57 @@ namespace PdfXenon.Standard
         {
         }
 
+        public override int Output(StringBuilder sb, int indent)
+        {
+            string blank = new string(' ', indent);
+            sb.AppendLine("PdfStructTreeRoot");
+            sb.Append(blank);
+
+            foreach (PdfStructTreeElement element in K)
+                element.Output(sb, indent);
+
+            return indent;
+        }
+
+        public List<PdfStructTreeElement> K
+        {
+            get
+            {
+                if (_elements == null)
+                {
+                    _elements = new List<PdfStructTreeElement>();
+
+                    PdfObject k = OptionalValueRef<PdfObject>("K");
+                    if (k is PdfDictionary dictionary)
+                        _elements.Add(new PdfStructTreeElement(dictionary));
+                    else if (k is PdfArray array)
+                    { 
+                        foreach(PdfObject item in array.Objects)
+                        {
+                            dictionary = item as PdfDictionary;
+                            if (dictionary == null)
+                            {
+                                if (item is PdfObjectReference reference)
+                                    dictionary = Document.IndirectObjects.MandatoryValue<PdfDictionary>(reference);
+                                else
+                                    throw new ApplicationException($"PdfStructTreeRoot property K with array must contain dictionary or object reference and not '{item.GetType().Name}'.");
+                            }
+
+                            _elements.Add(new PdfStructTreeElement(dictionary));
+                        }
+                    }
+                }
+
+                return _elements;
+            }
+        }
+
         public PdfNameTree IDTree
         {
             get
             {
                 if (_IdTree == null)
-                    _IdTree = new PdfNameTree(this, MandatoryValueRef<PdfDictionary>("IDTree"));
+                    _IdTree = new PdfNameTree(MandatoryValueRef<PdfDictionary>("IDTree"));
 
                 return _IdTree;
             }
@@ -29,7 +76,7 @@ namespace PdfXenon.Standard
             get
             {
                 if (_parentTree == null)
-                    _parentTree = new PdfNumberTree(this, MandatoryValueRef<PdfDictionary>("ParentTree"));
+                    _parentTree = new PdfNumberTree(MandatoryValueRef<PdfDictionary>("ParentTree"));
 
                 return _parentTree;
             }

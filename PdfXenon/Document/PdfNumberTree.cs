@@ -6,55 +6,105 @@ namespace PdfXenon.Standard
 {
     public class PdfNumberTree : PdfObject
     {
-        private Dictionary<int, PdfObject> _values = new Dictionary<int, PdfObject>();
+        private readonly bool _root;
+        private PdfDictionary _dictionary;
+        private List<PdfNumberTree> _children;
+        private Dictionary<int, PdfObject> _nums;
 
-        public PdfNumberTree(PdfObject parent, PdfDictionary dictionary)
-            : base(parent)
+        public PdfNumberTree(PdfDictionary dictionary, bool root = true)
+            : base(dictionary.Parent)
         {
-            Numbers = new List<int>();
-            ProcessNumberTreePage(dictionary);
+            _dictionary = dictionary;
+            _root = root;
+
+            if (_root)
+                Load();
+            else
+            {
+                PdfArray limits = _dictionary.MandatoryValue<PdfArray>("Limits");
+                LimitMin = ((PdfInteger)limits.Objects[0]).Value;
+                LimitMax = ((PdfInteger)limits.Objects[1]).Value;
+            }
         }
 
         public override int Output(StringBuilder sb, int indent)
         {
-            string blank = new string(' ', indent);
-            foreach(var pair in _values)
-            {
-                string pre = $"{pair.Key} = ";
-                sb.Append(pre);
-                pair.Value.Output(sb, indent + pre.Length);
-                sb.Append("\n");
-                sb.Append(blank);
-            }
-
-            return indent;
+            string output = $"Number Tree {LimitMin} -> {LimitMax}";
+            sb.Append(output);
+            return indent + output.Length;
         }
 
-        public int Count { get => Numbers.Count; }
-        public bool ContainsNumber(int number) { return _values.ContainsKey(number); }
-        public List<int> Numbers { get; private set; }
-        public Dictionary<int, PdfObject>.ValueCollection Values { get { return _values.Values; } }
-        public Dictionary<int, PdfObject>.Enumerator GetEnumerator() { return _values.GetEnumerator(); }
-        public PdfObject this[int number] { get => _values[number]; }
+        public int LimitMin { get; private set; }
+        public int LimitMax { get; private set; }
 
-        private void ProcessNumberTreePage(PdfDictionary dictionary)
+        public PdfObject this[int number]
         {
-            PdfArray kids = dictionary.OptionalValue<PdfArray>("Kids");
+            get
+            {
+                PdfObject ret = null;
+
+                if ((number >= LimitMin) && (number <= LimitMax))
+                {
+                    if ((_nums == null) && (_children == null))
+                        Load();
+
+                    if (_nums != null)
+                        _nums.TryGetValue(number, out ret);
+                    else
+                    {
+                        // Linear search, could improve perf by using a binary search
+                        foreach(PdfNumberTree child in _children)
+                        {
+                            if ((number >= child.LimitMin) && (number <= child.LimitMax))
+                            {
+                                ret = child[number];
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                return ret;
+            }
+        }
+
+        private void Load()
+        {
+            PdfArray kids = _dictionary.OptionalValue<PdfArray>("Kids");
             if (kids != null)
             {
-                // Process each child number tree page
+                // Must load all the children as objects immediately, so we can then calculate the overall limits
+                _children = new List<PdfNumberTree>();
                 foreach (PdfObjectReference reference in kids.Objects)
-                    ProcessNumberTreePage(Document.IndirectObjects.MandatoryValue<PdfDictionary>(reference));
+                    _children.Add(new PdfNumberTree(Document.IndirectObjects.MandatoryValue<PdfDictionary>(reference), false));
+
+                // Only the root calculates the limits by examining the children
+                if (_root)
+                {
+                    LimitMin = _children[0].LimitMin;
+                    LimitMax = _children[_children.Count - 1].LimitMax;
+                }
             }
             else
             {
-                // Without a 'Kids' there must be 'Nums'
-                PdfArray nums = dictionary.MandatoryValue<PdfArray>("Nums");
-                for(int i=0; i<nums.Objects.Count; i+=2)
+                // Without 'Kids' the 'Nums' is mandatory
+                PdfArray array = _dictionary.MandatoryValue<PdfArray>("Nums");
+
+                _nums = new Dictionary<int, PdfObject>();
+                int count = array.Objects.Count;
+                for (int i = 0; i < count; i += 2)
                 {
-                    PdfInteger key = (PdfInteger)nums.Objects[i];
-                    Numbers.Add(key.Value);
-                    _values.Add(key.Value, nums.Objects[i + 1]);
+                    PdfInteger name = (PdfInteger)array.Objects[i];
+                    _nums.Add(name.Value, array.Objects[i + 1]);
+
+                    // Only the root calculates the limits by examining the enties
+                    if (_root)
+                    {
+                        if (i == 0)
+                            LimitMin = name.Value;
+                        else if (i == (count - 1))
+                            LimitMax = name.Value;
+                    }
                 }
             }
         }

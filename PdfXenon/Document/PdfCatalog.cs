@@ -6,6 +6,7 @@ namespace PdfXenon.Standard
     public class PdfCatalog : PdfDictionary
     {
         private List<PdfPage> _pages;
+        private PdfPages _rootPage;
         private PdfNumberTree _pageLabels;
         private PdfOutlineLevel _outlineRoot;
         private PdfStructTreeRoot _structTreeRoot;
@@ -21,17 +22,33 @@ namespace PdfXenon.Standard
         {
             get
             {
-                if (_pages == null)
+                if (_rootPage == null)
                 {
-                    PdfDictionary dictionary = MandatoryValueRef<PdfDictionary>("Pages");
-                    _pages = new List<PdfPage>();
-
-                    // Build all the objects in the page tree, we only do this to get the list of pages
-                    PdfPages rootPage = new PdfPages(this, dictionary.ParseObject as ParseDictionary);
-                    rootPage.CreatePages(_pages);
+                    // Accessing the RootPage will cause the pages to be loaded
+                    var temp = RootPage;
                 }
 
                 return _pages;
+            }
+        }
+
+        public PdfPages RootPage
+        {
+            get
+            {
+                if (_rootPage == null)
+                {
+                    PdfDictionary dictionary = MandatoryValueRef<PdfDictionary>("Pages");
+
+                    // Page tree construct the hierarchy so that inheritance of properties works correctly
+                    _rootPage = new PdfPages(dictionary);
+
+                    // Flatten the hierarchy into a list of pages, this is more useful for the user
+                    _pages = new List<PdfPage>();
+                    _rootPage.FindLeafPages(_pages);
+                }
+
+                return _rootPage;
             }
         }
 
@@ -43,7 +60,7 @@ namespace PdfXenon.Standard
                 {
                     PdfDictionary dictionary = OptionalValueRef<PdfDictionary>("PageLabels");
                     if (dictionary != null)
-                        _pageLabels = new PdfNumberTree(this, dictionary);
+                        _pageLabels = new PdfNumberTree(dictionary);
                 }
 
                 return _pageLabels;
@@ -92,5 +109,17 @@ namespace PdfXenon.Standard
                 return _structTreeRoot;
             }
         }
+
+        public PdfDictionary MarkInfo { get => OptionalValueRef<PdfDictionary>("MarkInfo"); }
+        public PdfString Lang { get => OptionalValueRef<PdfString>("Lang"); }
+        public PdfDictionary SpiderInfo { get => OptionalValueRef<PdfDictionary>("SpiderInfo"); }
+        public PdfArray OutputIntents { get => OptionalValueRef<PdfArray>("OutputIntents"); }
+        public PdfDictionary PieceInfo { get => OptionalValueRef<PdfDictionary>("PieceInfo"); }
+        public PdfDictionary OCProperties { get => OptionalValueRef<PdfDictionary>("OCProperties"); }
+        public PdfDictionary Perms { get => OptionalValueRef<PdfDictionary>("Perms"); }
+        public PdfDictionary Legal { get => OptionalValueRef<PdfDictionary>("Legal"); }
+        public PdfArray Requirements { get => OptionalValueRef<PdfArray>("Requirements"); }
+        public PdfDictionary Collection { get => OptionalValueRef<PdfDictionary>("Collection"); }
+        public PdfBoolean NeedsRendering { get => OptionalValueRef<PdfBoolean>("NeedsRendering"); }
     }
 }

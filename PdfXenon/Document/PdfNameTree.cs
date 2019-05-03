@@ -6,57 +6,108 @@ namespace PdfXenon.Standard
 {
     public class PdfNameTree : PdfObject
     {
-        private Dictionary<string, PdfObject> _values = new Dictionary<string, PdfObject>();
+        private readonly bool _root;
+        private PdfDictionary _dictionary;
+        private List<PdfNameTree> _children;
+        private Dictionary<string, PdfObject> _names;
 
-        public PdfNameTree(PdfObject parent, PdfDictionary dictionary)
-            : base(parent)
+        public PdfNameTree(PdfDictionary dictionary, bool root = true)
+            : base(dictionary.Parent)
         {
-            Names = new List<string>();
-            ProcessNameTreePage(dictionary);
+            _dictionary = dictionary;
+            _root = root;
+
+            if (_root)
+                Load();
+            else
+            {
+                PdfArray limits = _dictionary.MandatoryValue<PdfArray>("Limits");
+                LimitMin = ((PdfString)limits.Objects[0]).Value;
+                LimitMax = ((PdfString)limits.Objects[1]).Value;
+            }
         }
 
         public override int Output(StringBuilder sb, int indent)
         {
-            string blank = new string(' ', indent);
-            foreach(var pair in _values)
-            {
-                string pre = $"{pair.Key} = ";
-                sb.Append(pre);
-                pair.Value.Output(sb, indent + pre.Length);
-                sb.Append("\n");
-                sb.Append(blank);
-            }
-
-            return indent;
+            string output = $"Name Tree {LimitMin} -> {LimitMax}";
+            sb.Append(output);
+            return indent + output.Length;
         }
 
-        public int Count { get => Names.Count; }
-        public bool ContainsName(string name) { return _values.ContainsKey(name); }
-        public List<string> Names { get; private set; }
-        public Dictionary<string, PdfObject>.ValueCollection Values { get { return _values.Values; } }
-        public Dictionary<string, PdfObject>.Enumerator GetEnumerator() { return _values.GetEnumerator(); }
-        public PdfObject this[string name] { get => _values[name]; }
+        public string LimitMin { get; private set; }
+        public string LimitMax { get; private set; }
 
-        private void ProcessNameTreePage(PdfDictionary dictionary)
+        public PdfObject this[string name]
         {
-            PdfArray kids = dictionary.OptionalValue<PdfArray>("Kids");
+            get
+            {
+                PdfObject ret = null;
+
+                if ((string.Compare(name, LimitMin) >= 0) && (string.Compare(name, LimitMax) <= 0))
+                {
+                    if ((_names == null) && (_children == null))
+                        Load();
+
+                    if (_names != null)
+                        _names.TryGetValue(name, out ret);
+                    else
+                    {
+                        // Linear search, could improve perf by using a binary search
+                        foreach (PdfNameTree child in _children)
+                        {
+                            if ((string.Compare(name, child.LimitMin) >= 0) && (string.Compare(name, child.LimitMax) <= 0))
+                            {
+                                ret = child[name];
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                return ret;
+            }
+        }
+
+        private void Load()
+        {
+            PdfArray kids = _dictionary.OptionalValue<PdfArray>("Kids");
             if (kids != null)
             {
-                // Process each child number tree page
+                // Must load all the children as objects immediately, so we can then calculate the overall limits
+                _children = new List<PdfNameTree>();
                 foreach (PdfObjectReference reference in kids.Objects)
-                    ProcessNameTreePage(Document.IndirectObjects.MandatoryValue<PdfDictionary>(reference));
+                    _children.Add(new PdfNameTree(Document.IndirectObjects.MandatoryValue<PdfDictionary>(reference), false));
+
+                // Only the root calculates the limits by examining the children
+                if (_root)
+                {
+                    LimitMin = _children[0].LimitMin;
+                    LimitMax = _children[_children.Count - 1].LimitMax;
+                }
             }
             else
             {
-                // Without a 'Kids' there must be 'Names'
-                PdfArray names = dictionary.MandatoryValue<PdfArray>("Names");
-                for(int i=0; i<names.Objects.Count; i+=2)
+                // Without 'Kids' the 'Names' is mandatory
+                PdfArray array = _dictionary.MandatoryValue<PdfArray>("Names");
+
+                _names = new Dictionary<string, PdfObject>();
+                int count = array.Objects.Count;
+                for (int i = 0; i < count; i += 2)
                 {
-                    PdfString name = (PdfString)names.Objects[i];
-                    Names.Add(name.Value);
-                    _values.Add(name.Value, names.Objects[i + 1]);
+                    PdfString key = (PdfString)array.Objects[i];
+                    _names.Add(key.Value, array.Objects[i + 1]);
+
+                    // Only the root calculates the limits by examining the enties
+                    if (_root)
+                    {
+                        if (i == 0)
+                            LimitMin = key.Value;
+                        else if (i == (count - 1))
+                            LimitMax = key.Value;
+                    }
                 }
             }
         }
+
     }
 }

@@ -5,30 +5,30 @@ namespace PdfXenon.Standard
 {
     public class PdfPages : PdfPageInherit
     {
-        public PdfPages(PdfObject parent, ParseDictionary dictionary)
-            : base(parent, dictionary)
+        public PdfPages(PdfDictionary dictionary)
+            : base(dictionary.Parent, dictionary.ParseDictionary)
         {
-        }
-
-        public void CreatePages(List<PdfPage> pages)
-        {
-            PdfArray kids = MandatoryValue<PdfArray>("Kids");
-            foreach(PdfObjectReference reference in kids.Objects)
+            Children = new List<PdfPageInherit>();
+            foreach (PdfObjectReference reference in MandatoryValue<PdfArray>("Kids").Objects)
             {
-                PdfDictionary dictionary = Document.IndirectObjects.MandatoryValue<PdfDictionary>(reference);
-                string type = dictionary.MandatoryValue<PdfName>("Type").Value;
+                PdfDictionary childDictionary = Document.IndirectObjects.MandatoryValue<PdfDictionary>(reference);
+                string type = childDictionary.MandatoryValue<PdfName>("Type").Value;
 
                 if (type == "Page")
-                {
-                    PdfPage pdfPage = new PdfPage(this, dictionary.ParseObject as ParseDictionary);
-                    pages.Add(pdfPage);
-                }
+                    Children.Add(new PdfPage(childDictionary));
                 else if (type == "Pages")
-                {
-                    PdfPages pdfPages = new PdfPages(this, dictionary.ParseObject as ParseDictionary);
-                    pdfPages.CreatePages(pages);
-                }
+                    Children.Add(new PdfPages(childDictionary));
+                else
+                    throw new ArgumentException($"Unrecognized dictionary type references from page tree '{type}'.");
             }
         }
+
+        public override void FindLeafPages(List<PdfPage> pages)
+        {
+            foreach (PdfPageInherit child in Children)
+                child.FindLeafPages(pages);
+        }
+
+        public List<PdfPageInherit> Children { get; private set; }
     }
 }

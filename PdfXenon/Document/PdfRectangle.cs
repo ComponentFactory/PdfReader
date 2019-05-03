@@ -28,7 +28,7 @@ namespace PdfXenon.Standard
 
         public override int Output(StringBuilder sb, int indent)
         {
-            string output = $"({_lowerLeftX}.{_lowerLeftY}),({_upperRightX}.{_upperRightY})";
+            string output = $"({_lowerLeftX},{_lowerLeftY}),({_upperRightX},{_upperRightY})";
             sb.Append(output);
             return indent + output.Length;
         }

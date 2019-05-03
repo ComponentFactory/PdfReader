@@ -2,8 +2,6 @@
     FlatDecode
 	    Implement Predictors
 
-Convert number tree into hierarchy of objects with ranges that are load and resolved when needed based on lookup
-Convert name tree into hierarchy of objects with ranges that are load and resolved when needed based on lookup
 
 PDFClown
 iTextShar-Develop

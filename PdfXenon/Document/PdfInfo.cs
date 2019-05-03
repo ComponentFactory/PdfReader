@@ -17,5 +17,6 @@ namespace PdfXenon.Standard
         public PdfString Producer { get => OptionalValue<PdfString>("Producer"); }
         public PdfDateTime CreationDate { get => OptionalDateTime("CreationDate"); }
         public PdfDateTime ModDate { get => OptionalDateTime("ModDate"); }
+        public PdfName Trapped { get => OptionalValue<PdfName>("Trapped"); }
     }
 }

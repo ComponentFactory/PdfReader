@@ -50,6 +50,14 @@ namespace PdfXenon.Standard
             return null;
         }
 
+        public PdfRectangle ArrayToRectangle(PdfArray array)
+        {
+            if (array != null)
+                return new PdfRectangle(array.Parent, array.ParseArray);
+            else
+                return null;
+        }
+
         public PdfObject WrapObject(ParseObject obj)
         {
             if (obj is ParseString str)

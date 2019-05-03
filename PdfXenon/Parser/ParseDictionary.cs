@@ -66,9 +66,7 @@ namespace PdfXenon.Standard
         public T OptionalValue<T>(string name) where T : ParseObject
         {
             BuildDictionary();
-
-            ParseObject entry;
-            if (_dictionary.TryGetValue(name, out entry))
+            if (_dictionary.TryGetValue(name, out ParseObject entry))
             {
                 if (entry is T)
                     return (T)entry;
@@ -82,9 +80,7 @@ namespace PdfXenon.Standard
         public T MandatoryValue<T>(string name) where T : ParseObject
         {
             BuildDictionary();
-
-            ParseObject entry;
-            if (_dictionary.TryGetValue(name, out entry))
+            if (_dictionary.TryGetValue(name, out ParseObject entry))
             {
                 if (entry is T)
                     return (T)entry;

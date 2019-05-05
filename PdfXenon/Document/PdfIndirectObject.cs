@@ -14,12 +14,17 @@ namespace PdfXenon.Standard
             Offset = xref.Offset;
         }
 
-        public override int Output(StringBuilder sb, int indent)
+        public override string ToString()
+        {
+            return $"PdfIndirectObject Id:{Id} Gen:{Gen} Offset:{Offset}";
+        }
+
+        public override int ToDebug(StringBuilder sb, int indent)
         {
             string blank = new string(' ', indent);
 
             sb.Append($"{Id} {Gen} obj\n");
-            Child.Output(sb, indent);
+            Child.ToDebug(sb, indent);
             sb.Append("\n");
             sb.Append(blank);
             sb.Append("endobj\n");

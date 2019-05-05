@@ -15,14 +15,19 @@ namespace PdfXenon.Standard
         {
         }
 
-        public override int Output(StringBuilder sb, int indent)
+        public override string ToString()
+        {
+            return $"PdfStructTreeRoot Count:{K.Count}";
+        }
+
+        public override int ToDebug(StringBuilder sb, int indent)
         {
             string blank = new string(' ', indent);
             sb.AppendLine("PdfStructTreeRoot");
             sb.Append(blank);
 
             foreach (PdfStructTreeElement element in K)
-                element.Output(sb, indent);
+                element.ToDebug(sb, indent);
 
             return indent;
         }

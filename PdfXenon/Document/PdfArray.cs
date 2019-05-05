@@ -13,7 +13,12 @@ namespace PdfXenon.Standard
         {
         }
 
-        public override int Output(StringBuilder sb, int indent)
+        public override string ToString()
+        {
+            return $"PdfArray Count:{Objects.Count}";
+        }
+
+        public override int ToDebug(StringBuilder sb, int indent)
         {
             sb.Append("[");
             indent++;
@@ -22,7 +27,7 @@ namespace PdfXenon.Standard
             int count = Objects.Count;
             foreach (PdfObject obj in Objects)
             {
-                indent += obj.Output(sb, indent);
+                indent += obj.ToDebug(sb, indent);
 
                 if (index < (count - 1))
                     sb.Append(" ");

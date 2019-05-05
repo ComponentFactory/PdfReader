@@ -11,7 +11,12 @@ namespace PdfXenon.Standard
             DateTime = str.ValueAsDateTime;
         }
 
-        public override int Output(StringBuilder sb, int indent)
+        public override string ToString()
+        {
+            return $"PdfDateTime {DateTime}";
+        }
+
+        public override int ToDebug(StringBuilder sb, int indent)
         {
             string output = DateTime.ToString();
             sb.Append(output);

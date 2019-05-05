@@ -26,7 +26,12 @@ namespace PdfXenon.Standard
             _upperRightY = Math.Min(ly, uy);
         }
 
-        public override int Output(StringBuilder sb, int indent)
+        public override string ToString()
+        {
+            return $"PdfRectangle ({_lowerLeftX},{_lowerLeftY}),({_upperRightX},{_upperRightY})";
+        }
+
+        public override int ToDebug(StringBuilder sb, int indent)
         {
             string output = $"({_lowerLeftX},{_lowerLeftY}),({_upperRightX},{_upperRightY})";
             sb.Append(output);

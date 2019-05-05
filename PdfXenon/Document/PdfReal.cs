@@ -10,7 +10,12 @@ namespace PdfXenon.Standard
         {
         }
 
-        public override int Output(StringBuilder sb, int indent)
+        public override string ToString()
+        {
+            return $"PdfReal {Value}";
+        }
+
+        public override int ToDebug(StringBuilder sb, int indent)
         {
             string output = Value.ToString();
             sb.Append(output);

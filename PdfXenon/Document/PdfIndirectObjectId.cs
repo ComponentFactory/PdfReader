@@ -6,13 +6,21 @@ namespace PdfXenon.Standard
 {
     public class PdfIndirectObjectId : PdfObject
     {
-        private Dictionary<int, PdfIndirectObject> _gens;
         private PdfIndirectObject _single;
+        private Dictionary<int, PdfIndirectObject> _gens;
 
-        public PdfIndirectObjectId(PdfObject parent)
+        public PdfIndirectObjectId(PdfObject parent, int id)
             : base(parent)
         {
+            Id = id;
         }
+
+        public override string ToString()
+        {
+            return $"PdfIndirectObjectId Id:{Id} Count:{_gens.Count}";
+        }
+
+        public int Id { get; private set; }
 
         public int Count
         {
@@ -150,8 +158,7 @@ namespace PdfXenon.Standard
                 else
                 {
                     // Convert from single entry to using a dictionary
-                    _gens = new Dictionary<int, PdfIndirectObject>();
-                    _gens.Add(_single.Gen, _single);
+                    _gens = new Dictionary<int, PdfIndirectObject> { { _single.Gen, _single } };
                     _single = null;
                 }
             }

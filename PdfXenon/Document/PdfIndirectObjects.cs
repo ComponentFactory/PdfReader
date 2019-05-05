@@ -13,13 +13,18 @@ namespace PdfXenon.Standard
         {
         }
 
-        public override int Output(StringBuilder sb, int indent)
+        public override string ToString()
+        {
+            return $"PdfIndirectObjects Count:{_ids.Count}";
+        }
+
+        public override int ToDebug(StringBuilder sb, int indent)
         {
             foreach (var id in Values)
             {
                 foreach(var gen in id.Values)
                 {
-                    gen.Output(sb, indent);
+                    gen.ToDebug(sb, indent);
                 }
             }
             return indent;
@@ -70,7 +75,7 @@ namespace PdfXenon.Standard
             // If this is the first time we have encountered this id, then add it
             if (!_ids.TryGetValue(xref.Id, out PdfIndirectObjectId indirectId))
             {
-                indirectId = new PdfIndirectObjectId(this);
+                indirectId = new PdfIndirectObjectId(this, xref.Id);
                 _ids.Add(xref.Id, indirectId);
             }
 

@@ -10,7 +10,7 @@ namespace ConsoleApp
         static void Main(string[] args)
         {
             TestFileLoads(@"d:\Blank.pdf");
-           TestFileLoads(@"d:\Coffee.pdf");
+            TestFileLoads(@"d:\Coffee.pdf");
             TestFileLoads(@"d:\FSharp.pdf");
             TestFileLoads(@"d:\Magazine.pdf");
             TestFileLoads(@"d:\Maths.pdf");
@@ -45,6 +45,7 @@ namespace ConsoleApp
 
             Console.WriteLine("");
             Console.WriteLine($"{filename}: {sw.ElapsedMilliseconds}ms");
+
             Output(document.Catalog.Pages[0]);
         }
 

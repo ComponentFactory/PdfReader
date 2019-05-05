@@ -13,7 +13,12 @@ namespace PdfXenon.Standard
         {
         }
 
-        public override int Output(StringBuilder sb, int indent)
+        public override string ToString()
+        {
+            return $"PdfDictionary Count:{ParseDictionary.Count}";
+        }
+
+        public override int ToDebug(StringBuilder sb, int indent)
         {
             WrapAllNames();
             string blank = new string(' ', indent);
@@ -32,7 +37,7 @@ namespace PdfXenon.Standard
 
                 sb.Append($"{entry.Key} ");
                 int entryIndent = entry.Key.Length + 1;
-                entry.Value.Output(sb, entryIndent);
+                entry.Value.ToDebug(sb, entryIndent);
 
                 if (count > 2)
                 {

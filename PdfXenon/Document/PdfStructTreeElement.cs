@@ -13,7 +13,12 @@ namespace PdfXenon.Standard
         {
         }
 
-        public override int Output(StringBuilder sb, int indent)
+        public override string ToString()
+        {
+            return $"PdfStructTreeElement S:{S.Value}";
+        }
+
+        public override int ToDebug(StringBuilder sb, int indent)
         {
             string blank = new string(' ', indent);
             sb.Append($"S = {S.Value} ");
@@ -46,7 +51,7 @@ namespace PdfXenon.Standard
             sb.Append(blank);
 
             foreach (PdfStructTreeElement element in K)
-                element.Output(sb, indent + 2);
+                element.ToDebug(sb, indent + 2);
 
             return indent;
         }

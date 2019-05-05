@@ -21,15 +21,12 @@ namespace PdfXenon.Standard
 
         private void ResolveToStreams(PdfObject obj)
         {
-            if (obj is PdfStream)
-                _streams.Add(obj as PdfStream);
-            else if (obj is PdfObjectReference)
+            if (obj is PdfStream stream)
+                _streams.Add(stream);
+            else if (obj is PdfObjectReference reference)
+                ResolveToStreams(Document.ResolveReference(reference));
+            else if (obj is PdfArray array)
             {
-                ResolveToStreams(Document.ResolveReference(obj as PdfObjectReference));
-            }
-            else if (obj is PdfArray)
-            {
-                PdfArray array = (PdfArray)obj;
                 foreach (PdfObject entry in array.Objects)
                     ResolveToStreams(entry);
             }

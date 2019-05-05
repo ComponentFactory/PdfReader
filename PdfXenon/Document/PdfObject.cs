@@ -18,12 +18,17 @@ namespace PdfXenon.Standard
 
         public override string ToString()
         {
+            return GetType().Name;
+        }
+
+        public virtual string ToDebug()
+        {
             StringBuilder sb = new StringBuilder();
-            Output(sb, 0);
+            ToDebug(sb, 0);
             return sb.ToString();
         }
 
-        public virtual int Output(StringBuilder sb, int indent)
+        public virtual int ToDebug(StringBuilder sb, int indent)
         {
             string output = $"({GetType().Name})";
             sb.Append(output);

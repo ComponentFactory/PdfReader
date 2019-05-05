@@ -10,7 +10,12 @@ namespace PdfXenon.Standard
         {
         }
 
-        public override int Output(StringBuilder sb, int indent)
+        public override string ToString()
+        {
+            return $"PdfNull";
+        }
+
+        public override int ToDebug(StringBuilder sb, int indent)
         {
             string output = "(null)";
             sb.Append(output);

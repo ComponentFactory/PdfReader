@@ -13,7 +13,12 @@ namespace PdfXenon.Standard
             _dictionary = dictionary;
         }
 
-        public override int Output(StringBuilder sb, int indent)
+        public override string ToString()
+        {
+            return $"PdfOutlineItem Title:{Title}";
+        }
+
+        public override int ToDebug(StringBuilder sb, int indent)
         {
             string blank = new string(' ', indent);
 
@@ -21,7 +26,7 @@ namespace PdfXenon.Standard
             sb.Append(output);
             sb.Append("\n");
             sb.Append(blank);
-            base.Output(sb, indent + 2);
+            base.ToDebug(sb, indent + 2);
 
             return indent;
         }

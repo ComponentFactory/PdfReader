@@ -23,6 +23,11 @@ namespace PdfXenon.Standard
             }
         }
 
+        public override string ToString()
+        {
+            return $"PdfPages Count:{Children.Count}";
+        }
+
         public override void FindLeafPages(List<PdfPage> pages)
         {
             foreach (PdfPageInherit child in Children)

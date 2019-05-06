@@ -7,7 +7,7 @@ namespace PdfXenon.Standard
 {
     public abstract class PdfProcessor : PdfObject
     {
-        private PdfGraphicsState _currentState = new PdfGraphicsState();
+        private PdfGraphicsState _graphicsState = new PdfGraphicsState();
         private Stack<PdfObject> _operands = new Stack<PdfObject>();
 
         public PdfProcessor(PdfObject parent)
@@ -24,38 +24,39 @@ namespace PdfXenon.Standard
                 switch (identifer.Value)
                 {
                     case "q": // Save graphics state
-                        _currentState = new PdfGraphicsState(_currentState);
+                        _graphicsState = new PdfGraphicsState(_graphicsState);
                         break;
                     case "Q": // Restore graphics state
-                        _currentState = _currentState.ParentGraphicsState;
+                        _graphicsState = _graphicsState.ParentGraphicsState;
                         break;
                     case "w": // Set Line Width
-                        _currentState.LineWidth = AsNumber(_operands.Pop());
+                        _graphicsState.LineWidth = AsNumber(_operands.Pop());
                         break;
                     case "j": // Set Line Cap Style
-                        _currentState.LineCapStyle = AsInteger(_operands.Pop());
+                        _graphicsState.LineCapStyle = AsInteger(_operands.Pop());
                         break;
                     case "J": // Set Line Join Style
-                        _currentState.LineJoinStyle = AsInteger(_operands.Pop());
+                        _graphicsState.LineJoinStyle = AsInteger(_operands.Pop());
                         break;
                     case "M": // Set Miter Length
-                        _currentState.MiterLength = AsNumber(_operands.Pop());
+                        _graphicsState.MiterLength = AsNumber(_operands.Pop());
                         break;
                     case "d": // Set Dash
-                        _currentState.DashPhase = AsInteger(_operands.Pop());
-                        _currentState.DashArray = AsNumberArray(_operands.Pop());
+                        _graphicsState.DashPhase = AsInteger(_operands.Pop());
+                        _graphicsState.DashArray = AsNumberArray(_operands.Pop());
                         break;
                     case "ri": // Set Rendering Intent
-                        _currentState.RenderingIntent = AsString(_operands.Pop());
+                        _graphicsState.RenderingIntent = AsString(_operands.Pop());
                         break;
                     case "i": // Set Flatness
-                        _currentState.Flatness = AsNumber(_operands.Pop());
+                        _graphicsState.Flatness = AsNumber(_operands.Pop());
                         break;
-                    case "gs": // Set parameters from graphics dictionary
-                        string dictName = AsString(_operands.Pop());
-                        PdfDictionary extGStates = Resources.MandatoryValueRef<PdfDictionary>("ExtGState");
-                        PdfDictionary extGState = extGStates.MandatoryValueRef<PdfDictionary>(dictName);
-                        UpdateFromExtGState(extGState);
+                    case "gs": // Set graphics state from dictionary
+                        {
+                            PdfDictionary extGStates = Resources.MandatoryValueRef<PdfDictionary>("ExtGState");
+                            PdfDictionary extGState = extGStates.MandatoryValueRef<PdfDictionary>(AsString(_operands.Pop()));
+                            ProcessExtGState(extGState);
+                        }
                         break;
                     default:
                         // Ignore anything we do not recognize
@@ -72,98 +73,98 @@ namespace PdfXenon.Standard
                         break;
                 }
             }
-            else
-            {
-                // Assume it must be an operand
-                _operands.Push(obj);
-            }
+
+            // Any other type must be an operand
+            _operands.Push(obj);
         }
 
-        public void UpdateFromExtGState(PdfDictionary dictionary)
+        public void ProcessExtGState(PdfDictionary dictionary)
         {
             foreach (var entry in dictionary)
             {
                 switch (entry.Key)
                 {
                     case "LW": // Set Line Width
-                        _currentState.LineWidth = AsNumber(entry.Value);
+                        _graphicsState.LineWidth = AsNumber(entry.Value);
                         break;
                     case "LC": // Set Line Cap Style
-                        _currentState.LineCapStyle = AsInteger(entry.Value);
+                        _graphicsState.LineCapStyle = AsInteger(entry.Value);
                         break;
                     case "LJ": // Set Line Join Style
-                        _currentState.LineJoinStyle = AsInteger(entry.Value);
+                        _graphicsState.LineJoinStyle = AsInteger(entry.Value);
                         break;
                     case "ML": // Set Miter Length
-                        _currentState.MiterLength = AsNumber(entry.Value);
+                        _graphicsState.MiterLength = AsNumber(entry.Value);
                         break;
                     case "D": // Set Dash
-                        List<PdfObject> array = AsArray(entry.Value);
-                        _currentState.DashArray = AsNumberArray(array[0]);
-                        _currentState.DashPhase = AsInteger(array[1]);
+                        {
+                            List<PdfObject> array = AsArray(entry.Value);
+                            _graphicsState.DashArray = AsNumberArray(array[0]);
+                            _graphicsState.DashPhase = AsInteger(array[1]);
+                        }
                         break;
                     case "RI": // Set Rendering Intent
-                        _currentState.RenderingIntent = AsString(entry.Value);
+                        _graphicsState.RenderingIntent = AsString(entry.Value);
                         break;
                     case "OP": // Set Over Print (available in all versions)
-                        _currentState.OverPrint10 = AsBoolean(entry.Value);
+                        _graphicsState.OverPrint10 = AsBoolean(entry.Value);
                         break;
-                    case "op": // Set Over Print (available in version 1.3 onwards for everything except stroking)
-                        _currentState.OverPrint13 = AsBoolean(entry.Value);
+                    case "op": // Set Over Print (available in version 1.3 onwards)
+                        _graphicsState.OverPrint13 = AsBoolean(entry.Value);
                         break;
                     case "OPM": // Set Overprint Mode
-                        _currentState.OverPrintMode = AsInteger(entry.Value);
+                        _graphicsState.OverPrintMode = AsInteger(entry.Value);
                         break;
                     case "BM": // Set Blend Mode
-                        _currentState.BlendMode = entry.Value;
+                        _graphicsState.BlendMode = entry.Value;
                         break;
                     case "CA": // Set Constant Alpha for Stroking
-                        _currentState.ConstantAlphaStroking = AsNumber(entry.Value);
+                        _graphicsState.ConstantAlphaStroking = AsNumber(entry.Value);
                         break;
                     case "ca": // Set Constant Alpha for Non-Stroking
-                        _currentState.ConstantAlphaNonStroking = AsNumber(entry.Value);
+                        _graphicsState.ConstantAlphaNonStroking = AsNumber(entry.Value);
                         break;
                     case "Font": // Font parameters
-                        _currentState.Font = entry.Value;
+                        _graphicsState.Font = entry.Value;
                         break;
                     case "BG": // Set Black generation function
-                        _currentState.BlackGeneration = entry.Value;
+                        _graphicsState.BlackGeneration = entry.Value;
                         break;
                     case "BG2": // Set Black generation function or name
-                        _currentState.BlackGeneration2 = entry.Value;
+                        _graphicsState.BlackGeneration2 = entry.Value;
                         break;
                     case "UCR": // Set Undercolor removal function
-                        _currentState.UndercolorRemoval = entry.Value;
+                        _graphicsState.UndercolorRemoval = entry.Value;
                         break;
                     case "UCR2": // Set Undercolor removal function or name
-                        _currentState.UndercolorRemoval2 = entry.Value;
+                        _graphicsState.UndercolorRemoval2 = entry.Value;
                         break;
                     case "TR": // Set Transfer function
-                        _currentState.Transfer = entry.Value;
+                        _graphicsState.Transfer = entry.Value;
                         break;
                     case "TR2": // Set Transfer function or name
-                        _currentState.Transfer2 = entry.Value;
+                        _graphicsState.Transfer2 = entry.Value;
                         break;
                     case "HT": // Set Halftone
-                        _currentState.Halftone = entry.Value;
+                        _graphicsState.Halftone = entry.Value;
                         break;
                     case "FL": // Set Flatness tolerance
-                        _currentState.FlatnessTolerance = AsNumber(entry.Value);
+                        _graphicsState.FlatnessTolerance = AsNumber(entry.Value);
                         break;
                     case "SM": // Set Smoothness tolerance
-                        _currentState.SmoothnessTolerance = AsNumber(entry.Value);
+                        _graphicsState.SmoothnessTolerance = AsNumber(entry.Value);
                         break;
                     case "SA": // Set Stroke adjustment flag
-                        _currentState.StrokeAdjustment = AsBoolean(entry.Value);
+                        _graphicsState.StrokeAdjustment = AsBoolean(entry.Value);
                         break;
                     case "SMask": // Set Soft Mask
-                        _currentState.SoftMask = entry.Value;
+                        _graphicsState.SoftMask = entry.Value;
                         break;
                     case "AIS": // Set Alpha Source Mask
-                        _currentState.AlphaSourceMask = AsBoolean(entry.Value);
+                        _graphicsState.AlphaSourceMask = AsBoolean(entry.Value);
                         break;
                     case "TK": // Set Text Knockout flag
-                        _currentState.TextKnockout = AsBoolean(entry.Value);
+                        _graphicsState.TextKnockout = AsBoolean(entry.Value);
                         break;
                     default:
                         // Ignore anything we do not recognize

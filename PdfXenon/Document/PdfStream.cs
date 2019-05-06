@@ -15,6 +15,11 @@ namespace PdfXenon.Standard
             return $"PdfStream Bytes:{ValueAsBytes.Length}";
         }
 
+        public override string ToDebug()
+        {
+            return $"(Stream Bytes:{ValueAsBytes.Length})";
+        }
+
         public ParseStream ParseStream { get => ParseObject as ParseStream; }
         public bool HasFilter { get => ParseStream.HasFilter; }
 

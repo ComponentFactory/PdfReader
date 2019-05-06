@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace PdfXenon.Standard
 {
@@ -14,6 +15,43 @@ namespace PdfXenon.Standard
         public PdfCatalog(PdfObject parent, ParseDictionary dictionary)
             : base(parent, dictionary)
         {
+        }
+
+        public override int ToDebug(StringBuilder sb, int indent)
+        {
+            string blank = new string(' ', indent);
+
+            sb.Append($"Pages: Count:{Pages.Count}\n{blank}");
+            if (RootPage != null) sb.Append($"RootPage: \n{RootPage.ToDebug()}\n{blank}");
+            if (PageLabels != null) sb.Append($"PageLabels: {PageLabels.ToDebug()}\n{blank}");
+            if (Names != null) sb.Append($"Names: {Names.ToDebug()}\n{blank}");
+            if (Dests != null) sb.Append($"Dests: {Dests.ToDebug()}\n{blank}");
+            if (ViewerPreferences != null) sb.Append($"ViewerPreferences: {ViewerPreferences.ToDebug()}\n{blank}");
+            if (PageLayout != null) sb.Append($"PageLayout: {PageLayout.ToDebug()}\n{blank}");
+            if (PageMode != null) sb.Append($"PageMode: {PageMode.ToDebug()}\n{blank}");
+            if (Outlines != null) sb.Append($"Outlines: \n{Outlines.ToDebug()}\n{blank}");
+            if (Threads != null) sb.Append($"Threads: {Threads.ToDebug()}\n{blank}");
+            if (OpenAction != null) sb.Append($"OpenAction: {OpenAction.ToDebug()}\n{blank}");
+            if (AA != null) sb.Append($"AA: {AA.ToDebug()}\n{blank}");
+            if (URI != null) sb.Append($"URI: {URI.ToDebug()}\n{blank}");
+            if (AA != null) sb.Append($"AA: {AA.ToDebug()}\n{blank}");
+            if (AcroForm != null) sb.Append($"AcroForm: {AcroForm.ToDebug()}\n{blank}");
+            if (Metadata != null) sb.Append($"Metadata: {Metadata.ToDebug()}\n{blank}");
+            if (StructTreeRoot != null) sb.Append($"StructTreeRoot: \n{StructTreeRoot.ToDebug()}\n{blank}");
+            if (Metadata != null) sb.Append($"Metadata: {Metadata.ToDebug()}\n{blank}");
+            if (MarkInfo != null) sb.Append($"MarkInfo: {MarkInfo.ToDebug()}\n{blank}");
+            if (Lang != null) sb.Append($"Lang: {Lang.ToDebug()}\n{blank}");
+            if (SpiderInfo != null) sb.Append($"SpiderInfo: {SpiderInfo.ToDebug()}\n{blank}");
+            if (OutputIntents != null) sb.Append($"OutputIntents: {OutputIntents.ToDebug()}\n{blank}");
+            if (PieceInfo != null) sb.Append($"PieceInfo: {PieceInfo.ToDebug()}\n{blank}");
+            if (OCProperties != null) sb.Append($"OCProperties: {OCProperties.ToDebug()}\n{blank}");
+            if (Perms != null) sb.Append($"Perms: {Perms.ToDebug()}\n{blank}");
+            if (Legal != null) sb.Append($"Legal: {Legal.ToDebug()}\n{blank}");
+            if (Requirements != null) sb.Append($"Requirements: {Requirements.ToDebug()}\n{blank}");
+            if (Collection != null) sb.Append($"Collection: {Collection.ToDebug()}\n{blank}");
+            if (NeedsRendering != null) sb.Append($"NeedsRendering: {NeedsRendering.ToDebug()}\n{blank}");
+
+            return indent;
         }
 
         public PdfName Version { get => OptionalValue<PdfName>("Version"); }

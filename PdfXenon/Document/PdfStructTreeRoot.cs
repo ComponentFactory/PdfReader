@@ -23,8 +23,6 @@ namespace PdfXenon.Standard
         public override int ToDebug(StringBuilder sb, int indent)
         {
             string blank = new string(' ', indent);
-            sb.AppendLine("PdfStructTreeRoot");
-            sb.Append(blank);
 
             foreach (PdfStructTreeElement element in K)
                 element.ToDebug(sb, indent);

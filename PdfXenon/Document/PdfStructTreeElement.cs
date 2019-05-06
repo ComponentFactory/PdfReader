@@ -21,33 +21,33 @@ namespace PdfXenon.Standard
         public override int ToDebug(StringBuilder sb, int indent)
         {
             string blank = new string(' ', indent);
-            sb.Append($"S = {S.Value} ");
+            sb.Append($"S = {S.ToDebug()}");
 
             if (ID != null)
-                sb.Append($"ID = {ID.Value} ");
+                sb.Append($", ID = {ID.ToDebug()}");
 
             if (Pg != null)
-                sb.Append($"Pg = {Pg} ");
+                sb.Append($", Pg = {Pg.ToDebug()}");
 
             if (A != null)
-                sb.Append($"A = {A} ");
+                sb.Append($", A = {A.ToDebug()}");
 
             if (C != null)
-                sb.Append($"C = {C} ");
+                sb.Append($", C = {C.ToDebug()}");
 
             if (R != null)
-                sb.Append($"R = {R} ");
+                sb.Append($", R = {R.ToDebug()}");
 
             if (T != null)
-                sb.Append($"T = {T} ");
+                sb.Append($", T = {T.ToDebug()}");
 
             if (Lang != null)
-                sb.Append($"Lang = {Lang} ");
+                sb.Append($", Lang = {Lang.ToDebug()}");
 
             if (ActualText != null)
-                sb.Append($"ActualText = {ActualText} ");
+                sb.Append($", ActualText = {ActualText.ToDebug()}");
 
-            sb.AppendLine("");
+            sb.Append("\n");
             sb.Append(blank);
 
             foreach (PdfStructTreeElement element in K)

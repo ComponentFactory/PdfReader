@@ -14,6 +14,16 @@ namespace PdfXenon.Standard
             ResolveToStreams(obj);
         }
 
+        public override string ToString()
+        {
+            return $"PdfContents Streams:{_streams.Count}";
+        }
+
+        public override string ToDebug()
+        {
+            return $"(Contents Streams:{_streams.Count})";
+        }
+
         public PdfContentsParser CreateParser()
         {
             return new PdfContentsParser(this, _streams);

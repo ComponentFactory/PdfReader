@@ -34,7 +34,7 @@ namespace PdfXenon.Standard
 
         public override int ToDebug(StringBuilder sb, int indent)
         {
-            string output = $"Name Tree {LimitMin} -> {LimitMax}";
+            string output = $"NameTree {LimitMin} -> {LimitMax}";
             sb.Append(output);
             return indent + output.Length;
         }

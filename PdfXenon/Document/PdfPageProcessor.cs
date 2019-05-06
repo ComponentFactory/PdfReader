@@ -14,22 +14,22 @@ namespace PdfXenon.Standard
         {
             _page = page;
         }
-        
+
+        public override PdfDictionary Resources
+        {
+            get { return _page.Resources; }
+        }
+
         public void Process()
         {
-            // If CropBox is not specified then default to the mandatory MediaBox
-            PdfRectangle cropBox = _page.CropBox;
-            if (cropBox == null)
-                cropBox = _page.MediaBox;
-
-            Initialize(cropBox);
-
             PdfContentsParser parser = _page.Contents.CreateParser();
             PdfObject obj = null;
 
             do
             {
                 obj = parser.GetObject();
+                if (obj != null)
+                    Process(obj);
 
             } while (obj != null);
         }

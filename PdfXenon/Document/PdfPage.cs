@@ -45,9 +45,9 @@ namespace PdfXenon.Standard
             return indent;
         }
 
-        public PdfProcessor CreateProcessor()
+        public PdfPageProcessor CreateProcessor()
         {
-            return new PdfProcessor(this);
+            return new PdfPageProcessor(this);
         }
 
         public override void FindLeafPages(List<PdfPage> pages)

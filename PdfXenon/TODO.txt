@@ -4,5 +4,6 @@
 
 
 PDFClown
-iTextShar-Develop
+iTextSharp-Develop
 https://github.com/PDFium/PDFium
+https://github.com/empira/PDFsharp

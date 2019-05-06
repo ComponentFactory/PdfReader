@@ -37,7 +37,7 @@ namespace ConsoleApp
                 PdfObject obj = null;
                 do
                 {
-                    obj = parser.GetToken();
+                    obj = parser.GetObject();
                 } while (obj != null);
             }
 

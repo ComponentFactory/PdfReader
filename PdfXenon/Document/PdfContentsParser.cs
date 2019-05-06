@@ -17,16 +17,13 @@ namespace PdfXenon.Standard
             _streams = streams;
         }    
 
-        public PdfObject GetToken()
+        public PdfObject GetObject()
         {
             // First time around we setup the parser to the first stream
             if ((_parser == null) && (_index < _streams.Count))
-            {
-                MemoryStream stream = new MemoryStream(_streams[_index++].ValueAsBytes);
-                _parser = new Parser(stream, true);
-            }
+                _parser = new Parser(new MemoryStream(_streams[_index++].ValueAsBytes), true);
 
-            // Each trying to get a token as long as there is a parser for a stream
+            // Keep trying to get a parsed object as long as there is a parser for a stream
             while (_parser != null)
             {
                 ParseObject obj = _parser.ParseObject(true);
@@ -36,12 +33,9 @@ namespace PdfXenon.Standard
                 _parser.Dispose();
                 _parser = null;
 
-                // Is there another stream we can continue parsin g with
+                // Is there another stream we can continue parsing with
                 if (_index < _streams.Count)
-                {
-                    MemoryStream stream = new MemoryStream(_streams[_index++].ValueAsBytes);
-                    _parser = new Parser(stream, true);
-                }
+                    _parser = new Parser(new MemoryStream(_streams[_index++].ValueAsBytes), true);
             }
 
             return null;

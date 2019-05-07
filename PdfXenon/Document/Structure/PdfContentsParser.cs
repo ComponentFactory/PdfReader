@@ -21,11 +21,7 @@ namespace PdfXenon.Standard
         {
             // First time around we setup the parser to the first stream
             if ((_parser == null) && (_index < _streams.Count))
-            {
-                Console.WriteLine(_streams[_index].Value);
-                Console.WriteLine("----------------------");
                 _parser = new Parser(new MemoryStream(_streams[_index++].ValueAsBytes), true);
-            }
 
             // Keep trying to get a parsed object as long as there is a parser for a stream
             while (_parser != null)

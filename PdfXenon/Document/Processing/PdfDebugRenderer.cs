@@ -5,10 +5,13 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class PdfDebugProcessor : PdfProcessor
+    public class PdfDebugRenderer : PdfRenderer
     {
-        public PdfDebugProcessor()
+        public override void Initialize(PdfRectangle mediaBox, PdfRectangle cropBox)
         {
+            Console.WriteLine($"Initialize");
+            Console.WriteLine($"    MediaBox: {mediaBox}");
+            Console.WriteLine($"     CropBox: {cropBox}");
         }
 
         public override void SubPathStart(PdfPoint pt)
@@ -54,6 +57,11 @@ namespace PdfXenon.Standard
         public override void PathEnd()
         {
             Console.WriteLine($"PathEnd");
+        }
+
+        public override void Finshed()
+        {
+            Console.WriteLine($"Finshed");
         }
     }
 }

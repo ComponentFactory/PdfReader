@@ -1,4 +1,6 @@
-﻿using System;
+﻿using PdfXenon.GDI;
+using PdfXenon.Standard;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -35,7 +37,26 @@ namespace WindowsFormsApp1
             //ellipsePath.AddBezier(100.12f, 454.17f, 66.367f, 454.17f, 39f, 479.52f, 39f, 510.8f);
             //e.Graphics.DrawPath(Pens.Blue, ellipsePath);
 
+            if(_bitmap != null)
+                e.Graphics.DrawImage(_bitmap, 12, 12);
+
             base.OnPaint(e);
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            PdfDocument document = new PdfDocument();
+            document.Load(@"d:\Shapes.pdf", true);
+            document.Close();
+
+            PdfGDIRenderer renderer = new PdfGDIRenderer();
+            PdfPageProcessor processsor = new PdfPageProcessor(document.Catalog.Pages[0], renderer);
+            processsor.Process();
+            _bitmap = renderer.Bitmap;
+
+            Refresh();
+        }
+
+        private Bitmap _bitmap;
     }
 }

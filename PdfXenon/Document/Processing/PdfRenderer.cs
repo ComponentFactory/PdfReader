@@ -5,18 +5,19 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public abstract class PdfProcessor
+    public abstract class PdfRenderer
     {
         private Stack<PdfObject> _operands = new Stack<PdfObject>();
 
-        public PdfProcessor()
+        public PdfRenderer()
         {
             GraphicsState = new PdfGraphicsState();
         }
 
-        public PdfDictionary Resources { get; set; }
+        public IPdfRendererResolver Resolver { get; set; }
         public PdfGraphicsState GraphicsState { get; set; }
 
+        public abstract void Initialize(PdfRectangle mediaBox, PdfRectangle cropBox);
         public abstract void SubPathStart(PdfPoint pt);
         public abstract void SubPathLineTo(PdfPoint pt);
         public abstract void SubPathBezier(PdfPoint pt1, PdfPoint pt2, PdfPoint pt3);
@@ -26,8 +27,9 @@ namespace PdfXenon.Standard
         public abstract void PathFill(bool evenOdd);
         public abstract void PathClip(bool evenOdd);
         public abstract void PathEnd();
+        public abstract void Finshed();
 
-        public void Process(PdfObject obj)
+        public void Render(PdfObject obj)
         {
             if (obj is PdfIdentifier identifer)
             {
@@ -62,11 +64,7 @@ namespace PdfXenon.Standard
                         GraphicsState.Flatness = AsNumber(_operands.Pop());
                         break;
                     case "gs": // Set graphics state from dictionary
-                        {
-                            PdfDictionary extGStates = Resources.MandatoryValueRef<PdfDictionary>("ExtGState");
-                            PdfDictionary extGState = extGStates.MandatoryValueRef<PdfDictionary>(AsString(_operands.Pop()));
-                            ProcessExtGState(extGState);
-                        }
+                        ProcessExtGState(Resolver.GetGraphicsStateDictionary(AsString(_operands.Pop())));
                         break;
                     case "m": // Start a new subpath and set currrent point
                         {

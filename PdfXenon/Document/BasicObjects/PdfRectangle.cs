@@ -5,11 +5,6 @@ namespace PdfXenon.Standard
 {
     public class PdfRectangle : PdfObject
     {
-        private readonly float _lowerLeftX;
-        private readonly float _lowerLeftY;
-        private readonly float _upperRightX;
-        private readonly float _upperRightY;
-
         public PdfRectangle(PdfObject parent, ParseArray array)
             : base(parent, array)
         {
@@ -19,24 +14,28 @@ namespace PdfXenon.Standard
             float ux = ObjectToFloat(array.Objects[2]);
             float uy = ObjectToFloat(array.Objects[3]);
 
-            // Normalize so the lower-left and upper-right are actually those values, because this is not guaranteed
-            _lowerLeftX = Math.Min(lx, ux);
-            _lowerLeftY = Math.Max(ly, uy);
-            _upperRightX = Math.Max(lx, ux);
-            _upperRightY = Math.Min(ly, uy);
+            // Normalize so the lower-left and upper-right are actually those values
+            LowerLeft = new PdfPoint(Math.Min(lx, ux), Math.Min(ly, uy));
+            UpperRight = new PdfPoint(Math.Max(lx, ux), Math.Max(ly, uy));
         }
 
         public override string ToString()
         {
-            return $"PdfRectangle ({_lowerLeftX},{_lowerLeftY}),({_upperRightX},{_upperRightY})";
+            return $"PdfRectangle ({LowerLeft.X},{LowerLeft.Y}),({UpperRight.X},{UpperRight.Y})";
         }
 
         public override int ToDebug(StringBuilder sb, int indent)
         {
-            string output = $"({_lowerLeftX},{_lowerLeftY}),({_upperRightX},{_upperRightY})";
+            string output = $"({LowerLeft.X},{LowerLeft.Y}),({UpperRight.X},{UpperRight.Y})";
             sb.Append(output);
             return indent + output.Length;
         }
+
+        public PdfPoint LowerLeft { get; private set; }
+        public PdfPoint UpperRight { get; private set; }
+
+        public float Width { get { return UpperRight.X - LowerLeft.X; } }
+        public float Height { get { return UpperRight.Y - LowerLeft.Y; } }
 
         private float ObjectToFloat(ParseObject obj)
         {

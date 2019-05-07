@@ -37,7 +37,7 @@ namespace ConsoleApp
 
             foreach (PdfPage page in document.Catalog.Pages)
             {
-                PdfPageProcessor processor = new PdfPageProcessor(page, new PdfDebugProcessor());
+                PdfPageProcessor processor = new PdfPageProcessor(page, new PdfDebugRenderer());
                 processor.Process();
             }
 

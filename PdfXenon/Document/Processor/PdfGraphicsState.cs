@@ -6,21 +6,21 @@ namespace PdfXenon.Standard
 {
     public class PdfGraphicsState : PdfObject
     {
-        private double? _lineWidth;
+        private float? _lineWidth;
         private int? _lineCapStyle;
         private int? _lineJoinStyle;
-        private double? _miterLength;
-        private double[] _dashArray;
+        private float? _miterLength;
+        private float[] _dashArray;
         private int? _dashPhase;
         private string _renderingIntent;
-        private double? _flatness;
+        private float? _flatness;
         private bool? _overPrint10;
         private bool? _overPrint13;
         private int? _overPrintMode;
-        private double? _constantAlphaStroking;
-        private double? _constantAlphaNonStroking;
-        private double? _flatnessTolerance;
-        private double? _smoothnessTolerance;
+        private float? _constantAlphaStroking;
+        private float? _constantAlphaNonStroking;
+        private float? _flatnessTolerance;
+        private float? _smoothnessTolerance;
         private bool? _strokeAdjustment;
         private bool? _alphaSourceMask;
         private bool? _textKnockout;
@@ -43,7 +43,7 @@ namespace PdfXenon.Standard
             _lineCapStyle = 0; 
             _lineJoinStyle = 0; 
             _miterLength = 10;
-            _dashArray = new double[] { };
+            _dashArray = new float[] { };
             _dashPhase = 0;
             _renderingIntent = "RelativeColorimetric";
             _flatness = 0;
@@ -63,7 +63,7 @@ namespace PdfXenon.Standard
 
         public PdfGraphicsState ParentGraphicsState { get => TypedParent<PdfGraphicsState>(); }
 
-        public double LineWidth
+        public float LineWidth
         {
             get
             {
@@ -102,7 +102,7 @@ namespace PdfXenon.Standard
             set { _lineJoinStyle = Math.Max(0, value); }
         }
 
-        public double MiterLength
+        public float MiterLength
         {
             get
             {
@@ -115,7 +115,7 @@ namespace PdfXenon.Standard
             set { _miterLength = value; }
         }
 
-        public double[] DashArray
+        public float[] DashArray
         {
             get
             {
@@ -154,7 +154,7 @@ namespace PdfXenon.Standard
             set { _renderingIntent = value; }
         }
 
-        public double Flatness
+        public float Flatness
         {
             get
             {
@@ -176,7 +176,7 @@ namespace PdfXenon.Standard
             throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected an integer.");
         }
 
-        private double AsAnyNumber(PdfObject obj)
+        private float AsAnyNumber(PdfObject obj)
         {
             if (obj is PdfInteger integer)
                 return integer.Value;
@@ -225,7 +225,7 @@ namespace PdfXenon.Standard
             set { _overPrintMode = value; }
         }
 
-        public double? ConstantAlphaStroking
+        public float? ConstantAlphaStroking
         {
             get
             {
@@ -238,7 +238,7 @@ namespace PdfXenon.Standard
             set { _constantAlphaStroking = value; }
         }
 
-        public double? ConstantAlphaNonStroking
+        public float? ConstantAlphaNonStroking
         {
             get
             {
@@ -251,7 +251,7 @@ namespace PdfXenon.Standard
             set { _constantAlphaNonStroking = value; }
         }
 
-        public double? FlatnessTolerance
+        public float? FlatnessTolerance
         {
             get
             {
@@ -264,7 +264,7 @@ namespace PdfXenon.Standard
             set { _flatnessTolerance = value; }
         }
 
-        public double? SmoothnessTolerance
+        public float? SmoothnessTolerance
         {
             get
             {
@@ -445,5 +445,7 @@ namespace PdfXenon.Standard
 
             set { _softMask = value; }
         }
+
+        public object Clipping { get; set; }
     }
 }

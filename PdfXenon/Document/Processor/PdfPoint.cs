@@ -10,13 +10,18 @@ namespace PdfXenon.Standard
         {
         }
 
-        public PdfPoint(double x, double y)
+        public PdfPoint(float x, float y)
         {
             X = x;
             Y = y;
         }
 
-        public double X { get; set; }
-        public double Y { get; set; }
+        public override string ToString()
+        {
+            return $"({X},{Y})";
+        }
+
+        public float X { get; set; }
+        public float Y { get; set; }
     }
 }

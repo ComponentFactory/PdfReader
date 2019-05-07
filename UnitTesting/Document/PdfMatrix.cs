@@ -135,7 +135,7 @@ namespace DocumentUnitTesting
         public void ScaleXNeg()
         {
             PdfMatrix m = new PdfMatrix();
-            m.Scale(0.5, 1);
+            m.Scale(0.5f, 1);
 
             PdfPoint p = new PdfPoint(100, 100);
             m.Transform(p);
@@ -159,7 +159,7 @@ namespace DocumentUnitTesting
         public void ScaleYNeg()
         {
             PdfMatrix m = new PdfMatrix();
-            m.Scale(1, 0.5);
+            m.Scale(1, 0.5F);
 
             PdfPoint p = new PdfPoint(100, 100);
             m.Transform(p);
@@ -171,7 +171,7 @@ namespace DocumentUnitTesting
         public void ScaleBoth()
         {
             PdfMatrix m = new PdfMatrix();
-            m.Scale(2, 0.5);
+            m.Scale(2, 0.5f);
 
             PdfPoint p = new PdfPoint(100, 100);
             m.Transform(p);
@@ -197,7 +197,7 @@ namespace DocumentUnitTesting
         {
             PdfMatrix m = new PdfMatrix();
             m.Scale(2, 2);
-            m.Scale(0.5, 0.5);
+            m.Scale(0.5f, 0.5f);
 
             PdfPoint p = new PdfPoint(100, 100);
             m.Transform(p);

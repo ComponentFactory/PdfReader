@@ -5,25 +5,35 @@ namespace PdfXenon.Standard
 {
     public class PdfMatrix
     {
-        private float _m11;
-        private float _m12;
-        private float _m21;
-        private float _m22;
-        private float _offsetX;
-        private float _offsetY;
-
         public PdfMatrix()
         {
             // Identity matrix
-            _m11 = 1;
-            _m22 = 1;
+            M11 = 1;
+            M22 = 1;
         }
+
+        public PdfMatrix(float m11, float m12, float m21, float m22, float offsetX, float offsetY)
+        {
+            M11 = m11;
+            M12 = m12;
+            M21 = m21;
+            M22 = m22;
+            OffsetX = offsetX;
+            OffsetY = offsetY;
+        }
+
+        public float M11 { get; private set; }
+        public float M12 { get; private set; }
+        public float M21 { get; private set; }
+        public float M22 { get; private set; }
+        public float OffsetX { get; private set; }
+        public float OffsetY { get; private set; }
 
         public void Translate(float x, float y)
         {
             // Only need to adjust the offsets
-            _offsetX += x;
-            _offsetY += y;
+            OffsetX += x;
+            OffsetY += y;
         }
 
         public void Scale(float scaleX, float scaleY)
@@ -44,10 +54,16 @@ namespace PdfXenon.Standard
                     (float)(centreY * (1.0 - cos)) - (centreX * sin));
         }
 
+        public PdfPoint Transform(float x, float y)
+        {
+            float tempX = (float)((x * M11) + (y * M21) + OffsetX);
+            return new PdfPoint(tempX, (x * M12) + (y * M22) + OffsetY);
+        }
+
         public void Transform(PdfPoint pt)
         {
-            float tempX = (float)((pt.X * _m11) + (pt.Y * _m21) + _offsetX);
-            pt.Y = (pt.X * _m12) + (pt.Y * _m22) + _offsetY;
+            float tempX = (float)((pt.X * M11) + (pt.Y * M21) + OffsetX);
+            pt.Y = (pt.X * M12) + (pt.Y * M22) + OffsetY;
             pt.X = tempX;
         }
 
@@ -63,17 +79,27 @@ namespace PdfXenon.Standard
                 Transform(pt);
         }
 
+        public void Multiply(PdfMatrix matrix)
+        {
+            Multiply(matrix.M11, matrix.M12, matrix.M21, matrix.M22, matrix.OffsetX, matrix.OffsetY);
+        }
+
+        public PdfMatrix Clone()
+        {
+            return new PdfMatrix(M11, M12, M21, M22, OffsetX, OffsetY);
+        }
+
         private void Multiply(float m11, float m12, float m21, float m22, float offsetX, float offsetY)
         {
-            float tm11 = (_m11 * m11) + (_m12 * m21);
-            float tm12 = (_m11 * m12) + (_m12 * m22);
-            float tm21 = (_m21 * m11) + (_m22 * m21);
-            _m22 = (_m21 * m12) + (_m22 * m22);
-            _m21 = tm21;
-            _m12 = tm12;
-            _m11 = tm11;
-            _offsetX = (_offsetX * m11) + (_offsetY * m21) + offsetX;
-            _offsetY = (_offsetX * m12) + (_offsetY * m22) + offsetY;
+            float tm11 = (M11 * m11) + (M12 * m21);
+            float tm12 = (M11 * m12) + (M12 * m22);
+            float tm21 = (M21 * m11) + (M22 * m21);
+            M22 = (M21 * m12) + (M22 * m22);
+            M21 = tm21;
+            M12 = tm12;
+            M11 = tm11;
+            OffsetX = (OffsetX * m11) + (OffsetY * m21) + offsetX;
+            OffsetY = (OffsetX * m12) + (OffsetY * m22) + offsetY;
         }
     }
 }

@@ -6,6 +6,7 @@ namespace PdfXenon.Standard
 {
     public class PdfGraphicsState : PdfObject
     {
+        private PdfMatrix _currentTransformationMatrix;
         private float? _lineWidth;
         private int? _lineCapStyle;
         private int? _lineJoinStyle;
@@ -34,11 +35,13 @@ namespace PdfXenon.Standard
         private PdfObject _transfer2;
         private PdfObject _halftone;
         private PdfObject _softMask;
+        private object _clip;
 
         public PdfGraphicsState()
             : base(null)
         {
             // Default values for root graphics state
+            _currentTransformationMatrix = new PdfMatrix();
             _lineWidth = 1; 
             _lineCapStyle = 0; 
             _lineJoinStyle = 0; 
@@ -62,6 +65,34 @@ namespace PdfXenon.Standard
         }
 
         public PdfGraphicsState ParentGraphicsState { get => TypedParent<PdfGraphicsState>(); }
+
+        public PdfMatrix CTM
+        {
+            get
+            {
+                if (_currentTransformationMatrix != null)
+                    return _currentTransformationMatrix;
+                else
+                    return ParentGraphicsState.CTM;
+            }
+
+            set
+            {
+                if (_currentTransformationMatrix == null)
+                {
+                    _currentTransformationMatrix = CTM;
+                    if (_currentTransformationMatrix == null)
+                        _currentTransformationMatrix = value;
+                    else
+                    {
+                        _currentTransformationMatrix = _currentTransformationMatrix.Clone();
+                        _currentTransformationMatrix.Multiply(value);
+                    }
+                }
+                else
+                    _currentTransformationMatrix.Multiply(value);
+            }
+        }
 
         public float LineWidth
         {
@@ -446,6 +477,17 @@ namespace PdfXenon.Standard
             set { _softMask = value; }
         }
 
-        public object Clipping { get; set; }
+        public object Clipping
+        {
+            get
+            {
+                if (_clip != null)
+                    return _clip;
+                else
+                    return ParentGraphicsState.Clipping;
+            }
+
+            set { _clip = value; }
+        }
     }
 }

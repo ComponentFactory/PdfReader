@@ -24,9 +24,9 @@ namespace PdfXenon.Standard
             Console.WriteLine($"SubPathLineTo {pt}");
         }
 
-        public override void SubPathBezier(PdfPoint pt1, PdfPoint pt2, PdfPoint pt3)
+        public override void SubPathBezier(PdfPoint pt2, PdfPoint pt3, PdfPoint pt4)
         {
-            Console.WriteLine($"SubPathBezier {pt1} {pt2} {pt3}");
+            Console.WriteLine($"SubPathBezier {pt2} {pt3} {pt4}");
         }
 
         public override void SubPathClose()

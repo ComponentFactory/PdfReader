@@ -20,9 +20,9 @@ namespace PdfXenon.Standard
         public abstract void Initialize(PdfRectangle mediaBox, PdfRectangle cropBox);
         public abstract void SubPathStart(PdfPoint pt);
         public abstract void SubPathLineTo(PdfPoint pt);
-        public abstract void SubPathBezier(PdfPoint pt1, PdfPoint pt2, PdfPoint pt3);
+        public abstract void SubPathBezier(PdfPoint pt2, PdfPoint pt3, PdfPoint pt4);
         public abstract void SubPathClose();
-        public abstract void PathRectangle(PdfPoint pt1, float width, float height);
+        public abstract void PathRectangle(PdfPoint pt, float width, float height);
         public abstract void PathStroke();
         public abstract void PathFill(bool evenOdd);
         public abstract void PathClip(bool evenOdd);
@@ -40,6 +40,17 @@ namespace PdfXenon.Standard
                         break;
                     case "Q": // Restore graphics state
                         GraphicsState = GraphicsState.ParentGraphicsState;
+                        break;
+                    case "cm":
+                        {
+                            float f = AsNumber(_operands.Pop());
+                            float e = AsNumber(_operands.Pop());
+                            float d = AsNumber(_operands.Pop());
+                            float c = AsNumber(_operands.Pop());
+                            float b = AsNumber(_operands.Pop());
+                            float a = AsNumber(_operands.Pop());
+                            GraphicsState.CTM = new PdfMatrix(a, b, c, d, e, f);
+                        }
                         break;
                     case "w": // Set Line Width
                         GraphicsState.LineWidth = AsNumber(_operands.Pop());

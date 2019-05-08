@@ -9,9 +9,9 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            TestFileLoads(@"d:\Shapes.pdf");
+            //TestFileLoads(@"d:\Shapes.pdf");
             //TestFileLoads(@"d:\Blank.pdf");
-            //TestFileLoads(@"d:\Coffee.pdf");
+            TestFileLoads(@"d:\Coffee.pdf");
             //TestFileLoads(@"d:\FSharp.pdf");
             //TestFileLoads(@"d:\Magazine.pdf");
             //TestFileLoads(@"d:\Maths.pdf");

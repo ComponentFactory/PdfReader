@@ -45,18 +45,27 @@ namespace WindowsFormsApp1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            PdfDocument document = new PdfDocument();
-            document.Load(@"d:\Shapes.pdf", true);
-            document.Close();
+            if (_document == null)
+            {
+                _document = new PdfDocument();
+                _document.Load(@"d:\Coffee.pdf", true);
+                _document.Close();
+            }
 
-            PdfGDIRenderer renderer = new PdfGDIRenderer();
-            PdfPageProcessor processsor = new PdfPageProcessor(document.Catalog.Pages[0], renderer);
-            processsor.Process();
-            _bitmap = renderer.Bitmap;
+            if (_pageIndex < _document.Catalog.Pages.Count)
+            {
+                label1.Text = _pageIndex.ToString();
+                PdfGDIRenderer renderer = new PdfGDIRenderer();
+                PdfPageProcessor processsor = new PdfPageProcessor(_document.Catalog.Pages[_pageIndex++], renderer);
+                processsor.Process();
+                _bitmap = renderer.Bitmap;
 
-            Refresh();
+                Refresh();
+            }
         }
 
+        private PdfDocument _document;
+        private int _pageIndex;
         private Bitmap _bitmap;
     }
 }

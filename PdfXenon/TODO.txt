@@ -1,7 +1,10 @@
 ﻿TODO
     FlatDecode
 	    Implement Predictors
-
+    Renderer
+		 (DefaultGray/DefaultRGB/DefaultCYMK)
+	     DeviceCMYK,Lab
+		 Indexed, Pattern, Separation, DeviceN
 
 PDFClown
 iTextSharp-Develop

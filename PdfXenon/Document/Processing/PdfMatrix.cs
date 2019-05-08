@@ -60,11 +60,12 @@ namespace PdfXenon.Standard
             return new PdfPoint(tempX, (x * M12) + (y * M22) + OffsetY);
         }
 
-        public void Transform(PdfPoint pt)
+        public PdfPoint Transform(PdfPoint pt)
         {
             float tempX = (float)((pt.X * M11) + (pt.Y * M21) + OffsetX);
             pt.Y = (pt.X * M12) + (pt.Y * M22) + OffsetY;
             pt.X = tempX;
+            return pt;
         }
 
         public void Transform(PdfPoint[] pts)

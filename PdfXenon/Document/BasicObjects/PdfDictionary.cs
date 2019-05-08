@@ -113,9 +113,7 @@ namespace PdfXenon.Standard
                 WrapName(name);
                 if (_wrapped.TryGetValue(name, out PdfObject entry))
                 {
-                    if (entry is T)
-                        return (T)entry;
-                    else if (entry is PdfObjectReference reference)
+                    if (entry is PdfObjectReference reference)
                     {
                         if (Document.IndirectObjects.ContainsId(reference.Id))
                         {
@@ -130,8 +128,10 @@ namespace PdfXenon.Standard
                             }
                         }
                     }
-                    else
-                        throw new ApplicationException($"Dictionary entry is type '{entry.GetType().Name}' instead of mandatory type of '{typeof(T).Name}'.");
+                    else  if (entry is T)
+                        return (T)entry;
+
+                    throw new ApplicationException($"Dictionary entry is type '{entry.GetType().Name}' instead of mandatory type of '{typeof(T).Name}'.");
                 }
             }
 
@@ -173,14 +173,14 @@ namespace PdfXenon.Standard
                 WrapName(name);
                 if (_wrapped.TryGetValue(name, out PdfObject entry))
                 {
-                    if (entry is T)
-                        return (T)entry;
-                    else if (entry is PdfObjectReference reference)
+                    if (entry is PdfObjectReference reference)
                     {
                         entry = Document.ResolveReference(reference);
                         if (entry is T)
                             return (T)entry;
                     }
+                    else if (entry is T)
+                        return (T)entry;
 
                     throw new ApplicationException($"Dictionary entry is type '{entry.GetType().Name}' instead of mandatory type of '{typeof(T).Name}'.");
                 }

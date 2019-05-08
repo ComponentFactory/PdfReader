@@ -8,19 +8,18 @@ namespace PdfXenon.Standard
 {
     public class ParseStream : ParseObject
     {
-        private ParseDictionary _dictionary;
-
         public ParseStream(ParseDictionary dictionary, byte[] streamBytes)
         {
-            _dictionary = dictionary;
+            Dictionary = dictionary;
             StreamBytes = streamBytes;
         }
 
+        public ParseDictionary Dictionary { get; private set; }
         public byte[] StreamBytes { get; private set; }
 
         public bool HasFilter
         {
-            get { return _dictionary.ContainsName("Filter"); }
+            get { return Dictionary.ContainsName("Filter"); }
         }
 
         public string Value
@@ -38,7 +37,7 @@ namespace PdfXenon.Standard
             if (HasFilter)
             {
                 // Get the filtering as an array to be applied in order (if a single filter then convert from Name to an Array of one entry)
-                ParseObject obj = _dictionary["Filter"];
+                ParseObject obj = Dictionary["Filter"];
                 ParseArray filters = obj as ParseArray;
                 if ((filters == null) && (obj is ParseName))
                     filters = new ParseArray(new List<ParseObject>() { obj });
@@ -51,7 +50,7 @@ namespace PdfXenon.Standard
                             bytes = FlateDecode(bytes);
                             break;
                         default:
-                            throw new ApplicationException($"Cannot process unrecognized stream filter '{filter.Value}'.");
+                            throw new NotImplementedException($"Cannot process unrecognized stream filter '{filter.Value}'.");
                     }
                 }
             }
@@ -75,9 +74,8 @@ namespace PdfXenon.Standard
                 }
             }
 
-            // TODO
-            if (_dictionary.ContainsName("Predictor"))
-                throw new ApplicationException($"Cannot process FlatDecode predictors.");
+            if (Dictionary.ContainsName("Predictor"))
+                throw new NotImplementedException($"Cannot process FlatDecode predictors.");
 
             return bytes;
         }

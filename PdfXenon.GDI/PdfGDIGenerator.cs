@@ -14,7 +14,7 @@ namespace PdfXenon.GDI
     {
         private Graphics _graphics;
         private GraphicsPath _currentPath;
-        private PdfPoint _currentPoint;
+        private PdfPoint _currentPoint;        
 
         public Bitmap Bitmap { get; private set; }
 
@@ -25,12 +25,13 @@ namespace PdfXenon.GDI
 
             // Create a GDI+ context for writing to the bitmap
             _graphics = Graphics.FromImage(Bitmap);
+            _graphics.SmoothingMode = SmoothingMode.AntiAlias;
             _graphics.FillRectangle(Brushes.White, 0, 0, Bitmap.Width, Bitmap.Height);
 
-            // Use a transform to convert from PDF (zero upwards) to GDI+ (zero downwards)
+            // Use a transform to convert from PDF (Y-axis points upwards) to GDI+ (Y-axis points downwards)
             _graphics.Transform = new Matrix(1, 0, 0, -1, 0, Bitmap.Height);
 
-            // Set the initial clip region to the user space crop
+            // Set the initial clipping region to the cropbox
             GraphicsState.Clipping = new Region(new RectangleF(cropBox.LowerLeft.X, cropBox.LowerLeft.Y, cropBox.Width, cropBox.Height));
         }
 
@@ -39,10 +40,10 @@ namespace PdfXenon.GDI
             if (_currentPath == null)
                 _currentPath = new GraphicsPath();
             else
-                _currentPath.CloseFigure();
+                _currentPath.StartFigure();
 
-            GraphicsState.CTM.Transform(pt);
-            _currentPoint = pt;
+            // Convert point to user space
+            _currentPoint = GraphicsState.CTM.Transform(pt);
         }
 
         public override void SubPathLineTo(PdfPoint pt)
@@ -84,8 +85,11 @@ namespace PdfXenon.GDI
 
         public override void PathStroke()
         {
-            _graphics.Clip = (Region)GraphicsState.Clipping;
-            _graphics.DrawPath(Pens.Blue, _currentPath);
+            using (Pen pen = CreatePen())
+            {
+                _graphics.Clip = (Region)GraphicsState.Clipping;
+                _graphics.DrawPath(pen, _currentPath);
+            }
         }
 
         public override void PathFill(bool evenOdd)
@@ -95,8 +99,11 @@ namespace PdfXenon.GDI
             else
                 _currentPath.FillMode = FillMode.Winding;
 
-            _graphics.Clip = (Region)GraphicsState.Clipping;
-            _graphics.FillPath(Brushes.Blue, _currentPath);
+            using (Brush brush = CreateBrush())
+            {
+                _graphics.Clip = (Region)GraphicsState.Clipping;
+                _graphics.FillPath(brush, _currentPath);
+            }
         }
 
         public override void PathClip(bool evenOdd)
@@ -106,7 +113,7 @@ namespace PdfXenon.GDI
             else
                 _currentPath.FillMode = FillMode.Winding;
 
-            // Always copy the region so each graphics states has its own instance
+            // Always copy the region, so each graphics state has its own instance
             Region currentClip = (Region)GraphicsState.Clipping;
             Region newClip = currentClip.Clone();
             newClip.Intersect(_currentPath);
@@ -130,6 +137,67 @@ namespace PdfXenon.GDI
                 _graphics.Dispose();
                 _graphics = null;
             }
+        }
+
+        private Brush CreateBrush()
+        {
+            // Get the current stroke colour and convert to GDI color
+            PdfRGB rgb = GraphicsState.ColorSpaceNonStroking.ColorAsRGB();
+            Color color = Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
+            SolidBrush brush = new SolidBrush(color);
+
+            return brush;
+        }
+
+        private Pen CreatePen()
+        {
+            // Get the current stroke colour and convert to GDI color
+            PdfRGB rgb = GraphicsState.ColorSpaceStroking.ColorAsRGB();
+            Color color = Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
+            Pen pen = new Pen(color, GraphicsState.LineWidth);
+
+            // Only if the dash pattern is more than a single value, do we need to apply it
+            if ((GraphicsState.DashArray != null) && (GraphicsState.DashArray.Length > 0))
+            {
+                pen.DashStyle = DashStyle.Custom;
+                pen.DashPattern = GraphicsState.DashArray;
+                pen.DashOffset = GraphicsState.DashPhase;
+            }
+
+            // Define how the start and end caps of the line appear
+            switch (GraphicsState.LineCapStyle)
+            {
+                case 0:
+                default:
+                    pen.StartCap = LineCap.Flat;
+                    pen.EndCap = LineCap.Flat;
+                    break;
+                case 1:
+                    pen.StartCap = LineCap.Round;
+                    pen.EndCap = LineCap.Round;
+                    break;
+                case 2:
+                    pen.StartCap = LineCap.Square;
+                    pen.EndCap = LineCap.Square;
+                    break;
+            }
+
+            // Define how multiple lines are joined together
+            switch (GraphicsState.LineJoinStyle)
+            {
+                case 0:
+                default:
+                    pen.LineJoin = LineJoin.Miter;
+                    break;
+                case 1:
+                    pen.LineJoin = LineJoin.Round;
+                    break;
+                case 2:
+                    pen.LineJoin = LineJoin.Bevel;
+                    break;
+            }
+
+            return pen;
         }
     }
 }

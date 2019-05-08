@@ -6,6 +6,8 @@ namespace PdfXenon.Standard
 {
     public interface IPdfRendererResolver
     {
+        PdfStream GetStream(PdfObjectReference reference);
         PdfDictionary GetGraphicsStateDictionary(string dictName);
+        PdfObject GetColorSpaceObject(string colorSpaceName);
     }
 }

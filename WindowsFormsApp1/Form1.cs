@@ -48,7 +48,7 @@ namespace WindowsFormsApp1
             if (_document == null)
             {
                 _document = new PdfDocument();
-                _document.Load(@"d:\Coffee.pdf", true);
+                _document.Load(@"d:\Magazine.pdf", true);
                 _document.Close();
             }
 
@@ -59,7 +59,6 @@ namespace WindowsFormsApp1
                 PdfPageProcessor processsor = new PdfPageProcessor(_document.Catalog.Pages[_pageIndex++], renderer);
                 processsor.Process();
                 _bitmap = renderer.Bitmap;
-
                 Refresh();
             }
         }

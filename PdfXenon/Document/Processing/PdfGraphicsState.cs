@@ -6,7 +6,7 @@ namespace PdfXenon.Standard
 {
     public class PdfGraphicsState : PdfObject
     {
-        private PdfMatrix _currentTransformationMatrix;
+        private PdfMatrix _CTM;
         private float? _lineWidth;
         private int? _lineCapStyle;
         private int? _lineJoinStyle;
@@ -25,6 +25,8 @@ namespace PdfXenon.Standard
         private bool? _strokeAdjustment;
         private bool? _alphaSourceMask;
         private bool? _textKnockout;
+        private PdfColorSpace _colorSpaceStroking;
+        private PdfColorSpace _colorSpaceNonStroking;
         private PdfObject _blendMode;
         private PdfObject _font;
         private PdfObject _blackGeneration;
@@ -41,7 +43,7 @@ namespace PdfXenon.Standard
             : base(null)
         {
             // Default values for root graphics state
-            _currentTransformationMatrix = new PdfMatrix();
+            _CTM = new PdfMatrix();
             _lineWidth = 1; 
             _lineCapStyle = 0; 
             _lineJoinStyle = 0; 
@@ -70,27 +72,27 @@ namespace PdfXenon.Standard
         {
             get
             {
-                if (_currentTransformationMatrix != null)
-                    return _currentTransformationMatrix;
+                if (_CTM != null)
+                    return _CTM;
                 else
                     return ParentGraphicsState.CTM;
             }
 
             set
             {
-                if (_currentTransformationMatrix == null)
+                if (_CTM == null)
                 {
-                    _currentTransformationMatrix = CTM;
-                    if (_currentTransformationMatrix == null)
-                        _currentTransformationMatrix = value;
+                    _CTM = CTM;
+                    if (_CTM == null)
+                        _CTM = value;
                     else
                     {
-                        _currentTransformationMatrix = _currentTransformationMatrix.Clone();
-                        _currentTransformationMatrix.Multiply(value);
+                        _CTM = _CTM.Clone();
+                        _CTM.Multiply(value);
                     }
                 }
                 else
-                    _currentTransformationMatrix.Multiply(value);
+                    _CTM.Multiply(value);
             }
         }
 
@@ -196,25 +198,6 @@ namespace PdfXenon.Standard
             }
 
             set { _flatness = Math.Min(100, Math.Max(0, value)); }
-        }
-
-
-        private int AsInteger(PdfObject obj)
-        {
-            if (obj is PdfInteger integer)
-                return integer.Value;
-
-            throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected an integer.");
-        }
-
-        private float AsAnyNumber(PdfObject obj)
-        {
-            if (obj is PdfInteger integer)
-                return integer.Value;
-            else if (obj is PdfReal real)
-                return real.Value;
-
-            throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected a number.");
         }
 
         public bool? OverPrint10
@@ -345,6 +328,32 @@ namespace PdfXenon.Standard
             }
 
             set { _textKnockout = value; }
+        }
+
+        public PdfColorSpace ColorSpaceStroking
+        {
+            get
+            {
+                if (_colorSpaceStroking != null)
+                    return _colorSpaceStroking;
+                else
+                    return ParentGraphicsState.ColorSpaceStroking;
+            }
+
+            set { _colorSpaceStroking = value; }
+        }
+
+        public PdfColorSpace ColorSpaceNonStroking
+        {
+            get
+            {
+                if (_colorSpaceNonStroking != null)
+                    return _colorSpaceNonStroking;
+                else
+                    return ParentGraphicsState.ColorSpaceNonStroking;
+            }
+
+            set { _colorSpaceNonStroking = value; }
         }
 
         public PdfObject BlendMode

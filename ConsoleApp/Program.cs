@@ -11,12 +11,12 @@ namespace ConsoleApp
         {
             //TestFileLoads(@"d:\Shapes.pdf");
             //TestFileLoads(@"d:\Blank.pdf");
-            TestFileLoads(@"d:\Coffee.pdf");
+            //TestFileLoads(@"d:\Coffee.pdf");
             //TestFileLoads(@"d:\FSharp.pdf");
             //TestFileLoads(@"d:\Magazine.pdf");
             //TestFileLoads(@"d:\Maths.pdf");
             //TestFileLoads(@"d:\Slides.pdf");
-            //TestFileLoads(@"d:\PDF17.pdf");
+            TestFileLoads(@"d:\PDF17.pdf");
 
             Console.ReadLine();
         }

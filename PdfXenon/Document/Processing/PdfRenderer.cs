@@ -7,15 +7,15 @@ namespace PdfXenon.Standard
 {
     public abstract class PdfRenderer
     {
-        private Stack<PdfObject> _operands = new Stack<PdfObject>();
-
         public PdfRenderer()
         {
             GraphicsState = new PdfGraphicsState();
+            Operands = new Stack<PdfObject>();
         }
 
         public IPdfRendererResolver Resolver { get; set; }
-        public PdfGraphicsState GraphicsState { get; set; }
+        public PdfGraphicsState GraphicsState { get; private set; }
+        public Stack<PdfObject> Operands { get; private set; }
 
         public abstract void Initialize(PdfRectangle mediaBox, PdfRectangle cropBox);
         public abstract void SubPathStart(PdfPoint pt);
@@ -43,78 +43,78 @@ namespace PdfXenon.Standard
                         break;
                     case "cm":
                         {
-                            float f = AsNumber(_operands.Pop());
-                            float e = AsNumber(_operands.Pop());
-                            float d = AsNumber(_operands.Pop());
-                            float c = AsNumber(_operands.Pop());
-                            float b = AsNumber(_operands.Pop());
-                            float a = AsNumber(_operands.Pop());
+                            float f = OperandAsNumber();
+                            float e = OperandAsNumber();
+                            float d = OperandAsNumber();
+                            float c = OperandAsNumber();
+                            float b = OperandAsNumber();
+                            float a = OperandAsNumber();
                             GraphicsState.CTM = new PdfMatrix(a, b, c, d, e, f);
                         }
                         break;
                     case "w": // Set Line Width
-                        GraphicsState.LineWidth = AsNumber(_operands.Pop());
+                        GraphicsState.LineWidth = OperandAsNumber();
                         break;
-                    case "j": // Set Line Cap Style
-                        GraphicsState.LineCapStyle = AsInteger(_operands.Pop());
+                    case "j": // Set Line Join Style
+                        GraphicsState.LineJoinStyle = OperandAsInteger();
                         break;
-                    case "J": // Set Line Join Style
-                        GraphicsState.LineJoinStyle = AsInteger(_operands.Pop());
+                    case "J": // Set Line Cap Style
+                        GraphicsState.LineCapStyle = OperandAsInteger();
                         break;
                     case "M": // Set Miter Length
-                        GraphicsState.MiterLength = AsNumber(_operands.Pop());
+                        GraphicsState.MiterLength = OperandAsNumber();
                         break;
                     case "d": // Set Dash
-                        GraphicsState.DashPhase = AsInteger(_operands.Pop());
-                        GraphicsState.DashArray = AsNumberArray(_operands.Pop());
+                        GraphicsState.DashPhase = OperandAsInteger();
+                        GraphicsState.DashArray = OperandAsNumberArray();
                         break;
                     case "ri": // Set Rendering Intent
-                        GraphicsState.RenderingIntent = AsString(_operands.Pop());
+                        GraphicsState.RenderingIntent = OperandAsString();
                         break;
                     case "i": // Set Flatness
-                        GraphicsState.Flatness = AsNumber(_operands.Pop());
+                        GraphicsState.Flatness = OperandAsNumber();
                         break;
                     case "gs": // Set graphics state from dictionary
-                        ProcessExtGState(Resolver.GetGraphicsStateDictionary(AsString(_operands.Pop())));
+                        ProcessExtGState(Resolver.GetGraphicsStateDictionary(OperandAsString()));
                         break;
                     case "m": // Start a new subpath and set currrent point
                         {
-                            float y = AsNumber(_operands.Pop());
-                            SubPathStart(new PdfPoint(AsNumber(_operands.Pop()), y));
+                            float y = OperandAsNumber();
+                            SubPathStart(new PdfPoint(OperandAsNumber(), y));
                         }
                         break;
                     case "l": // Append straight line segment to subpath
                         {
-                            float y = AsNumber(_operands.Pop());
-                            SubPathLineTo(new PdfPoint(AsNumber(_operands.Pop()), y));
+                            float y = OperandAsNumber(Operands.Pop());
+                            SubPathLineTo(new PdfPoint(OperandAsNumber(), y));
                         }
                         break;
                     case "c": // Append cubic Bezier curve to subpath
                         {
-                            float y3 = AsNumber(_operands.Pop());
-                            PdfPoint pt3 = new PdfPoint(AsNumber(_operands.Pop()), y3);
-                            float y2 = AsNumber(_operands.Pop());
-                            PdfPoint pt2 = new PdfPoint(AsNumber(_operands.Pop()), y2);
-                            float y1 = AsNumber(_operands.Pop());
-                            PdfPoint pt1 = new PdfPoint(AsNumber(_operands.Pop()), y1);
+                            float y3 = OperandAsNumber();
+                            PdfPoint pt3 = new PdfPoint(OperandAsNumber(), y3);
+                            float y2 = OperandAsNumber();
+                            PdfPoint pt2 = new PdfPoint(OperandAsNumber(), y2);
+                            float y1 = OperandAsNumber();
+                            PdfPoint pt1 = new PdfPoint(OperandAsNumber(), y1);
                             SubPathBezier(pt1, pt2, pt3);
                         }
                         break;
                     case "v": // Append cubic Bezier curve to subpath (first control point is same as initial point)
                         {
-                            float y3 = AsNumber(_operands.Pop());
-                            PdfPoint pt3 = new PdfPoint(AsNumber(_operands.Pop()), y3);
-                            float y2 = AsNumber(_operands.Pop());
-                            PdfPoint pt2 = new PdfPoint(AsNumber(_operands.Pop()), y2);
+                            float y3 = OperandAsNumber();
+                            PdfPoint pt3 = new PdfPoint(OperandAsNumber(), y3);
+                            float y2 = OperandAsNumber();
+                            PdfPoint pt2 = new PdfPoint(OperandAsNumber(), y2);
                             SubPathBezier(pt2, pt2, pt3);
                         }
                         break;
                     case "y": // Append cubic Bezier curve to subpath (second control point is same as final point)
                         {
-                            float y3 = AsNumber(_operands.Pop());
-                            PdfPoint pt3 = new PdfPoint(AsNumber(_operands.Pop()), y3);
-                            float y1 = AsNumber(_operands.Pop());
-                            PdfPoint pt1 = new PdfPoint(AsNumber(_operands.Pop()), y1);
+                            float y3 = OperandAsNumber();
+                            PdfPoint pt3 = new PdfPoint(OperandAsNumber(), y3);
+                            float y1 = OperandAsNumber();
+                            PdfPoint pt1 = new PdfPoint(OperandAsNumber(), y1);
                             SubPathBezier(pt1, pt1, pt3);
                         }
                         break;
@@ -123,10 +123,10 @@ namespace PdfXenon.Standard
                         break;
                     case "re": // Append rectange as complete subpath
                         {
-                            float h = AsNumber(_operands.Pop());
-                            float w = AsNumber(_operands.Pop());
-                            float y = AsNumber(_operands.Pop());
-                            PdfPoint pt = new PdfPoint(AsNumber(_operands.Pop()), y);
+                            float h = OperandAsNumber();
+                            float w = OperandAsNumber();
+                            float y = OperandAsNumber();
+                            PdfPoint pt = new PdfPoint(OperandAsNumber(), y);
                             PathRectangle(pt, w, h);
                         }
                         break;
@@ -179,6 +179,48 @@ namespace PdfXenon.Standard
                     case "W*": // Update clipping path when current path is ended using the even-odd rule
                         PathClip(true);
                         break;
+                    case "CS": // Set the current Color Space for stroking
+                        GraphicsState.ColorSpaceStroking = PdfColorSpace.FromName(this, OperandAsString());
+                        break;
+                    case "cs": // Set the current Color Space for non-stroking
+                        GraphicsState.ColorSpaceNonStroking = PdfColorSpace.FromName(this, OperandAsString());
+                        break;
+                    case "SC": // Set the color for stroking
+                        GraphicsState.ColorSpaceStroking.ParseColor();
+                        break;
+                    case "sc": // Set the color for non-stroking
+                        GraphicsState.ColorSpaceNonStroking.ParseColor();
+                        break;
+                    case "SCN": // Set the color for stroking
+                        GraphicsState.ColorSpaceStroking.ParseColor();
+                        break;
+                    case "scn": // Set the color for non-stroking
+                        GraphicsState.ColorSpaceNonStroking.ParseColor();
+                        break;
+                    case "G": // Set a gray and the color space to DeviceGray for stroking
+                        GraphicsState.ColorSpaceStroking = PdfColorSpace.FromName(this, "DeviceGray");
+                        GraphicsState.ColorSpaceStroking.ParseColor();
+                        break;
+                    case "g": // Set a gray and the color space to DeviceGray for non-stroking
+                        GraphicsState.ColorSpaceNonStroking = PdfColorSpace.FromName(this, "DeviceGray");
+                        GraphicsState.ColorSpaceNonStroking.ParseColor();
+                        break;
+                    case "RG": // Set a color and the color space to DeviceRGB for stroking
+                        GraphicsState.ColorSpaceStroking = PdfColorSpace.FromName(this, "DeviceRGB");
+                        GraphicsState.ColorSpaceStroking.ParseColor();
+                        break;
+                    case "rg": // Set a color and the color space to DeviceRGB for non-stroking
+                        GraphicsState.ColorSpaceNonStroking = PdfColorSpace.FromName(this, "DeviceRGB");
+                        GraphicsState.ColorSpaceNonStroking.ParseColor();
+                        break;
+                    case "K": // Set a color and the color space to DeviceCMYK for stroking
+                        GraphicsState.ColorSpaceStroking = PdfColorSpace.FromName(this, "DeviceCMYK");
+                        GraphicsState.ColorSpaceStroking.ParseColor();
+                        break;
+                    case "k": // Set a color and the color space to DeviceCMYK for non-stroking
+                        GraphicsState.ColorSpaceNonStroking = PdfColorSpace.FromName(this, "DeviceCMYK");
+                        GraphicsState.ColorSpaceNonStroking.ParseColor();
+                        break;
                     default:
                         // Ignore anything we do not recognize
                         break;
@@ -190,13 +232,13 @@ namespace PdfXenon.Standard
                 {
                     default:
                         // If not an identifier that happens to match a Name, then must be an operand
-                        _operands.Push(name);
+                        Operands.Push(name);
                         break;
                 }
             }
 
             // Any other type must be an operand
-            _operands.Push(obj);
+            Operands.Push(obj);
         }
 
         public void ProcessExtGState(PdfDictionary dictionary)
@@ -206,44 +248,44 @@ namespace PdfXenon.Standard
                 switch (entry.Key)
                 {
                     case "LW": // Set Line Width
-                        GraphicsState.LineWidth = AsNumber(entry.Value);
+                        GraphicsState.LineWidth = OperandAsNumber(entry.Value);
                         break;
                     case "LC": // Set Line Cap Style
-                        GraphicsState.LineCapStyle = AsInteger(entry.Value);
+                        GraphicsState.LineCapStyle = OperandAsInteger(entry.Value);
                         break;
                     case "LJ": // Set Line Join Style
-                        GraphicsState.LineJoinStyle = AsInteger(entry.Value);
+                        GraphicsState.LineJoinStyle = OperandAsInteger(entry.Value);
                         break;
                     case "ML": // Set Miter Length
-                        GraphicsState.MiterLength = AsNumber(entry.Value);
+                        GraphicsState.MiterLength = OperandAsNumber(entry.Value);
                         break;
                     case "D": // Set Dash
                         {
-                            List<PdfObject> array = AsArray(entry.Value);
-                            GraphicsState.DashArray = AsNumberArray(array[0]);
-                            GraphicsState.DashPhase = AsInteger(array[1]);
+                            List<PdfObject> array = OperandAsArray(entry.Value);
+                            GraphicsState.DashArray = OperandAsNumberArray(array[0]);
+                            GraphicsState.DashPhase = OperandAsInteger(array[1]);
                         }
                         break;
                     case "RI": // Set Rendering Intent
-                        GraphicsState.RenderingIntent = AsString(entry.Value);
+                        GraphicsState.RenderingIntent = OperandAsString(entry.Value);
                         break;
                     case "OP": // Set Over Print (available in all versions)
-                        GraphicsState.OverPrint10 = AsBoolean(entry.Value);
+                        GraphicsState.OverPrint10 = OperandAsBoolean(entry.Value);
                         break;
                     case "op": // Set Over Print (available in version 1.3 onwards)
-                        GraphicsState.OverPrint13 = AsBoolean(entry.Value);
+                        GraphicsState.OverPrint13 = OperandAsBoolean(entry.Value);
                         break;
                     case "OPM": // Set Overprint Mode
-                        GraphicsState.OverPrintMode = AsInteger(entry.Value);
+                        GraphicsState.OverPrintMode = OperandAsInteger(entry.Value);
                         break;
                     case "BM": // Set Blend Mode
                         GraphicsState.BlendMode = entry.Value;
                         break;
                     case "CA": // Set Constant Alpha for Stroking
-                        GraphicsState.ConstantAlphaStroking = AsNumber(entry.Value);
+                        GraphicsState.ConstantAlphaStroking = OperandAsNumber(entry.Value);
                         break;
                     case "ca": // Set Constant Alpha for Non-Stroking
-                        GraphicsState.ConstantAlphaNonStroking = AsNumber(entry.Value);
+                        GraphicsState.ConstantAlphaNonStroking = OperandAsNumber(entry.Value);
                         break;
                     case "Font": // Font parameters
                         GraphicsState.Font = entry.Value;
@@ -270,22 +312,22 @@ namespace PdfXenon.Standard
                         GraphicsState.Halftone = entry.Value;
                         break;
                     case "FL": // Set Flatness tolerance
-                        GraphicsState.FlatnessTolerance = AsNumber(entry.Value);
+                        GraphicsState.FlatnessTolerance = OperandAsNumber(entry.Value);
                         break;
                     case "SM": // Set Smoothness tolerance
-                        GraphicsState.SmoothnessTolerance = AsNumber(entry.Value);
+                        GraphicsState.SmoothnessTolerance = OperandAsNumber(entry.Value);
                         break;
                     case "SA": // Set Stroke adjustment flag
-                        GraphicsState.StrokeAdjustment = AsBoolean(entry.Value);
+                        GraphicsState.StrokeAdjustment = OperandAsBoolean(entry.Value);
                         break;
                     case "SMask": // Set Soft Mask
                         GraphicsState.SoftMask = entry.Value;
                         break;
                     case "AIS": // Set Alpha Source Mask
-                        GraphicsState.AlphaSourceMask = AsBoolean(entry.Value);
+                        GraphicsState.AlphaSourceMask = OperandAsBoolean(entry.Value);
                         break;
                     case "TK": // Set Text Knockout flag
-                        GraphicsState.TextKnockout = AsBoolean(entry.Value);
+                        GraphicsState.TextKnockout = OperandAsBoolean(entry.Value);
                         break;
                     default:
                         // Ignore anything we do not recognize
@@ -294,7 +336,12 @@ namespace PdfXenon.Standard
             }
         }
 
-        private bool AsBoolean(PdfObject obj)
+        public bool OperandAsBoolean()
+        {
+            return OperandAsBoolean(Operands.Pop());
+        }
+
+        public bool OperandAsBoolean(PdfObject obj)
         {
             if (obj is PdfBoolean boolean)
                 return boolean.Value;
@@ -302,7 +349,12 @@ namespace PdfXenon.Standard
             throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected a boolean.");
         }
 
-        private string AsString(PdfObject obj)
+        public string OperandAsString()
+        {
+            return OperandAsString(Operands.Pop());
+        }
+
+        public string OperandAsString(PdfObject obj)
         {
             if (obj is PdfName name)
                 return name.Value;
@@ -312,7 +364,12 @@ namespace PdfXenon.Standard
             throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected a string.");
         }
 
-        private int AsInteger(PdfObject obj)
+        public int OperandAsInteger()
+        {
+            return OperandAsInteger(Operands.Pop());
+        }
+
+        public int OperandAsInteger(PdfObject obj)
         {
             if (obj is PdfInteger integer)
                 return integer.Value;
@@ -320,7 +377,12 @@ namespace PdfXenon.Standard
             throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected an integer.");
         }
 
-        private float AsNumber(PdfObject obj)
+        public float OperandAsNumber()
+        {
+            return OperandAsNumber(Operands.Pop());
+        }
+
+        public float OperandAsNumber(PdfObject obj)
         {
             if (obj is PdfInteger integer)
                 return integer.Value;
@@ -330,7 +392,12 @@ namespace PdfXenon.Standard
             throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected a number.");
         }
 
-        private List<PdfObject> AsArray(PdfObject obj)
+        public List<PdfObject> OperandAsArray()
+        {
+            return OperandAsArray(Operands.Pop());
+        }
+
+        public List<PdfObject> OperandAsArray(PdfObject obj)
         {
             if (obj is PdfArray array)
                 return array.Objects;
@@ -338,7 +405,12 @@ namespace PdfXenon.Standard
             throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected an integer array.");
         }
 
-        private float[] AsNumberArray(PdfObject obj)
+        public float[] OperandAsNumberArray()
+        {
+            return OperandAsNumberArray(Operands.Pop());
+        }
+
+        public float[] OperandAsNumberArray(PdfObject obj)
         {
             if (obj is PdfArray array)
             {

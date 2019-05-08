@@ -25,11 +25,23 @@ namespace PdfXenon.Standard
             _renderer.Initialize(mediaBox, cropBox);
         }
 
+        public PdfStream GetStream(PdfObjectReference reference)
+        {
+            return (PdfStream)_page.Document.ResolveReference(reference);
+        }
+
         public PdfDictionary GetGraphicsStateDictionary(string dictName)
         {
             // Page resources should have a dictionary with set of graphics state dictionaries
             PdfDictionary extGStates = _page.Resources.MandatoryValueRef<PdfDictionary>("ExtGState");
             return extGStates.MandatoryValueRef<PdfDictionary>(dictName);
+        }
+
+        public PdfObject GetColorSpaceObject(string colorSpaceName)
+        {
+            // Page resources should have a dictionary with set of graphics state dictionaries
+            PdfDictionary colorSpaces = _page.Resources.MandatoryValueRef<PdfDictionary>("ColorSpace");
+            return colorSpaces.MandatoryValueRef<PdfObject>(colorSpaceName);
         }
 
         public void Process()

@@ -4,11 +4,11 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class PdfDeviceCMYK : PdfColorSpace
+    public class PdfColorSpaceDeviceCMYK : PdfColorSpace
     {
         private float[] _cmyk = new float[] { 0f, 0f, 0f, 1f };
 
-        public PdfDeviceCMYK(PdfRenderer renderer)
+        public PdfColorSpaceDeviceCMYK(PdfRenderer renderer)
             : base(renderer)
         {
         }
@@ -21,9 +21,9 @@ namespace PdfXenon.Standard
             _cmyk[0] = Renderer.OperandAsNumber();
         }
 
-        public override PdfRGB ColorAsRGB()
+        public override PdfColorRGB ColorAsRGB()
         {
-            throw new NotImplementedException("PdfDeviceCMYK color conversion to RGB.");
+            return new PdfColorRGB(1, 0, 0);
         }
     }
 }

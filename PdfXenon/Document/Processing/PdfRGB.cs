@@ -4,9 +4,9 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class PdfRGB
+    public class PdfColorRGB
     {
-        public PdfRGB(float r, float g, float b)
+        public PdfColorRGB(float r, float g, float b)
         {
             R = r;
             G = g;

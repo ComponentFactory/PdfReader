@@ -34,14 +34,14 @@ namespace PdfXenon.Standard
         {
             // Page resources should have a dictionary with set of graphics state dictionaries
             PdfDictionary extGStates = _page.Resources.MandatoryValueRef<PdfDictionary>("ExtGState");
-            return extGStates.MandatoryValueRef<PdfDictionary>(dictName);
+            return extGStates.OptionalValueRef<PdfDictionary>(dictName);
         }
 
         public PdfObject GetColorSpaceObject(string colorSpaceName)
         {
             // Page resources should have a dictionary with set of graphics state dictionaries
             PdfDictionary colorSpaces = _page.Resources.MandatoryValueRef<PdfDictionary>("ColorSpace");
-            return colorSpaces.MandatoryValueRef<PdfObject>(colorSpaceName);
+            return colorSpaces.OptionalValueRef<PdfObject>(colorSpaceName);
         }
 
         public void Process()

@@ -48,7 +48,7 @@ namespace WindowsFormsApp1
             if (_document == null)
             {
                 _document = new PdfDocument();
-                _document.Load(@"d:\Magazine.pdf", true);
+                _document.Load(@"d:\PDF17.pdf", true);
                 _document.Close();
             }
 
@@ -64,7 +64,7 @@ namespace WindowsFormsApp1
         }
 
         private PdfDocument _document;
-        private int _pageIndex;
+        private int _pageIndex = 1137;
         private Bitmap _bitmap;
     }
 }

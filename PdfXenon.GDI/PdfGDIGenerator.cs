@@ -142,7 +142,7 @@ namespace PdfXenon.GDI
         private Brush CreateBrush()
         {
             // Get the current stroke colour and convert to GDI color
-            PdfRGB rgb = GraphicsState.ColorSpaceNonStroking.ColorAsRGB();
+            PdfColorRGB rgb = GraphicsState.ColorSpaceNonStroking.ColorAsRGB();
             Color color = Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
             SolidBrush brush = new SolidBrush(color);
 
@@ -152,7 +152,7 @@ namespace PdfXenon.GDI
         private Pen CreatePen()
         {
             // Get the current stroke colour and convert to GDI color
-            PdfRGB rgb = GraphicsState.ColorSpaceStroking.ColorAsRGB();
+            PdfColorRGB rgb = GraphicsState.ColorSpaceStroking.ColorAsRGB();
             Color color = Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
             Pen pen = new Pen(color, GraphicsState.LineWidth);
 

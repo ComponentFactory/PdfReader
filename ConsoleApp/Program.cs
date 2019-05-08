@@ -35,10 +35,17 @@ namespace ConsoleApp
             Console.WriteLine($"{filename}: {sw.ElapsedMilliseconds}ms");
             sw.Restart();
 
+            int index = 0;
             foreach (PdfPage page in document.Catalog.Pages)
             {
+                if (index == 1142)
+                {
+                    Console.WriteLine(page.ToDebug());
+                }
+
                 PdfPageProcessor processor = new PdfPageProcessor(page, new PdfDebugRenderer());
                 processor.Process();
+                index++;
             }
 
             sw.Stop();

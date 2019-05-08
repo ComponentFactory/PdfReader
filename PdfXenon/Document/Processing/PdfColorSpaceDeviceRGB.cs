@@ -4,11 +4,11 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class PdfDeviceRGB : PdfColorSpace
+    public class PdfColorSpaceDeviceRGB : PdfColorSpace
     {
         private float[] _rgb = new float[] { 0f, 0f, 0f };
 
-        public PdfDeviceRGB(PdfRenderer renderer)
+        public PdfColorSpaceDeviceRGB(PdfRenderer renderer)
             : base(renderer)
         {
         }
@@ -20,9 +20,9 @@ namespace PdfXenon.Standard
             _rgb[0] = Renderer.OperandAsNumber();
         }
 
-        public override PdfRGB ColorAsRGB()
+        public override PdfColorRGB ColorAsRGB()
         {
-            return new PdfRGB(_rgb[0], _rgb[1], _rgb[2]);
+            return new PdfColorRGB(_rgb[0], _rgb[1], _rgb[2]);
         }
     }
 }

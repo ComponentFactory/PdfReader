@@ -44,6 +44,13 @@ namespace PdfXenon.Standard
             return colorSpaces.OptionalValueRef<PdfObject>(colorSpaceName);
         }
 
+        public PdfObject GetPatternObject(string patternName)
+        {
+            // Page resources should have a dictionary with set of graphics state dictionaries
+            PdfDictionary patterns = _page.Resources.MandatoryValueRef<PdfDictionary>("Pattern");
+            return patterns.OptionalValueRef<PdfObject>(patternName);
+        }
+
         public void Process()
         {
             PdfContentsParser parser = _page.Contents.CreateParser();

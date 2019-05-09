@@ -4,14 +4,20 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public abstract class PdfColorSpace
+    public abstract class PdfColorSpace : PdfObject
     {
-        public PdfColorSpace(PdfRenderer renderer)
+        public PdfColorSpace(PdfObject parent)
+            : base(parent)
         {
-            Renderer = renderer;
         }
 
-        public PdfRenderer Renderer { get; private set; }
+        public abstract void ParseParameters();
+        public virtual bool IsColor { get => false; }
+        public virtual bool IsPattern { get => false; }
+        public virtual PdfColorRGB GetColor() => null;
+        public virtual PdfPatternType GetPattern() => null;
+
+        public PdfRenderer Renderer { get => TypedParent<PdfRenderer>(); }
 
         public static PdfColorSpace FromName(PdfRenderer renderer, string colorSpaceName)
         {
@@ -36,9 +42,6 @@ namespace PdfXenon.Standard
                         throw new NotImplementedException($"Colorspace has unexpected type '{obj.GetType().Name}' when only name and array are recognized.");
             }
         }
-
-        public abstract void ParseColor();
-        public abstract PdfColorRGB ColorAsRGB();
 
         private static PdfColorSpace FromArray(PdfRenderer renderer, PdfArray array)
         {
@@ -72,7 +75,7 @@ namespace PdfXenon.Standard
                         }
                     }
                 case "Pattern":
-                    return new PdfColorSpacePattern(renderer, FromArray(renderer, (PdfArray)array.Objects[1]));
+                    return new PdfColorSpacePattern(renderer);
                 case "Separation":
                     return new PdfColorSpaceDeviceGray(renderer);
                 default:

@@ -13,7 +13,7 @@ namespace PdfXenon.Standard
         {
         }
 
-        public override void ParseColor()
+        public override void ParseParameters()
         {
             _cmyk[3] = Renderer.OperandAsNumber();
             _cmyk[2] = Renderer.OperandAsNumber();
@@ -21,15 +21,13 @@ namespace PdfXenon.Standard
             _cmyk[0] = Renderer.OperandAsNumber();
         }
 
-        public override PdfColorRGB ColorAsRGB()
-        {
-            float r = (1 - _cmyk[0]) * (1 - _cmyk[3]);
-            float g = (1 - _cmyk[1]) * (1 - _cmyk[3]);
-            float b = (1 - _cmyk[2]) * (1 - _cmyk[3]);
+        public override bool IsColor { get => true; }
 
-            return new PdfColorRGB(Math.Max(0f, Math.Min(1, r)),
-                                   Math.Max(0f, Math.Min(1, g)),
-                                   Math.Max(0f, Math.Min(1, b)));
+        public override PdfColorRGB GetColor()
+        {
+            return new PdfColorRGB((1 - _cmyk[0]) * (1 - _cmyk[3]),
+                                   (1 - _cmyk[1]) * (1 - _cmyk[3]),
+                                   (1 - _cmyk[2]) * (1 - _cmyk[3]));
         }
     }
 }

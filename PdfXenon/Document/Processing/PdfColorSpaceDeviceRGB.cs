@@ -13,14 +13,16 @@ namespace PdfXenon.Standard
         {
         }
 
-        public override void ParseColor()
+        public override void ParseParameters()
         {
             _rgb[2] = Renderer.OperandAsNumber();
             _rgb[1] = Renderer.OperandAsNumber();
             _rgb[0] = Renderer.OperandAsNumber();
         }
 
-        public override PdfColorRGB ColorAsRGB()
+        public override bool IsColor { get => true; }
+
+        public override PdfColorRGB GetColor()
         {
             return new PdfColorRGB(_rgb[0], _rgb[1], _rgb[2]);
         }

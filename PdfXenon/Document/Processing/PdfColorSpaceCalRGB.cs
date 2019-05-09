@@ -86,14 +86,16 @@ namespace PdfXenon.Standard
             _xyz_rgb = _rgb_xyz.Multiply(wp_inverse_rgb).Inverse();
         }
 
-        public override void ParseColor()
+        public override void ParseParameters()
         {
             _abc[2] = Renderer.OperandAsNumber();
             _abc[1] = Renderer.OperandAsNumber();
             _abc[0] = Renderer.OperandAsNumber();
         }
 
-        public override PdfColorRGB ColorAsRGB()
+        public override bool IsColor { get => true; }
+
+        public override PdfColorRGB GetColor()
         {
             // Convert from ABC -> XYZ
             Matrix31 xyz = new Matrix31((float)((_matrix[0] * Math.Pow(_abc[0], _gamma[0])) + (_matrix[3] * Math.Pow(_abc[1], _gamma[1])) + (_matrix[6] * Math.Pow(_abc[2], _gamma[2]))),

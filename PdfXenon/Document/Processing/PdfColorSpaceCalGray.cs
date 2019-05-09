@@ -30,20 +30,18 @@ namespace PdfXenon.Standard
                 _gamma = Renderer.AsNumber(obj);
         }
 
-        public override void ParseColor()
+        public override void ParseParameters()
         {
             _a = Renderer.OperandAsNumber();
         }
 
-        public override PdfColorRGB ColorAsRGB()
-        {
-            float r = (float)(_whitePoint[0] * Math.Pow(_a, _gamma));
-            float g = (float)(_whitePoint[1] * Math.Pow(_a, _gamma));
-            float b = (float)(_whitePoint[2] * Math.Pow(_a, _gamma));
+        public override bool IsColor { get => true; }
 
-            return new PdfColorRGB(Math.Max(0f, Math.Min(1, r)),
-                                   Math.Max(0f, Math.Min(1, g)),
-                                   Math.Max(0f, Math.Min(1, b)));
+        public override PdfColorRGB GetColor()
+        {
+            return new PdfColorRGB((float)(_whitePoint[0] * Math.Pow(_a, _gamma)),
+                                   (float)(_whitePoint[1] * Math.Pow(_a, _gamma)),
+                                   (float)(_whitePoint[2] * Math.Pow(_a, _gamma)));
         }
     }
 }

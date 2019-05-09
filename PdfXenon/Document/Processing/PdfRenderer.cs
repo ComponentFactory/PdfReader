@@ -5,11 +5,12 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public abstract class PdfRenderer
+    public abstract class PdfRenderer : PdfObject
     {
         public PdfRenderer()
+            : base(null)
         {
-            GraphicsState = new PdfGraphicsState();
+            GraphicsState = new PdfGraphicsState(this, true);
             Operands = new Stack<PdfObject>();
         }
 
@@ -186,40 +187,40 @@ namespace PdfXenon.Standard
                         GraphicsState.ColorSpaceNonStroking = PdfColorSpace.FromName(this, OperandAsString());
                         break;
                     case "SC": // Set the color for stroking
-                        GraphicsState.ColorSpaceStroking.ParseColor();
+                        GraphicsState.ColorSpaceStroking.ParseParameters();
                         break;
                     case "sc": // Set the color for non-stroking
-                        GraphicsState.ColorSpaceNonStroking.ParseColor();
+                        GraphicsState.ColorSpaceNonStroking.ParseParameters();
                         break;
                     case "SCN": // Set the color for stroking
-                        GraphicsState.ColorSpaceStroking.ParseColor();
+                        GraphicsState.ColorSpaceStroking.ParseParameters();
                         break;
                     case "scn": // Set the color for non-stroking
-                        GraphicsState.ColorSpaceNonStroking.ParseColor();
+                        GraphicsState.ColorSpaceNonStroking.ParseParameters();
                         break;
                     case "G": // Set a gray and the color space to DeviceGray for stroking
                         GraphicsState.ColorSpaceStroking = PdfColorSpace.FromName(this, "DeviceGray");
-                        GraphicsState.ColorSpaceStroking.ParseColor();
+                        GraphicsState.ColorSpaceStroking.ParseParameters();
                         break;
                     case "g": // Set a gray and the color space to DeviceGray for non-stroking
                         GraphicsState.ColorSpaceNonStroking = PdfColorSpace.FromName(this, "DeviceGray");
-                        GraphicsState.ColorSpaceNonStroking.ParseColor();
+                        GraphicsState.ColorSpaceNonStroking.ParseParameters();
                         break;
                     case "RG": // Set a color and the color space to DeviceRGB for stroking
                         GraphicsState.ColorSpaceStroking = PdfColorSpace.FromName(this, "DeviceRGB");
-                        GraphicsState.ColorSpaceStroking.ParseColor();
+                        GraphicsState.ColorSpaceStroking.ParseParameters();
                         break;
                     case "rg": // Set a color and the color space to DeviceRGB for non-stroking
                         GraphicsState.ColorSpaceNonStroking = PdfColorSpace.FromName(this, "DeviceRGB");
-                        GraphicsState.ColorSpaceNonStroking.ParseColor();
+                        GraphicsState.ColorSpaceNonStroking.ParseParameters();
                         break;
                     case "K": // Set a color and the color space to DeviceCMYK for stroking
                         GraphicsState.ColorSpaceStroking = PdfColorSpace.FromName(this, "DeviceCMYK");
-                        GraphicsState.ColorSpaceStroking.ParseColor();
+                        GraphicsState.ColorSpaceStroking.ParseParameters();
                         break;
                     case "k": // Set a color and the color space to DeviceCMYK for non-stroking
                         GraphicsState.ColorSpaceNonStroking = PdfColorSpace.FromName(this, "DeviceCMYK");
-                        GraphicsState.ColorSpaceNonStroking.ParseColor();
+                        GraphicsState.ColorSpaceNonStroking.ParseParameters();
                         break;
                     default:
                         // Ignore anything we do not recognize
@@ -341,40 +342,16 @@ namespace PdfXenon.Standard
             return AsBoolean(Operands.Pop());
         }
 
-        public bool AsBoolean(PdfObject obj)
-        {
-            if (obj is PdfBoolean boolean)
-                return boolean.Value;
-
-            throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected a boolean.");
-        }
 
         public string OperandAsString()
         {
             return AsString(Operands.Pop());
         }
 
-        public string AsString(PdfObject obj)
-        {
-            if (obj is PdfName name)
-                return name.Value;
-            else if (obj is PdfString str)
-                return str.Value;
-
-            throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected a string.");
-        }
 
         public int OperandAsInteger()
         {
             return AsInteger(Operands.Pop());
-        }
-
-        public int AsInteger(PdfObject obj)
-        {
-            if (obj is PdfInteger integer)
-                return integer.Value;
-
-            throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected an integer.");
         }
 
         public float OperandAsNumber()
@@ -382,15 +359,6 @@ namespace PdfXenon.Standard
             return AsNumber(Operands.Pop());
         }
 
-        public float AsNumber(PdfObject obj)
-        {
-            if (obj is PdfInteger integer)
-                return integer.Value;
-            else if (obj is PdfReal real)
-                return real.Value;
-
-            throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected a number.");
-        }
 
         public List<PdfObject> OperandAsArray()
         {
@@ -408,28 +376,6 @@ namespace PdfXenon.Standard
         public float[] OperandAsNumberArray()
         {
             return AsNumberArray(Operands.Pop());
-        }
-
-        public float[] AsNumberArray(PdfObject obj)
-        {
-            if (obj is PdfArray array)
-            {
-                List<float> numbers = new List<float>();
-                foreach(PdfObject item in array.Objects)
-                {
-                    if (item is PdfInteger integer)
-                        numbers.Add(integer.Value);
-                    else if (item is PdfReal real)
-                        numbers.Add(real.Value);
-                    else
-                        throw new ApplicationException($"Array contains object of type '{obj.GetType().Name}', expected only numbers.");
-
-                }
-
-                return numbers.ToArray();
-            }
-
-            throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected an integer array.");
         }
     }
 }

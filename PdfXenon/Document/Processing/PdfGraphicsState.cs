@@ -39,31 +39,29 @@ namespace PdfXenon.Standard
         private PdfObject _softMask;
         private object _clip;
 
-        public PdfGraphicsState()
-            : base(null)
-        {
-            // Default values for root graphics state
-            _CTM = new PdfMatrix();
-            _lineWidth = 1; 
-            _lineCapStyle = 0; 
-            _lineJoinStyle = 0; 
-            _miterLength = 10;
-            _dashArray = new float[] { };
-            _dashPhase = 0;
-            _renderingIntent = "RelativeColorimetric";
-            _flatness = 0;
-            _overPrint10 = false;
-            _overPrint13 = false;
-            _overPrintMode = 1;
-            _blendMode = new PdfName(this, new ParseName("Normal"));
-            _constantAlphaStroking = 1;
-            _constantAlphaNonStroking = 1;
-            _textKnockout = true;
-        }
-
-        public PdfGraphicsState(PdfGraphicsState parent)
+        public PdfGraphicsState(PdfObject parent, bool init = false)
             : base(parent)
         {
+            if (init)
+            {
+                // Default values for root graphics state
+                _CTM = new PdfMatrix();
+                _lineWidth = 1;
+                _lineCapStyle = 0;
+                _lineJoinStyle = 0;
+                _miterLength = 10;
+                _dashArray = new float[] { };
+                _dashPhase = 0;
+                _renderingIntent = "RelativeColorimetric";
+                _flatness = 0;
+                _overPrint10 = false;
+                _overPrint13 = false;
+                _overPrintMode = 1;
+                _blendMode = new PdfName(this, new ParseName("Normal"));
+                _constantAlphaStroking = 1;
+                _constantAlphaNonStroking = 1;
+                _textKnockout = true;
+            }
         }
 
         public PdfGraphicsState ParentGraphicsState { get => TypedParent<PdfGraphicsState>(); }

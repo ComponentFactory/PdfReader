@@ -9,5 +9,6 @@ namespace PdfXenon.Standard
         PdfStream GetStream(PdfObjectReference reference);
         PdfDictionary GetGraphicsStateDictionary(string dictName);
         PdfObject GetColorSpaceObject(string colorSpaceName);
+        PdfObject GetPatternObject(string patternName);
     }
 }

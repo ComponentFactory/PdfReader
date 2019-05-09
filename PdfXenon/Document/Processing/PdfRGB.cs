@@ -8,9 +8,9 @@ namespace PdfXenon.Standard
     {
         public PdfColorRGB(float r, float g, float b)
         {
-            R = r;
-            G = g;
-            B = b;
+            R = Math.Max(0f, Math.Min(1, r));
+            G = Math.Max(0f, Math.Min(1, g));
+            B = Math.Max(0f, Math.Min(1, b));
         }
 
         public float R { get; set; }

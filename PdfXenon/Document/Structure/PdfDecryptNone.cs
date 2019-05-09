@@ -22,12 +22,12 @@ namespace PdfXenon.Standard
 
         public override string DecodeStream(PdfStream stream)
         {
-            return stream.ParseStream.Value;
+            return Encoding.ASCII.GetString(stream.ParseStream.DecodeBytes(stream.ParseStream.StreamBytes));
         }
 
         public override byte[] DecodeStreamAsBytes(PdfStream stream)
         {
-            return stream.ParseStream.ValueAsBytes;
+            return stream.ParseStream.DecodeBytes(stream.ParseStream.StreamBytes);
         }
     }
 }

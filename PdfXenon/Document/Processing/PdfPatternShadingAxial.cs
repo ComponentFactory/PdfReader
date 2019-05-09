@@ -34,7 +34,7 @@ namespace PdfXenon.Standard
                 sb.Append($"\n{blank}");
             }
             
-            if (Function != null) sb.Append($"Function: {Function.ToDebug()}\n{blank}");
+            if (Function != null) sb.Append($"Function: {Function}\n{blank}");
 
             if (Extend != null)
             {
@@ -81,7 +81,19 @@ namespace PdfXenon.Standard
             }            
         }
 
-        public PdfObject Function { get => Dictionary.OptionalValue<PdfObject>("Function"); }
+        public string Function
+        {
+            get
+            {
+                PdfObject func = Dictionary.MandatoryValueRef<PdfObject>("Function");
+                if (func is PdfStream stream)
+                {
+                    return stream.Value;
+                }
+
+                return string.Empty;
+            }
+        }
 
         public bool[] Extend
         {

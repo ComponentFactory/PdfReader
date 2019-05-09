@@ -3,8 +3,8 @@
 	    Implement Predictors
     Renderer
 		 (DefaultGray/DefaultRGB/DefaultCYMK)
-	     DeviceCMYK,Lab
-		 Indexed, Pattern, Separation, DeviceN
+	     Lab, Indexed, Pattern, Separation, DeviceN
+		 CalGray needs testing (our impl is different from pdfium)
 
 PDFClown
 iTextSharp-Develop

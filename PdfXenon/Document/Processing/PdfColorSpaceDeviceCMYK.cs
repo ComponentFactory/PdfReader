@@ -23,7 +23,13 @@ namespace PdfXenon.Standard
 
         public override PdfColorRGB ColorAsRGB()
         {
-            return new PdfColorRGB(1, 0, 0);
+            float r = (1 - _cmyk[0]) * (1 - _cmyk[3]);
+            float g = (1 - _cmyk[1]) * (1 - _cmyk[3]);
+            float b = (1 - _cmyk[2]) * (1 - _cmyk[3]);
+
+            return new PdfColorRGB(Math.Max(0f, Math.Min(1, r)),
+                                   Math.Max(0f, Math.Min(1, g)),
+                                   Math.Max(0f, Math.Min(1, b)));
         }
     }
 }

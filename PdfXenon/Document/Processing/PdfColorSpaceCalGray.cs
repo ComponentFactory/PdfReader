@@ -42,8 +42,8 @@ namespace PdfXenon.Standard
             float b = (float)(_whitePoint[2] * Math.Pow(_a, _gamma));
 
             return new PdfColorRGB(Math.Max(0f, Math.Min(1, r)),
-                              Math.Max(0f, Math.Min(1, g)),
-                              Math.Max(0f, Math.Min(1, b)));
+                                   Math.Max(0f, Math.Min(1, g)),
+                                   Math.Max(0f, Math.Min(1, b)));
         }
     }
 }

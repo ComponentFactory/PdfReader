@@ -68,6 +68,23 @@ namespace PdfXenon.Standard
 
         public PdfGraphicsState ParentGraphicsState { get => TypedParent<PdfGraphicsState>(); }
 
+        public int Depth
+        {
+            get
+            {
+                int depth = 1;
+
+                PdfGraphicsState parent = ParentGraphicsState;
+                while(parent != null)
+                {
+                    depth++;
+                    parent = parent.ParentGraphicsState;
+                }
+
+                return depth;
+            }
+        }
+
         public PdfMatrix CTM
         {
             get

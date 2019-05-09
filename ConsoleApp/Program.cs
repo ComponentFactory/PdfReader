@@ -9,13 +9,13 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            //TestFileLoads(@"d:\Shapes.pdf");
-            //TestFileLoads(@"d:\Blank.pdf");
-            //TestFileLoads(@"d:\Coffee.pdf");
-            //TestFileLoads(@"d:\FSharp.pdf");
-            //TestFileLoads(@"d:\Magazine.pdf");
-            //TestFileLoads(@"d:\Maths.pdf");
-            //TestFileLoads(@"d:\Slides.pdf");
+            TestFileLoads(@"d:\Shapes.pdf");
+            TestFileLoads(@"d:\Blank.pdf");
+            TestFileLoads(@"d:\Coffee.pdf");
+            TestFileLoads(@"d:\FSharp.pdf");
+            TestFileLoads(@"d:\Magazine.pdf");
+            TestFileLoads(@"d:\Maths.pdf");
+            TestFileLoads(@"d:\Slides.pdf");
             TestFileLoads(@"d:\PDF17.pdf");
 
             Console.ReadLine();
@@ -38,11 +38,6 @@ namespace ConsoleApp
             int index = 0;
             foreach (PdfPage page in document.Catalog.Pages)
             {
-                if (index == 1142)
-                {
-                    Console.WriteLine(page.ToDebug());
-                }
-
                 PdfPageProcessor processor = new PdfPageProcessor(page, new PdfDebugRenderer());
                 processor.Process();
                 index++;

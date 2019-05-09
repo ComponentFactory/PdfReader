@@ -75,12 +75,18 @@ namespace PdfXenon.GDI
         {
             if (_currentPath == null)
                 _currentPath = new GraphicsPath();
+            else
+                _currentPath.StartFigure();
 
             // Convert points to user space
             GraphicsState.CTM.Transform(pt);
             PdfPoint pt2 = GraphicsState.CTM.Transform(pt.X + width, pt.Y + height);
 
-            _currentPath.AddRectangle(new RectangleF(pt.X, pt.Y, pt2.X - pt.X, pt2.Y - pt.Y));
+            _currentPath.AddLine(pt.X, pt.Y, pt2.X, pt.Y);
+            _currentPath.AddLine(pt2.X, pt.Y, pt2.X, pt2.Y);
+            _currentPath.AddLine(pt2.X, pt2.Y, pt.X, pt2.Y);
+
+            _currentPath.CloseFigure();
         }
 
         public override void PathStroke()

@@ -26,21 +26,14 @@ namespace PdfXenon.Standard
                 case "Pattern":
                     return new PdfColorSpacePattern(renderer);
                 default:
-                    {
-                        PdfColorSpace ret = null;
-
-                        // Resolve the color space to an object using the resolver
-                        PdfObject obj = renderer.Resolver.GetColorSpaceObject(colorSpaceName);
-                        if (obj is PdfName name)
-                            ret = FromName(renderer, name.Value);
-                        else if (obj is PdfArray array)
-                            ret = FromArray(renderer, array);
-
-                        if (ret != null)
-                            return ret;
-
-                        throw new NotImplementedException($"Colorspace '{colorSpaceName}' not implemented.");
-                    }
+                    // Resolve the color space to an object using the resolver
+                    PdfObject obj = renderer.Resolver.GetColorSpaceObject(colorSpaceName);
+                    if (obj is PdfName name)
+                        return FromName(renderer, name.Value);
+                    else if (obj is PdfArray array)
+                        return FromArray(renderer, array);
+                    else
+                        throw new NotImplementedException($"Colorspace has unexpected type '{obj.GetType().Name}' when only name and array are recognized.");
             }
         }
 
@@ -54,22 +47,18 @@ namespace PdfXenon.Standard
 
             switch (dictName)
             {
-                case "Pattern":
-                    return new PdfColorSpacePattern(renderer, FromArray(renderer, (PdfArray)array.Objects[1]));
                 case "CalGray":
                     return new PdfColorSpaceCalGray(renderer, array.Objects[1] as PdfDictionary);
                 case "CalRGB":
                     return new PdfColorSpaceCalRGB(renderer, array.Objects[1] as PdfDictionary);
-                case "Separation":
-                    return new PdfColorSpaceDeviceGray(renderer);
                 case "ICCBased":
                     {
                         PdfStream stream = renderer.Resolver.GetStream(array.Objects[1] as PdfObjectReference);
 
-                        // The ICCBased stream has an entry 'N' giving numbers of values in the color
+                        // The ICCBased stream has an entry 'N' giving the number of color values
                         PdfInteger n = stream.Dictionary.MandatoryValue<PdfInteger>("N");
 
-                        // We ignore the ICC implementation and revert to an matching sized device color space
+                        // We ignore the ICC implementation and revert to a matching sized device color space
                         switch (n.Value)
                         {
                             case 1:
@@ -78,12 +67,17 @@ namespace PdfXenon.Standard
                                 return new PdfColorSpaceDeviceRGB(renderer);
                             case 4:
                                 return new PdfColorSpaceDeviceCMYK(renderer);
+                            default:
+                                throw new NotImplementedException($"Cannot convert from ICCBased color space with '{n.Value}' values to a device color space.");
                         }
                     }
-                    break;
+                case "Pattern":
+                    return new PdfColorSpacePattern(renderer, FromArray(renderer, (PdfArray)array.Objects[1]));
+                case "Separation":
+                    return new PdfColorSpaceDeviceGray(renderer);
+                default:
+                    throw new NotImplementedException($"Colorspace '{dictName}' not implemented.");
             }
-
-            return null;
         }
     }
 }

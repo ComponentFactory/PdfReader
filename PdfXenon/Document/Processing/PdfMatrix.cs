@@ -7,7 +7,6 @@ namespace PdfXenon.Standard
     {
         public PdfMatrix()
         {
-            // Identity matrix
             M11 = 1;
             M22 = 1;
         }
@@ -20,6 +19,11 @@ namespace PdfXenon.Standard
             M22 = m22;
             OffsetX = offsetX;
             OffsetY = offsetY;
+        }
+
+        public override string ToString()
+        {
+            return $"{M11},{M12} {M21},{M22} {OffsetX},{OffsetY}";
         }
 
         public float M11 { get; private set; }

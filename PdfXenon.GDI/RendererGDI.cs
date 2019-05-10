@@ -159,6 +159,7 @@ namespace PdfXenon.GDI
                 RenderPatternType pattern = colorSpacePatten.GetPattern();
                 if (pattern is RenderPatternShadingAxial axial)
                 {
+                    // TODO
                 }
             }
 

@@ -17,6 +17,11 @@ namespace PdfXenon.Standard
             ParseObject = parse;
         }
 
+        public override string ToString()
+        {
+            return $"({GetType().Name})";
+        }
+
         public virtual void Visit(IPdfObjectVisitor visitor)
         {
             visitor.Visit(this);

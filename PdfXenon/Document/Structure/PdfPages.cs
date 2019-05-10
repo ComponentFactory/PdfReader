@@ -24,6 +24,11 @@ namespace PdfXenon.Standard
             }
         }
 
+        public override void Visit(IPdfObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         public override void FindLeafPages(List<PdfPage> pages)
         {
             foreach (PdfPageInherit child in Children)

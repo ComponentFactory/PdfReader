@@ -50,8 +50,9 @@ namespace PdfXenon.Standard
             PushNextLevel();
             Append("Catalog");
 
-            VisitNotNull(catalog.Version, "Version");
-            VisitNotNull(catalog.RootPage, "RootPage");
+            CurrentLevelNewLine();
+            catalog.RootPage.Visit(this);
+
             VisitNotNull(catalog.PageLabels, "PageLabels");
             VisitNotNull(catalog.Names, "Names");
             VisitNotNull(catalog.Dests, "Dests");
@@ -77,18 +78,14 @@ namespace PdfXenon.Standard
             VisitNotNull(catalog.Requirements, "Requirements");
             VisitNotNull(catalog.Collection, "Collection");
             VisitNotNull(catalog.NeedsRendering, "NeedsRendering");
+            VisitNotNull(catalog.Version, "Version");
 
             PopLevel();
         }
 
         public void Visit(PdfContents contents)
         {
-            throw new NotImplementedException();
-        }
-
-        public void Visit(PdfContentsParser contentsParser)
-        {
-            throw new NotImplementedException();
+ //           throw new NotImplementedException();
         }
 
         public void Visit(PdfDateTime dateTime)
@@ -184,7 +181,7 @@ namespace PdfXenon.Standard
 
         public void Visit(PdfObject obj)
         {
-            throw new NotImplementedException();
+            Append(obj.ToString());
         }
 
         public void Visit(PdfObjectReference reference)
@@ -194,12 +191,88 @@ namespace PdfXenon.Standard
 
         public void Visit(PdfOutlineItem outlineItem)
         {
-  //          throw new NotImplementedException();
+            PushNextLevel();
+            Append("Item");
+
+            VisitNotNull(outlineItem.Title, "Title");
+            VisitNotNull(outlineItem.Dest, "Dest");
+            VisitNotNull(outlineItem.A, "A");
+            VisitNotNull(outlineItem.SE, "SE");
+            VisitNotNull(outlineItem.C, "C");
+            VisitNotNull(outlineItem.F, "F");
+
+            foreach (PdfOutlineItem item in outlineItem.Items)
+            {
+                CurrentLevelNewLine();
+                item.Visit(this);
+            }
+
+            PopLevel();
         }
 
         public void Visit(PdfOutlineLevel outlineLevel)
         {
-  //          throw new NotImplementedException();
+            PushNextLevel();
+            Append("Level");
+
+            foreach (PdfOutlineItem item in outlineLevel.Items)
+            {
+                CurrentLevelNewLine();
+                item.Visit(this);
+            }
+
+            PopLevel();
+        }
+
+        public void Visit(PdfPage page)
+        {
+            PushNextLevel();
+            Append("Page");
+
+            VisitNotNull(page.LastModified, "LastModified");
+            VisitNotNull(page.Resources, "Resources");
+            VisitNotNull(page.MediaBox, "MediaBox");
+            VisitNotNull(page.CropBox, "CropBox");
+            VisitNotNull(page.BleedBox, "BleedBox");
+            VisitNotNull(page.TrimBox, "TrimBox");
+            VisitNotNull(page.ArtBox, "ArtBox");
+            VisitNotNull(page.BoxColorInfo, "BoxColorInfo");
+            VisitNotNull(page.Contents, "Contents");
+            VisitNotNull(page.Rotate, "Rotate");
+            VisitNotNull(page.Group, "Group");
+            VisitNotNull(page.Thumb, "Thumb");
+            VisitNotNull(page.B, "B");
+            VisitNotNull(page.Dur, "Dur");
+            VisitNotNull(page.Trans, "Trans");
+            VisitNotNull(page.Annots, "Annots");
+            VisitNotNull(page.AA, "AA");
+            VisitNotNull(page.Metadata, "Metadata");
+            VisitNotNull(page.PieceInfo, "PieceInfo");
+            VisitNotNull(page.StructParents, "StructParents");
+            VisitNotNull(page.ID, "ID");
+            VisitNotNull(page.PZ, "PZ");
+            VisitNotNull(page.SeparationInfo, "SeparationInfo");
+            VisitNotNull(page.Tabs, "Tabs");
+            VisitNotNull(page.TemplateInstantiated, "TemplateInstantiated");
+            VisitNotNull(page.PresSteps, "PresSteps");
+            VisitNotNull(page.UserUnit, "UserUnit");
+            VisitNotNull(page.VP, "VP");
+
+            PopLevel();
+        }
+
+        public void Visit(PdfPages pages)
+        {
+            PushNextLevel();
+            Append("Pages");
+
+            foreach (PdfObject child in pages.Children)
+            {
+                CurrentLevelNewLine();
+                child.Visit(this);
+            }
+
+            PopLevel();
         }
 
         public void Visit(PdfReal real)

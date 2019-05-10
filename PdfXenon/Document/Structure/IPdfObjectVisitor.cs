@@ -10,7 +10,6 @@ namespace PdfXenon.Standard
         void Visit(PdfBoolean boolean);
         void Visit(PdfCatalog contents);
         void Visit(PdfContents contents);
-        void Visit(PdfContentsParser contentsParser);
         void Visit(PdfDateTime dateTime);
         void Visit(PdfDictionary dateTime);
         void Visit(PdfDocument document);
@@ -25,6 +24,8 @@ namespace PdfXenon.Standard
         void Visit(PdfObjectReference reference);
         void Visit(PdfOutlineItem outlineItem);
         void Visit(PdfOutlineLevel outlineLevel);
+        void Visit(PdfPage page);
+        void Visit(PdfPages pages);
         void Visit(PdfReal real);
         void Visit(PdfRectangle rectangle);
         void Visit(PdfStream stream);

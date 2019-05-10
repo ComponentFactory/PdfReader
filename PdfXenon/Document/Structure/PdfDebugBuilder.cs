@@ -4,24 +4,42 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class DebugBuilder : IPdfObjectVisitor
+    public class PdfDebugBuilder : IPdfObjectVisitor
     {
+        private PdfObject _obj;
         private StringBuilder _sb = new StringBuilder();
         private Stack<int> _indents = new Stack<int>();
         private int _index;
 
-        public DebugBuilder(PdfObject obj)
+        public PdfDebugBuilder()
+            : this(null)
         {
-            _index = 0;
-            _indents.Push(_index);
-            obj.Visit(this);
+        }
+
+        public PdfDebugBuilder(PdfObject obj)
+        {
+            _obj = obj;
         }
 
         public override string ToString()
         {
-            return _sb.ToString();
+            if (_obj != null)
+            {
+                _index = 0;
+                _indents = new Stack<int>();
+                _indents.Push(_index);
+                _sb = new StringBuilder();
+                _obj.Visit(this);
+                return _sb.ToString();
+            }
+
+            return string.Empty;
         }
-   
+
+        public PdfDocument Document { get; set; }
+        public bool Resolve { get; set; }
+        public bool StreamContent { get; set; }
+
         public void Visit(PdfArray array)
         {
             Append("[");
@@ -85,7 +103,23 @@ namespace PdfXenon.Standard
 
         public void Visit(PdfContents contents)
         {
- //           throw new NotImplementedException();
+            if (contents.Streams.Count > 1)
+            {
+                PushNextLevel();
+                Append("Multiple Streams");
+
+                foreach (PdfStream stream in contents.Streams)
+                {
+                    CurrentLevelNewLine();
+                    stream.Visit(this);
+                }
+
+                PopLevel();
+            }
+            else
+            {
+                contents.Streams[0].Visit(this);
+            }
         }
 
         public void Visit(PdfDateTime dateTime)
@@ -103,12 +137,9 @@ namespace PdfXenon.Standard
             int count = dictionary.Count;
             foreach (var entry in dictionary)
             {
-                if ((index == 1) && (count == 2))
-                    Append(" ");
-
                 VisitNotNull(entry.Value, $"/{entry.Key}", newLine);
 
-                if (count > 2)
+                if (count > 1)
                     newLine = true;
 
                 index++;
@@ -120,6 +151,8 @@ namespace PdfXenon.Standard
 
         public void Visit(PdfDocument document)
         {
+            Document = document;
+
             PushNextLevel();
             Append("Document");
 
@@ -166,7 +199,7 @@ namespace PdfXenon.Standard
 
         public void Visit(PdfNameTree nameTree)
         {
-            throw new NotImplementedException();
+            Append($"NameTree {nameTree.LimitMin} -> {nameTree.LimitMax}");
         }
 
         public void Visit(PdfNull nul)
@@ -176,7 +209,7 @@ namespace PdfXenon.Standard
 
         public void Visit(PdfNumberTree numberTree)
         {
-            throw new NotImplementedException();
+            Append($"NumberTree {numberTree.LimitMin} -> {numberTree.LimitMax}");
         }
 
         public void Visit(PdfObject obj)
@@ -187,6 +220,16 @@ namespace PdfXenon.Standard
         public void Visit(PdfObjectReference reference)
         {
             Append($"{reference.Id} {reference.Gen} R");
+
+            if (Resolve && (Document != null))
+            {
+                PdfObject obj = Document.ResolveReference(reference);
+                if (obj != null)
+                {
+                    Append(" ");
+                    obj.Visit(this);
+                }
+            }
         }
 
         public void Visit(PdfOutlineItem outlineItem)
@@ -287,7 +330,47 @@ namespace PdfXenon.Standard
 
         public void Visit(PdfStream stream)
         {
+            PushLevel();
             stream.Dictionary.Visit(this);
+
+            if (StreamContent)
+            {
+                string content = stream.Value;
+                if (!string.IsNullOrEmpty(content))
+                {
+                    // Count how many binary data bytes found in the first 50
+                    int binary = 0;
+                    byte[] bytes = stream.ValueAsBytes;
+                    for (int i = 0; i < bytes.Length && i < 50; i++)
+                        if (bytes[i] > 128)
+                            binary++;
+
+                    CurrentLevelNewLine();
+                    Append("(START CONTENT)");
+                    CurrentLevelNewLine();
+                    CurrentLevelNewLine();
+
+                    // More than 4 binary bytes means we think it must be binary data
+                    if (binary > 4)
+                    {
+                        foreach (byte b in stream.ValueAsBytes)
+                            Append($"{b} ");
+                    }
+                    else
+                    {
+                        foreach (string line in content.Split('\r'))
+                        {
+                            Append(line);
+                            CurrentLevelNewLine();
+                        }
+                    }
+
+                    CurrentLevelNewLine();
+                    Append("(END CONTENT)");
+                }
+            }
+
+            PopLevel();
         }
 
         public void Visit(PdfString str)
@@ -323,6 +406,11 @@ namespace PdfXenon.Standard
             }
         }
 
+        private void PushLevel()
+        {
+            _indents.Push(_index);
+        }
+
         private void PushNextLevel()
         {
             _indents.Push(_index + 2);
@@ -338,6 +426,15 @@ namespace PdfXenon.Standard
             string str = obj.ToString();
             _sb.Append(str);
             _index += str.Length;
+        }
+
+        private void AppendObject(string name, object obj)
+        {
+            if (obj != null)
+            {
+                CurrentLevelNewLine();
+                Append($"{name} {obj.ToString()}");
+            }
         }
 
         private void CurrentLevelNewLine()

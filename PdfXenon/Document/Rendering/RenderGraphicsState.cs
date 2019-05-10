@@ -6,25 +6,6 @@ namespace PdfXenon.Standard
 {
     public class RenderGraphicsState : RenderObject
     {
-        private RenderMatrix _CTM;
-        private float? _lineWidth;
-        private int? _lineCapStyle;
-        private int? _lineJoinStyle;
-        private float? _miterLength;
-        private float[] _dashArray;
-        private int? _dashPhase;
-        private string _renderingIntent;
-        private float? _flatness;
-        private bool? _overPrint10;
-        private bool? _overPrint13;
-        private int? _overPrintMode;
-        private float? _constantAlphaStroking;
-        private float? _constantAlphaNonStroking;
-        private float? _flatnessTolerance;
-        private float? _smoothnessTolerance;
-        private bool? _strokeAdjustment;
-        private bool? _alphaSourceMask;
-        private bool? _textKnockout;
         private RenderColorSpace _colorSpaceStroking;
         private RenderColorSpace _colorSpaceNonStroking;
         private PdfObject _blendMode;
@@ -45,22 +26,27 @@ namespace PdfXenon.Standard
             if (init)
             {
                 // Default values for root graphics state
-                _CTM = new RenderMatrix();
-                _lineWidth = 1;
-                _lineCapStyle = 0;
-                _lineJoinStyle = 0;
-                _miterLength = 10;
-                _dashArray = new float[] { };
-                _dashPhase = 0;
-                _renderingIntent = "RelativeColorimetric";
-                _flatness = 0;
-                _overPrint10 = false;
-                _overPrint13 = false;
-                _overPrintMode = 1;
-                _constantAlphaStroking = 1;
-                _constantAlphaNonStroking = 1;
-                _textKnockout = true;
+                LocalCTM = new RenderMatrix();
+                LocalLineWidth = 1;
+                LocalLineCapStyle = 0;
+                LocalLineJoinStyle = 0;
+                LocalMiterLength = 10;
+                LocalDashArray = new float[] { };
+                LocalDashPhase = 0;
+                LocalRenderingIntent = "RelativeColorimetric";
+                LocalFlatness = 0;
+                LocalOverPrint10 = false;
+                LocalOverPrint13 = false;
+                LocalOverPrintMode = 1;
+                LocalConstantAlphaStroking = 1;
+                LocalConstantAlphaNonStroking = 1;
+                LocalTextKnockout = true;
             }
+        }
+
+        public override void Visit(IRenderObjectVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         public RenderGraphicsState ParentGraphicsState { get => TypedParent<RenderGraphicsState>(); }
@@ -82,266 +68,287 @@ namespace PdfXenon.Standard
             }
         }
 
+        public RenderMatrix LocalCTM { get; set; }
+        public float? LocalLineWidth { get; set; }
+        public int? LocalLineCapStyle { get; set; }
+        public int? LocalLineJoinStyle { get; set; }
+        public float? LocalMiterLength { get; set; }
+        public float[] LocalDashArray { get; set; }
+        public int? LocalDashPhase { get; set; }
+        public string LocalRenderingIntent { get; set; }
+        public float? LocalFlatness { get; set; }
+        public bool? LocalOverPrint10 { get; set; }
+        public bool? LocalOverPrint13 { get; set; }
+        public int? LocalOverPrintMode { get; set; }
+        public float? LocalConstantAlphaStroking { get; set; }
+        public float? LocalConstantAlphaNonStroking { get; set; }
+        public float? LocalFlatnessTolerance { get; set; }
+        public float? LocalSmoothnessTolerance { get; set; }
+        public bool? LocalStrokeAdjustment { get; set; }
+        public bool? LocalAlphaSourceMask { get; set; }
+        public bool? LocalTextKnockout { get; set; }
+
         public RenderMatrix CTM
         {
             get
             {
-                if (_CTM != null)
-                    return _CTM;
+                if (LocalCTM != null)
+                    return LocalCTM;
                 else
                     return ParentGraphicsState.CTM;
             }
 
             set
             {
-                if (_CTM == null)
+                if (LocalCTM == null)
                 {
-                    _CTM = CTM;
-                    if (_CTM == null)
-                        _CTM = value;
+                    LocalCTM = CTM;
+                    if (LocalCTM == null)
+                        LocalCTM = value;
                     else
                     {
-                        _CTM = _CTM.Clone();
-                        _CTM.Multiply(value);
+                        LocalCTM = LocalCTM.Clone();
+                        LocalCTM.Multiply(value);
                     }
                 }
                 else
-                    _CTM.Multiply(value);
+                    LocalCTM.Multiply(value);
             }
         }
+
 
         public float LineWidth
         {
             get
             {
-                if (_lineWidth.HasValue)
-                    return _lineWidth.Value;
+                if (LocalLineWidth.HasValue)
+                    return LocalLineWidth.Value;
                 else
                     return ParentGraphicsState.LineWidth;
             }
 
-            set { _lineWidth = Math.Max(0, value); }
+            set { LocalLineWidth = Math.Max(0, value); }
         }
 
         public int LineCapStyle
         {
             get
             {
-                if (_lineCapStyle.HasValue)
-                    return _lineCapStyle.Value;
+                if (LocalLineCapStyle.HasValue)
+                    return LocalLineCapStyle.Value;
                 else
                     return ParentGraphicsState.LineCapStyle;
             }
 
-            set { _lineCapStyle = Math.Max(0, value); }
+            set { LocalLineCapStyle = Math.Max(0, value); }
         }
 
         public int LineJoinStyle
         {
             get
             {
-                if (_lineJoinStyle.HasValue)
-                    return _lineJoinStyle.Value;
+                if (LocalLineJoinStyle.HasValue)
+                    return LocalLineJoinStyle.Value;
                 else
                     return ParentGraphicsState.LineJoinStyle;
             }
 
-            set { _lineJoinStyle = Math.Max(0, value); }
+            set { LocalLineJoinStyle = Math.Max(0, value); }
         }
 
         public float MiterLength
         {
             get
             {
-                if (_miterLength.HasValue)
-                    return _miterLength.Value;
+                if (LocalMiterLength.HasValue)
+                    return LocalMiterLength.Value;
                 else
                     return ParentGraphicsState.MiterLength;
             }
 
-            set { _miterLength = value; }
+            set { LocalMiterLength = value; }
         }
 
         public float[] DashArray
         {
             get
             {
-                if (_dashArray != null)
-                    return _dashArray;
+                if (LocalDashArray != null)
+                    return LocalDashArray;
                 else
                     return ParentGraphicsState.DashArray;
             }
 
-            set { _dashArray = value; }
+            set { LocalDashArray = value; }
         }
 
         public int DashPhase
         {
             get
             {
-                if (_dashPhase.HasValue)
-                    return _dashPhase.Value;
+                if (LocalDashPhase.HasValue)
+                    return LocalDashPhase.Value;
                 else
                     return ParentGraphicsState.DashPhase;
             }
 
-            set { _dashPhase = Math.Max(0, value); }
+            set { LocalDashPhase = Math.Max(0, value); }
         }
 
         public string RenderingIntent
         {
             get
             {
-                if (_renderingIntent != null)
-                    return _renderingIntent;
+                if (LocalRenderingIntent != null)
+                    return LocalRenderingIntent;
                 else
                     return ParentGraphicsState.RenderingIntent;
             }
 
-            set { _renderingIntent = value; }
+            set { LocalRenderingIntent = value; }
         }
 
         public float Flatness
         {
             get
             {
-                if (_flatness.HasValue)
-                    return _flatness.Value;
+                if (LocalFlatness.HasValue)
+                    return LocalFlatness.Value;
                 else
                     return ParentGraphicsState.Flatness;
             }
 
-            set { _flatness = Math.Min(100, Math.Max(0, value)); }
+            set { LocalFlatness = Math.Min(100, Math.Max(0, value)); }
         }
 
         public bool? OverPrint10
         {
             get
             {
-                if (_overPrint10.HasValue)
-                    return _overPrint10.Value;
+                if (LocalOverPrint10.HasValue)
+                    return LocalOverPrint10.Value;
                 else
                     return ParentGraphicsState.OverPrint10;
             }
 
-            set { _overPrint10 = value; }
+            set { LocalOverPrint10 = value; }
         }
 
         public bool? OverPrint13
         {
             get
             {
-                if (_overPrint13.HasValue)
-                    return _overPrint13.Value;
+                if (LocalOverPrint13.HasValue)
+                    return LocalOverPrint13.Value;
                 else
                     return ParentGraphicsState.OverPrint13;
             }
 
-            set { _overPrint13 = value; }
+            set { LocalOverPrint13 = value; }
         }
 
         public int OverPrintMode
         {
             get
             {
-                if (_overPrintMode.HasValue)
-                    return _overPrintMode.Value;
+                if (LocalOverPrintMode.HasValue)
+                    return LocalOverPrintMode.Value;
                 else
                     return ParentGraphicsState.OverPrintMode;
             }
 
-            set { _overPrintMode = value; }
+            set { LocalOverPrintMode = value; }
         }
 
         public float? ConstantAlphaStroking
         {
             get
             {
-                if (_constantAlphaStroking.HasValue)
-                    return _constantAlphaStroking.Value;
+                if (LocalConstantAlphaStroking.HasValue)
+                    return LocalConstantAlphaStroking.Value;
                 else
                     return ParentGraphicsState.ConstantAlphaStroking;
             }
 
-            set { _constantAlphaStroking = value; }
+            set { LocalConstantAlphaStroking = value; }
         }
 
         public float? ConstantAlphaNonStroking
         {
             get
             {
-                if (_constantAlphaNonStroking.HasValue)
-                    return _constantAlphaNonStroking.Value;
+                if (LocalConstantAlphaNonStroking.HasValue)
+                    return LocalConstantAlphaNonStroking.Value;
                 else
                     return ParentGraphicsState.ConstantAlphaNonStroking;
             }
 
-            set { _constantAlphaNonStroking = value; }
+            set { LocalConstantAlphaNonStroking = value; }
         }
 
         public float? FlatnessTolerance
         {
             get
             {
-                if (_flatnessTolerance.HasValue)
-                    return _flatnessTolerance.Value;
+                if (LocalFlatnessTolerance.HasValue)
+                    return LocalFlatnessTolerance.Value;
                 else
                     return ParentGraphicsState.FlatnessTolerance;
             }
 
-            set { _flatnessTolerance = value; }
+            set { LocalFlatnessTolerance = value; }
         }
 
         public float? SmoothnessTolerance
         {
             get
             {
-                if (_smoothnessTolerance.HasValue)
-                    return _smoothnessTolerance.Value;
+                if (LocalSmoothnessTolerance.HasValue)
+                    return LocalSmoothnessTolerance.Value;
                 else
                     return ParentGraphicsState.SmoothnessTolerance;
             }
 
-            set { _smoothnessTolerance = value; }
+            set { LocalSmoothnessTolerance = value; }
         }
 
         public bool? StrokeAdjustment
         {
             get
             {
-                if (_strokeAdjustment.HasValue)
-                    return _strokeAdjustment.Value;
+                if (LocalStrokeAdjustment.HasValue)
+                    return LocalStrokeAdjustment.Value;
                 else
                     return ParentGraphicsState.StrokeAdjustment;
             }
 
-            set { _strokeAdjustment = value; }
+            set { LocalStrokeAdjustment = value; }
         }
 
         public bool? AlphaSourceMask
         {
             get
             {
-                if (_alphaSourceMask.HasValue)
-                    return _alphaSourceMask.Value;
+                if (LocalAlphaSourceMask.HasValue)
+                    return LocalAlphaSourceMask.Value;
                 else
                     return ParentGraphicsState.AlphaSourceMask;
             }
 
-            set { _alphaSourceMask = value; }
+            set { LocalAlphaSourceMask = value; }
         }
 
         public bool? TextKnockout
         {
             get
             {
-                if (_textKnockout.HasValue)
-                    return _textKnockout.Value;
+                if (LocalTextKnockout.HasValue)
+                    return LocalTextKnockout.Value;
                 else
                     return ParentGraphicsState.TextKnockout;
             }
 
-            set { _textKnockout = value; }
+            set { LocalTextKnockout = value; }
         }
 
         public RenderColorSpace ColorSpaceStroking

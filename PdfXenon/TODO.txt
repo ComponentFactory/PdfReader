@@ -1,9 +1,14 @@
 ﻿TODO
     FlatDecode
 	    Implement Predictors
+	DCTDecode
+	    Is just the jpeg header/data bytes
     Renderer
-		 (DefaultGray/DefaultRGB/DefaultCYMK)
-	     Lab, Indexed, Pattern, Separation, DeviceN
+		Pattern
+		    Shading
+			    Axial
+	     
+		 Lab, Indexed, Separation, DeviceN
 		 CalGray needs testing (our impl is different from pdfium)
 
 PDFClown

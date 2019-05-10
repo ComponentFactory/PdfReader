@@ -14,6 +14,11 @@ namespace PdfXenon.Standard
             Operands = new Stack<PdfObject>();
         }
 
+        public override void Visit(IRenderObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         public IRendererResolver Resolver { get; set; }
         public RenderGraphicsState GraphicsState { get; private set; }
         public Stack<PdfObject> Operands { get; private set; }

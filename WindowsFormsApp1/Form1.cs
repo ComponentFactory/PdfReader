@@ -43,6 +43,7 @@ namespace WindowsFormsApp1
                 RendererGDI renderer = new RendererGDI();
                 RenderPageResolver processsor = new RenderPageResolver(_document.Catalog.Pages[_pageIndex++], renderer);
                 processsor.Process();
+                Console.WriteLine(new RenderDebugBuilder(renderer));
                 _bitmap = renderer.Bitmap;
                 Refresh();
             }

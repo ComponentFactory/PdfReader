@@ -12,7 +12,23 @@ namespace PdfXenon.Standard
         }
 
         public RenderObject Parent { get; private set; }
-        public Renderer Renderer { get => TypedParent<Renderer>(); }
+
+        public virtual void Visit(IRenderObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public Renderer Renderer
+        {
+            get
+            {
+                if (this is Renderer)
+                    return (Renderer)this;
+                else
+                    return TypedParent<Renderer>();
+            }
+
+        }
 
         public T TypedParent<T>() where T : RenderObject
         {

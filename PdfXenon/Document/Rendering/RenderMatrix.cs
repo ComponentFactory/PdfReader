@@ -20,6 +20,11 @@ namespace PdfXenon.Standard
             OffsetY = offsetY;
         }
 
+        public override string ToString()
+        {
+            return $"({M11},{M12},{M21},{M22},{OffsetX},{OffsetY})";
+        }
+
         public float M11 { get; private set; }
         public float M12 { get; private set; }
         public float M21 { get; private set; }

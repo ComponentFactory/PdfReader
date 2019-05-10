@@ -71,8 +71,6 @@ namespace PdfXenon.Standard
                     }
                 case "Pattern":
                     return new RenderColorSpacePattern(parent);
-                case "Separation":
-                    return new RenderColorSpaceDeviceGray(parent);
                 default:
                     throw new NotImplementedException($"Colorspace '{dictName}' not implemented.");
             }

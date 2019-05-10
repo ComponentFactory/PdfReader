@@ -27,18 +27,6 @@ namespace PdfXenon.Standard
             }
         }
 
-        public override string ToString()
-        {
-            return $"PdfNumberTree Min:{LimitMin} Max:{LimitMax}";
-        }
-
-        public override int ToDebug(StringBuilder sb, int indent)
-        {
-            string output = $"NumberTree {LimitMin} -> {LimitMax}";
-            sb.Append(output);
-            return indent + output.Length;
-        }
-
         public int LimitMin { get; private set; }
         public int LimitMax { get; private set; }
 

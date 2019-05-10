@@ -17,27 +17,8 @@ namespace PdfXenon.Standard
             ParseObject = parse;
         }
 
-        public override string ToString()
-        {
-            return GetType().Name;
-        }
-
-        public virtual string ToDebug()
-        {
-            StringBuilder sb = new StringBuilder();
-            ToDebug(sb, 0);
-            return sb.ToString();
-        }
-
-        public virtual int ToDebug(StringBuilder sb, int indent)
-        {
-            string output = $"({GetType().Name})";
-            sb.Append(output);
-            return indent + output.Length;
-        }
-
-        public ParseObject ParseObject { get; private set; }
         public PdfObject Parent { get; private set; }
+        public ParseObject ParseObject { get; private set; }
         public PdfDocument Document { get => TypedParent<PdfDocument>(); }
         public PdfDecrypt Decrypt { get => TypedParent<PdfDocument>().DecryptHandler; }
 
@@ -54,72 +35,6 @@ namespace PdfXenon.Standard
             }
 
             return null;
-        }
-
-        public bool AsBoolean(PdfObject obj)
-        {
-            if (obj is PdfBoolean boolean)
-                return boolean.Value;
-
-            throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected a boolean.");
-        }
-
-        public string AsString(PdfObject obj)
-        {
-            if (obj is PdfName name)
-                return name.Value;
-            else if (obj is PdfString str)
-                return str.Value;
-
-            throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected a string.");
-        }
-
-        public int AsInteger(PdfObject obj)
-        {
-            if (obj is PdfInteger integer)
-                return integer.Value;
-
-            throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected an integer.");
-        }
-
-        public float AsNumber(PdfObject obj)
-        {
-            if (obj is PdfInteger integer)
-                return integer.Value;
-            else if (obj is PdfReal real)
-                return real.Value;
-
-            throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected a number.");
-        }
-
-        public float[] AsNumberArray(PdfObject obj)
-        {
-            if (obj is PdfArray array)
-            {
-                List<float> numbers = new List<float>();
-                foreach (PdfObject item in array.Objects)
-                {
-                    if (item is PdfInteger integer)
-                        numbers.Add(integer.Value);
-                    else if (item is PdfReal real)
-                        numbers.Add(real.Value);
-                    else
-                        throw new ApplicationException($"Array contains object of type '{obj.GetType().Name}', expected only numbers.");
-
-                }
-
-                return numbers.ToArray();
-            }
-
-            throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected an integer array.");
-        }
-    
-        public PdfRectangle ArrayToRectangle(PdfArray array)
-        {
-            if (array != null)
-                return new PdfRectangle(array.Parent, array.ParseArray);
-            else
-                return null;
         }
 
         public PdfObject WrapObject(ParseObject obj)
@@ -148,6 +63,14 @@ namespace PdfXenon.Standard
                 return new PdfNull(this);
 
             throw new ApplicationException($"Cannot wrap object '{obj.GetType().Name}' as a pdf object .");
+        }
+
+        public static PdfRectangle ArrayToRectangle(PdfArray array)
+        {
+            if (array != null)
+                return new PdfRectangle(array.Parent, array.ParseArray);
+            else
+                return null;
         }
     }
 }

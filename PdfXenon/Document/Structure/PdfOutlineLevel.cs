@@ -22,24 +22,6 @@ namespace PdfXenon.Standard
             }
         }
 
-        public override string ToString()
-        {
-            return $"PdfOutlineLevel Count:{Count}";
-        }
-
-        public override int ToDebug(StringBuilder sb, int indent)
-        {
-            string blank = new string(' ', indent);
-
-            foreach (PdfOutlineItem item in Items)
-            {
-                sb.Append("  ");
-                item.ToDebug(sb, indent + 2);
-            }
-
-            return indent;
-        }
-
         public int Count { get => Items.Count; }
         public List<PdfOutlineItem> Items { get; private set; }
     }

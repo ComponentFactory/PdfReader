@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace PdfXenon.Standard
 {
@@ -21,11 +22,6 @@ namespace PdfXenon.Standard
                 else
                     throw new ArgumentException($"Unrecognized dictionary type references from page tree '{type}'.");
             }
-        }
-
-        public override string ToString()
-        {
-            return $"PdfPages Count:{Children.Count}";
         }
 
         public override void FindLeafPages(List<PdfPage> pages)

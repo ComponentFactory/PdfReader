@@ -9,42 +9,31 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            TestFileLoads(@"d:\Shapes.pdf");
-            TestFileLoads(@"d:\Blank.pdf");
-            TestFileLoads(@"d:\Coffee.pdf");
-            TestFileLoads(@"d:\FSharp.pdf");
+            //TestFileLoads(@"d:\Shapes.pdf");
+            //TestFileLoads(@"d:\Blank.pdf");
+            //TestFileLoads(@"d:\Coffee.pdf");
+            //TestFileLoads(@"d:\FSharp.pdf");
             TestFileLoads(@"d:\Magazine.pdf");
-            TestFileLoads(@"d:\Maths.pdf");
-            TestFileLoads(@"d:\Slides.pdf");
-            TestFileLoads(@"d:\PDF17.pdf");
+            //TestFileLoads(@"d:\Maths.pdf");
+            //TestFileLoads(@"d:\Slides.pdf");
+            //TestFileLoads(@"d:\PDF17.pdf");
 
             Console.ReadLine();
         }
 
         static private void TestFileLoads(string filename)
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
             PdfDocument document = new PdfDocument();
             document.Load(filename, true);
             document.Close();
 
-            sw.Stop();
-            Console.WriteLine("");
-            Console.WriteLine($"{filename}: {sw.ElapsedMilliseconds}ms");
-            sw.Restart();
-
             int index = 0;
             foreach (PdfPage page in document.Catalog.Pages)
             {
-                PdfPageProcessor processor = new PdfPageProcessor(page, new PdfDebugRenderer());
+                RenderPageResolver processor = new RenderPageResolver(page, new RendererNull());
                 processor.Process();
                 index++;
             }
-
-            sw.Stop();
-            Console.WriteLine($"Pages {document.Catalog.Pages.Count}: {sw.ElapsedMilliseconds}ms");
         }
     }
 }

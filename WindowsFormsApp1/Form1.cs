@@ -33,17 +33,15 @@ namespace WindowsFormsApp1
             if (_document == null)
             {
                 _document = new PdfDocument();
-                _document.Load(@"d:\Shapes.pdf", true);
+                _document.Load(@"d:\Magazine.pdf", true);
                 _document.Close();
             }
 
             if (_pageIndex < _document.Catalog.Pages.Count)
             {
-                Console.WriteLine(_document.Catalog.Pages[_pageIndex].ToDebug());
-
                 label1.Text = _pageIndex.ToString();
-                PdfGDIRenderer renderer = new PdfGDIRenderer();
-                PdfPageProcessor processsor = new PdfPageProcessor(_document.Catalog.Pages[_pageIndex++], renderer);
+                RendererGDI renderer = new RendererGDI();
+                RenderPageResolver processsor = new RenderPageResolver(_document.Catalog.Pages[_pageIndex++], renderer);
                 processsor.Process();
                 _bitmap = renderer.Bitmap;
                 Refresh();

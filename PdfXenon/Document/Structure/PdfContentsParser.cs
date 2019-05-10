@@ -22,7 +22,7 @@ namespace PdfXenon.Standard
             // First time around we setup the parser to the first stream
             if ((_parser == null) && (_index < _streams.Count))
             {
-                Console.WriteLine(_streams[_index].Value);
+//                Console.WriteLine(_streams[_index].Value);
                 _parser = new Parser(new MemoryStream(_streams[_index++].ValueAsBytes), true);
             }
 
@@ -39,7 +39,7 @@ namespace PdfXenon.Standard
                 // Is there another stream we can continue parsing with
                 if (_index < _streams.Count)
                 {
-                    Console.WriteLine(_streams[_index].Value);
+  //                  Console.WriteLine(_streams[_index].Value);
                     _parser = new Parser(new MemoryStream(_streams[_index++].ValueAsBytes), true);
                 }
             }

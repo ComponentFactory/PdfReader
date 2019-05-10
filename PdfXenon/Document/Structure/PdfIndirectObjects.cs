@@ -13,23 +13,6 @@ namespace PdfXenon.Standard
         {
         }
 
-        public override string ToString()
-        {
-            return $"PdfIndirectObjects Count:{_ids.Count}";
-        }
-
-        public override int ToDebug(StringBuilder sb, int indent)
-        {
-            foreach (var id in Values)
-            {
-                foreach(var gen in id.Values)
-                {
-                    gen.ToDebug(sb, indent);
-                }
-            }
-            return indent;
-        }
-
         public int Count { get => _ids.Count; }
         public bool ContainsId(int id) { return _ids.ContainsKey(id); }
         public Dictionary<int, PdfIndirectObjectId>.KeyCollection Ids { get => _ids.Keys; }

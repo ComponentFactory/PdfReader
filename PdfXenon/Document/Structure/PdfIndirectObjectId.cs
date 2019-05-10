@@ -15,11 +15,6 @@ namespace PdfXenon.Standard
             Id = id;
         }
 
-        public override string ToString()
-        {
-            return $"PdfIndirectObjectId Id:{Id} Count:{_gens.Count}";
-        }
-
         public int Id { get; private set; }
 
         public int Count

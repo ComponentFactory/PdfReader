@@ -11,18 +11,6 @@ namespace PdfXenon.Standard
             Minor = minor;
         }
 
-        public override string ToString()
-        {
-            return $"PdfVersion Version:{Major}.{Minor}";
-        }
-
-        public override int ToDebug(StringBuilder sb, int indent)
-        {
-            string output = $"{Major}.{Minor}";
-            sb.Append(output);
-            return indent + output.Length;
-        }
-
         public int Major { get; private set; }
         public int Minor { get; private set; }
     }

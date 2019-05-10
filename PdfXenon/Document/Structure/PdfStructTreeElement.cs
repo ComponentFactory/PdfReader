@@ -13,49 +13,6 @@ namespace PdfXenon.Standard
         {
         }
 
-        public override string ToString()
-        {
-            return $"PdfStructTreeElement S:{S.Value}";
-        }
-
-        public override int ToDebug(StringBuilder sb, int indent)
-        {
-            string blank = new string(' ', indent);
-            sb.Append($"S = {S.ToDebug()}");
-
-            if (ID != null)
-                sb.Append($", ID = {ID.ToDebug()}");
-
-            if (Pg != null)
-                sb.Append($", Pg = {Pg.ToDebug()}");
-
-            if (A != null)
-                sb.Append($", A = {A.ToDebug()}");
-
-            if (C != null)
-                sb.Append($", C = {C.ToDebug()}");
-
-            if (R != null)
-                sb.Append($", R = {R.ToDebug()}");
-
-            if (T != null)
-                sb.Append($", T = {T.ToDebug()}");
-
-            if (Lang != null)
-                sb.Append($", Lang = {Lang.ToDebug()}");
-
-            if (ActualText != null)
-                sb.Append($", ActualText = {ActualText.ToDebug()}");
-
-            sb.Append("\n");
-            sb.Append(blank);
-
-            foreach (PdfStructTreeElement element in K)
-                element.ToDebug(sb, indent + 2);
-
-            return indent;
-        }
-
         public PdfName S { get => MandatoryValue<PdfName>("S"); }
         public PdfString ID { get => OptionalValue<PdfString>("ID"); }
         public PdfObjectReference Pg { get => OptionalValue<PdfObjectReference>("Pg"); }

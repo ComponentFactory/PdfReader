@@ -10,6 +10,11 @@ namespace PdfXenon.Standard
         {
         }
 
+        public override void Visit(IPdfObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         public PdfString Title { get => OptionalValue<PdfString>("Title"); }
         public PdfString Author { get => OptionalValue<PdfString>("Author"); }
         public PdfString Subject { get => OptionalValue<PdfString>("Subject"); }

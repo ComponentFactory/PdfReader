@@ -21,7 +21,7 @@ namespace PdfXenon.GDI
         public override void Initialize(PdfRectangle mediaBox, PdfRectangle cropBox)
         {
             // Create a bitmap that is rounded up in size to the nearest pixel size
-            Bitmap = new Bitmap((int)Math.Ceiling(mediaBox.UpperRight.X), (int)Math.Ceiling(mediaBox.UpperRight.Y), PixelFormat.Format32bppArgb);
+            Bitmap = new Bitmap((int)Math.Ceiling(mediaBox.UpperRightX), (int)Math.Ceiling(mediaBox.UpperRightY), PixelFormat.Format32bppArgb);
 
             // Create a GDI+ context for writing to the bitmap
             _graphics = Graphics.FromImage(Bitmap);
@@ -32,7 +32,7 @@ namespace PdfXenon.GDI
             _graphics.Transform = new Matrix(1, 0, 0, -1, 0, Bitmap.Height);
 
             // Set the initial clipping region to the cropbox
-            GraphicsState.Clipping = new Region(new RectangleF(cropBox.LowerLeft.X, cropBox.LowerLeft.Y, cropBox.Width, cropBox.Height));
+            GraphicsState.Clipping = new Region(new RectangleF(cropBox.LowerLeftX, cropBox.LowerLeftY, cropBox.Width, cropBox.Height));
         }
 
         public override void SubPathStart(RenderPoint pt)

@@ -6,23 +6,29 @@ namespace PdfXenon.Standard
 {
     public class PdfContents : PdfObject
     {
-        private List<PdfStream> _streams = new List<PdfStream>();
-
         public PdfContents(PdfObject parent, PdfObject obj)
             : base(parent)
         {
+            Streams = new List<PdfStream>();
             ResolveToStreams(obj);
+        }
+
+        public List<PdfStream> Streams { get; private set; }
+
+        public override void Visit(IPdfObjectVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         public PdfContentsParser CreateParser()
         {
-            return new PdfContentsParser(this, _streams);
+            return new PdfContentsParser(this);
         }
 
         private void ResolveToStreams(PdfObject obj)
         {
             if (obj is PdfStream stream)
-                _streams.Add(stream);
+                Streams.Add(stream);
             else if (obj is PdfObjectReference reference)
                 ResolveToStreams(Document.ResolveReference(reference));
             else if (obj is PdfArray array)

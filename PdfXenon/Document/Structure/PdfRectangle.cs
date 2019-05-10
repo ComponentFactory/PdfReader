@@ -15,15 +15,29 @@ namespace PdfXenon.Standard
             float uy = ObjectToFloat(array.Objects[3]);
 
             // Normalize so the lower-left and upper-right are actually those values
-            LowerLeft = new RenderPoint(Math.Min(lx, ux), Math.Min(ly, uy));
-            UpperRight = new RenderPoint(Math.Max(lx, ux), Math.Max(ly, uy));
+            LowerLeftX = Math.Min(lx, ux);
+            LowerLeftY = Math.Min(ly, uy);
+            UpperRightX = Math.Max(lx, ux);
+            UpperRightY = Math.Max(ly, uy);
         }
 
-        public RenderPoint LowerLeft { get; private set; }
-        public RenderPoint UpperRight { get; private set; }
+        public override string ToString()
+        {
+            return $"({LowerLeftX},{LowerLeftY}) -> ({UpperRightX},{UpperRightY})";
+        }
 
-        public float Width { get { return UpperRight.X - LowerLeft.X; } }
-        public float Height { get { return UpperRight.Y - LowerLeft.Y; } }
+        public override void Visit(IPdfObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public float LowerLeftX { get; private set; }
+        public float LowerLeftY { get; private set; }
+        public float UpperRightX { get; private set; }
+        public float UpperRightY { get; private set; }
+
+        public float Width { get { return UpperRightX - LowerLeftX; } }
+        public float Height { get { return UpperRightY - LowerLeftY; } }
 
         private float ObjectToFloat(ParseObject obj)
         {

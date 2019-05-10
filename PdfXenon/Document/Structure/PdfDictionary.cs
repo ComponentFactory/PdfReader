@@ -13,6 +13,11 @@ namespace PdfXenon.Standard
         {
         }
 
+        public override void Visit(IPdfObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         public ParseDictionary ParseDictionary { get => ParseObject as ParseDictionary; }
         public int Count { get => ParseDictionary.Count; }
         public bool ContainsName(string name) { return ParseDictionary.ContainsName(name); }

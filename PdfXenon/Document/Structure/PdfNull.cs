@@ -9,5 +9,15 @@ namespace PdfXenon.Standard
             : base(parent)
         {
         }
+
+        public override string ToString()
+        {
+            return "null";
+        }
+
+        public override void Visit(IPdfObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

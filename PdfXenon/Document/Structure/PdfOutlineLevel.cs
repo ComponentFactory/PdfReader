@@ -22,6 +22,11 @@ namespace PdfXenon.Standard
             }
         }
 
+        public override void Visit(IPdfObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         public int Count { get => Items.Count; }
         public List<PdfOutlineItem> Items { get; private set; }
     }

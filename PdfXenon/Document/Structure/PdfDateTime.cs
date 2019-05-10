@@ -11,6 +11,16 @@ namespace PdfXenon.Standard
             DateTime = str.ValueAsDateTime;
         }
 
+        public override string ToString()
+        {
+            return DateTime.ToString();
+        }
+
+        public override void Visit(IPdfObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         public DateTime DateTime { get; private set; }
     }
 }

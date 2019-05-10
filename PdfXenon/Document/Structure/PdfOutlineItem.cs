@@ -13,6 +13,11 @@ namespace PdfXenon.Standard
             _dictionary = dictionary;
         }
 
+        public override void Visit(IPdfObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         public PdfString Title { get => _dictionary.MandatoryValueRef<PdfString>("Title"); }
         public PdfObject Dest { get => _dictionary.OptionalValueRef<PdfObject>("Dest"); }
         public PdfDictionary A { get => _dictionary.OptionalValueRef<PdfDictionary>("A"); }

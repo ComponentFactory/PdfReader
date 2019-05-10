@@ -9,22 +9,24 @@ namespace PdfXenon.Standard
     {
         private int _index = 0;
         private Parser _parser;
-        private List<PdfStream> _streams = new List<PdfStream>();
 
-        public PdfContentsParser(PdfObject parent, List<PdfStream> streams)
+        public PdfContentsParser(PdfContents parent)
             : base(parent)
         {
-            _streams = streams;
-        }    
+        }
+
+        public override void Visit(IPdfObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public PdfContents Contents { get => TypedParent<PdfContents>(); }
 
         public PdfObject GetObject()
         {
             // First time around we setup the parser to the first stream
-            if ((_parser == null) && (_index < _streams.Count))
-            {
-//                Console.WriteLine(_streams[_index].Value);
-                _parser = new Parser(new MemoryStream(_streams[_index++].ValueAsBytes), true);
-            }
+            if ((_parser == null) && (_index < Contents.Streams.Count))
+                _parser = new Parser(new MemoryStream(Contents.Streams[_index++].ValueAsBytes), true);
 
             // Keep trying to get a parsed object as long as there is a parser for a stream
             while (_parser != null)
@@ -37,11 +39,8 @@ namespace PdfXenon.Standard
                 _parser = null;
 
                 // Is there another stream we can continue parsing with
-                if (_index < _streams.Count)
-                {
-  //                  Console.WriteLine(_streams[_index].Value);
-                    _parser = new Parser(new MemoryStream(_streams[_index++].ValueAsBytes), true);
-                }
+                if (_index < Contents.Streams.Count)
+                    _parser = new Parser(new MemoryStream(Contents.Streams[_index++].ValueAsBytes), true);
             }
 
             return null;

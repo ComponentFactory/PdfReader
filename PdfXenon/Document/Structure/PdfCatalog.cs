@@ -17,6 +17,11 @@ namespace PdfXenon.Standard
         {
         }
 
+        public override void Visit(IPdfObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         public PdfName Version { get => OptionalValue<PdfName>("Version"); }
 
         public List<PdfPage> Pages

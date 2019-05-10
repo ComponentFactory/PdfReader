@@ -27,6 +27,11 @@ namespace PdfXenon.Standard
             }
         }
 
+        public override void Visit(IPdfObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         public string LimitMin { get; private set; }
         public string LimitMax { get; private set; }
 

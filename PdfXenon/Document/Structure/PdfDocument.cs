@@ -41,6 +41,11 @@ namespace PdfXenon.Standard
             DecryptHandler = new PdfDecryptNone(this);
         }
 
+        public override void Visit(IPdfObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         public PdfVersion Version { get; private set; }
         public PdfIndirectObjects IndirectObjects { get; private set; }
         public PdfDecrypt DecryptHandler { get; private set; }

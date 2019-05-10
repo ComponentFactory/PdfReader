@@ -17,6 +17,11 @@ namespace PdfXenon.Standard
             ParseObject = parse;
         }
 
+        public virtual void Visit(IPdfObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         public PdfObject Parent { get; private set; }
         public ParseObject ParseObject { get; private set; }
         public PdfDocument Document { get => TypedParent<PdfDocument>(); }

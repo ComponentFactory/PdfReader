@@ -10,6 +10,16 @@ namespace PdfXenon.Standard
         {
         }
 
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
+
+        public override void Visit(IPdfObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         public ParseBoolean ParseBoolean { get => ParseObject as ParseBoolean; }
         public bool Value { get => ParseBoolean.Value; }
     }

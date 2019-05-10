@@ -13,6 +13,11 @@ namespace PdfXenon.Standard
         {
         }
 
+        public override void Visit(IPdfObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
         public ParseArray ParseArray { get => ParseObject as ParseArray; }
 
         public List<PdfObject> Objects

@@ -5,11 +5,16 @@
 	    Is just the jpeg header/data bytes
     Renderer
 		Pattern
+		    Push
+		       ExtGState
+			Pop
 		    Shading
-			    Axial
+			    Radial
 	     
 		 Lab, Indexed, Separation, DeviceN
 		 CalGray needs testing (our impl is different from pdfium)
+
+sh command
 
 PDFClown
 iTextSharp-Develop

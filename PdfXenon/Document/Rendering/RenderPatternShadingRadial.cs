@@ -4,11 +4,11 @@ using System.Text;
 
 namespace PdfXenon.Standard
 {
-    public class RenderPatternShadingAxial : RenderPatternShading
+    public class RenderPatternShadingRadial : RenderPatternShading
     {
         private PdfFunction _function;
 
-        public RenderPatternShadingAxial(RenderObject parent, PdfDictionary extGState, PdfArray matrix, PdfDictionary dictionary)
+        public RenderPatternShadingRadial(RenderObject parent, PdfDictionary extGState, PdfArray matrix, PdfDictionary dictionary)
             : base(parent, extGState, matrix, dictionary)
         {
         }

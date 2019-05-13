@@ -6,12 +6,16 @@ namespace PdfXenon.Standard
 {
     public abstract class RenderPatternShading : RenderPatternType
     {
-        public RenderPatternShading(RenderObject parent, PdfDictionary dictionary)
+        public RenderPatternShading(RenderObject parent, PdfDictionary extGState, PdfArray matrix, PdfDictionary dictionary)
             : base(parent)
         {
+            ExtGState = extGState;
+            Matrix = matrix;
             Dictionary = dictionary;
         }
 
+        public PdfDictionary ExtGState { get; private set; }
+        public PdfArray Matrix { get; private set; }
         public PdfDictionary Dictionary { get; private set; }
 
         public PdfInteger ShadingType { get => Dictionary.MandatoryValue<PdfInteger>("ShadingType"); }

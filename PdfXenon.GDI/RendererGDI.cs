@@ -164,7 +164,7 @@ namespace PdfXenon.GDI
                     PointF pointStart = new PointF(coord.Objects[0].AsNumber(), coord.Objects[1].AsNumber());
                     PointF pointEnd = new PointF(coord.Objects[2].AsNumber(), coord.Objects[3].AsNumber());
 
-                    //Default the colors, they are overridden later with actual colors
+                    // Default the colors to white and black, they are overridden later with actual colors
                     LinearGradientBrush brush = new LinearGradientBrush(pointStart, pointEnd, Color.White, Color.Black);
 
                     // Use the specified color space for converting the function result to RGB color values
@@ -173,7 +173,7 @@ namespace PdfXenon.GDI
                     // The more positions we provide, the more accurate the gradient becomes
                     Color[] colors = new Color[512];
                     float[] positions = new float[512];
-                    for(int i=0; i<positions.Length; i++)
+                    for (int i = 0; i < positions.Length; i++)
                     {
                         float position = 0;
                         if (i == (positions.Length - 1))
@@ -181,7 +181,7 @@ namespace PdfXenon.GDI
                         else
                             position = 1f / positions.Length * i;
 
-                        // Use the axial function to get values for the position and then use color space to conver that into actual RGB values
+                        // Use the axial function to get values for the position and then use color space to convert result that into actual RGB values
                         colorSpace.Parse(axial.FunctionValue.Call(new float[] { position }));
                         RenderColorRGB rgb = colorSpace.GetColorRGB();
 
@@ -196,6 +196,9 @@ namespace PdfXenon.GDI
                     };
 
                     return brush;
+                }
+                else if (pattern is RenderPatternShadingRadial radial)
+                {
                 }
 
                 Console.WriteLine(new RenderDebugBuilder(this));

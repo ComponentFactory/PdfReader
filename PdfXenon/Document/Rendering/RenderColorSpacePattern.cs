@@ -38,11 +38,17 @@ namespace PdfXenon.Standard
                     case 2: // Shading Pattern
                         {
                             PdfDictionary shading = dictionary.MandatoryValue<PdfDictionary>("Shading");
+                            PdfDictionary extGState = dictionary.OptionalValueRef<PdfDictionary>("ExtGState");
+                            PdfArray matrix = dictionary.OptionalValueRef<PdfArray>("Matrix");
                             PdfInteger shadingType = shading.MandatoryValue<PdfInteger>("ShadingType");
+
                             switch (shadingType.Value)
                             {
                                 case 2: // Axial Shading
-                                    _patten = new RenderPatternShadingAxial(this, shading);
+                                    _patten = new RenderPatternShadingAxial(this, extGState, matrix, shading);
+                                    return;
+                                case 3: // Radial Shading
+                                    _patten = new RenderPatternShadingRadial(this, extGState, matrix, shading);
                                     return;
                                 default:
                                     throw new NotImplementedException($"Pattern shading type '{shadingType.Value}' not implemented.");

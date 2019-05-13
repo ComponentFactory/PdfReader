@@ -13,6 +13,16 @@ namespace PdfXenon.Standard
         {
         }
 
+        public override void Visit(IRenderObjectVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public override void Parse(float[] values)
+        {
+            throw new NotImplementedException($"Pattern parse of numbers is not implemented.");
+        }
+
         public override void ParseParameters()
         {
             string patternName = Renderer.OperandAsString();

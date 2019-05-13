@@ -57,27 +57,27 @@ namespace PdfXenon.Standard
         {
             PdfArray array = dictionary.MandatoryValue<PdfArray>("WhitePoint");
             for (int i = 0; i < 3; i++)
-                _whitePoint[i] = Renderer.AsNumber(array.Objects[i]);
+                _whitePoint[i] = array.Objects[i].AsNumber();
 
             array = dictionary.OptionalValue<PdfArray>("BlackPoint");
             if (array != null)
             {
                 for (int i = 0; i < 3; i++)
-                    _blackPoint[i] = Renderer.AsNumber(array.Objects[i]);
+                    _blackPoint[i] = array.Objects[i].AsNumber();
             }
 
             array = dictionary.OptionalValue<PdfArray>("Gamma");
             if (array != null)
             {
                 for (int i = 0; i < 3; i++)
-                    _gamma[i] = Renderer.AsNumber(array.Objects[i]);
+                    _gamma[i] = array.Objects[i].AsNumber();
             }
 
             array = dictionary.OptionalValue<PdfArray>("Matrix");
             if (array != null)
             {
                 for(int i = 0; i < 9; i++)
-                    _matrix[i] = Renderer.AsNumber(array.Objects[i]);
+                    _matrix[i] = array.Objects[i].AsNumber();
             }
 
             // Find the XYZ -> RGB conversion matrix based on the provided whitepoint
@@ -86,11 +86,20 @@ namespace PdfXenon.Standard
             _xyz_rgb = _rgb_xyz.Multiply(wp_inverse_rgb).Inverse();
         }
 
+        public override void Parse(float[] values)
+        {
+            _abc[0] = values[0];
+            _abc[1] = values[1];
+            _abc[2] = values[2];
+        }
+
         public override void ParseParameters()
         {
-            _abc[2] = Renderer.OperandAsNumber();
-            _abc[1] = Renderer.OperandAsNumber();
-            _abc[0] = Renderer.OperandAsNumber();
+            float[] values = new float[3];
+            values[2] = Renderer.OperandAsNumber();
+            values[1] = Renderer.OperandAsNumber();
+            values[0] = Renderer.OperandAsNumber();
+            Parse(values);
         }
 
         public override RenderColorRGB GetColorRGB()

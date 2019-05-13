@@ -13,12 +13,19 @@ namespace PdfXenon.Standard
         {
         }
 
+        public override void Parse(float[] values)
+        {
+            _cmyk = values;
+        }
+
         public override void ParseParameters()
         {
-            _cmyk[3] = Renderer.OperandAsNumber();
-            _cmyk[2] = Renderer.OperandAsNumber();
-            _cmyk[1] = Renderer.OperandAsNumber();
-            _cmyk[0] = Renderer.OperandAsNumber();
+            float[] values = new float[4];
+            values[3] = Renderer.OperandAsNumber();
+            values[2] = Renderer.OperandAsNumber();
+            values[1] = Renderer.OperandAsNumber();
+            values[0] = Renderer.OperandAsNumber();
+            Parse(values);
         }
 
         public override RenderColorRGB GetColorRGB()

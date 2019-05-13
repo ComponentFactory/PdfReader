@@ -13,9 +13,14 @@ namespace PdfXenon.Standard
         {
         }
 
+        public override void Parse(float[] values)
+        {
+            _gray = values[0];
+        }
+
         public override void ParseParameters()
         {
-            _gray = Renderer.OperandAsNumber();
+            Parse(new float[] { Renderer.OperandAsNumber() });
         }
 
         public override RenderColorRGB GetColorRGB()

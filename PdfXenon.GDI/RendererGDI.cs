@@ -159,8 +159,46 @@ namespace PdfXenon.GDI
                 RenderPatternType pattern = colorSpacePatten.GetPattern();
                 if (pattern is RenderPatternShadingAxial axial)
                 {
-                    // TODO
+                    // Get the points that represents the start and end of the axial gradient line
+                    PdfArray coord = axial.Coords;
+                    PointF pointStart = new PointF(coord.Objects[0].AsNumber(), coord.Objects[1].AsNumber());
+                    PointF pointEnd = new PointF(coord.Objects[2].AsNumber(), coord.Objects[3].AsNumber());
+
+                    //Default the colors, they are overridden later with actual colors
+                    LinearGradientBrush brush = new LinearGradientBrush(pointStart, pointEnd, Color.White, Color.Black);
+
+                    // Use the specified color space for converting the function result to RGB color values
+                    RenderColorSpaceRGB colorSpace = (RenderColorSpaceRGB)axial.ColorSpaceValue;
+
+                    // The more positions we provide, the more accurate the gradient becomes
+                    Color[] colors = new Color[512];
+                    float[] positions = new float[512];
+                    for(int i=0; i<positions.Length; i++)
+                    {
+                        float position = 0;
+                        if (i == (positions.Length - 1))
+                            position = 1;
+                        else
+                            position = 1f / positions.Length * i;
+
+                        // Use the axial function to get values for the position and then use color space to conver that into actual RGB values
+                        colorSpace.Parse(axial.FunctionValue.Call(new float[] { position }));
+                        RenderColorRGB rgb = colorSpace.GetColorRGB();
+
+                        colors[i] = Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
+                        positions[i] = position;
+                    }
+
+                    brush.InterpolationColors = new ColorBlend()
+                    {
+                        Colors = colors,
+                        Positions = positions
+                    };
+
+                    return brush;
                 }
+
+                Console.WriteLine(new RenderDebugBuilder(this));
             }
 
             throw new NotImplementedException($"Colorspace '{GraphicsState.ColorSpaceNonStroking.GetType().Name}' not recogonized.");

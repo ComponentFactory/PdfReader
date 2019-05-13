@@ -91,7 +91,7 @@ namespace PdfXenon.Standard
                         break;
                     case "l": // Append straight line segment to subpath
                         {
-                            float y = AsNumber(Operands.Pop());
+                            float y = OperandAsNumber();
                             SubPathLineTo(new RenderPoint(OperandAsNumber(), y));
                         }
                         break;
@@ -254,44 +254,44 @@ namespace PdfXenon.Standard
                 switch (entry.Key)
                 {
                     case "LW": // Set Line Width
-                        GraphicsState.LineWidth = AsNumber(entry.Value);
+                        GraphicsState.LineWidth = entry.Value.AsNumber();
                         break;
                     case "LC": // Set Line Cap Style
-                        GraphicsState.LineCapStyle = AsInteger(entry.Value);
+                        GraphicsState.LineCapStyle = entry.Value.AsInteger();
                         break;
                     case "LJ": // Set Line Join Style
-                        GraphicsState.LineJoinStyle = AsInteger(entry.Value);
+                        GraphicsState.LineJoinStyle = entry.Value.AsInteger();
                         break;
                     case "ML": // Set Miter Length
-                        GraphicsState.MiterLength = AsNumber(entry.Value);
+                        GraphicsState.MiterLength = entry.Value.AsNumber();
                         break;
                     case "D": // Set Dash
                         {
-                            List<PdfObject> array = AsArray(entry.Value);
-                            GraphicsState.DashArray = AsNumberArray(array[0]);
-                            GraphicsState.DashPhase = AsInteger(array[1]);
+                            List<PdfObject> array = entry.Value.AsArray();
+                            GraphicsState.DashArray = array[0].AsNumberArray();
+                            GraphicsState.DashPhase = array[1].AsInteger();
                         }
                         break;
                     case "RI": // Set Rendering Intent
-                        GraphicsState.RenderingIntent = AsString(entry.Value);
+                        GraphicsState.RenderingIntent = entry.Value.AsString();
                         break;
                     case "OP": // Set Over Print (available in all versions)
-                        GraphicsState.OverPrint10 = AsBoolean(entry.Value);
+                        GraphicsState.OverPrint10 = entry.Value.AsBoolean();
                         break;
                     case "op": // Set Over Print (available in version 1.3 onwards)
-                        GraphicsState.OverPrint13 = AsBoolean(entry.Value);
+                        GraphicsState.OverPrint13 = entry.Value.AsBoolean();
                         break;
                     case "OPM": // Set Overprint Mode
-                        GraphicsState.OverPrintMode = AsInteger(entry.Value);
+                        GraphicsState.OverPrintMode = entry.Value.AsInteger();
                         break;
                     case "BM": // Set Blend Mode
                         GraphicsState.BlendMode = entry.Value;
                         break;
                     case "CA": // Set Constant Alpha for Stroking
-                        GraphicsState.ConstantAlphaStroking = AsNumber(entry.Value);
+                        GraphicsState.ConstantAlphaStroking = entry.Value.AsNumber();
                         break;
                     case "ca": // Set Constant Alpha for Non-Stroking
-                        GraphicsState.ConstantAlphaNonStroking = AsNumber(entry.Value);
+                        GraphicsState.ConstantAlphaNonStroking = entry.Value.AsNumber();
                         break;
                     case "Font": // Font parameters
                         GraphicsState.Font = entry.Value;
@@ -318,22 +318,22 @@ namespace PdfXenon.Standard
                         GraphicsState.Halftone = entry.Value;
                         break;
                     case "FL": // Set Flatness tolerance
-                        GraphicsState.FlatnessTolerance = AsNumber(entry.Value);
+                        GraphicsState.FlatnessTolerance = entry.Value.AsNumber();
                         break;
                     case "SM": // Set Smoothness tolerance
-                        GraphicsState.SmoothnessTolerance = AsNumber(entry.Value);
+                        GraphicsState.SmoothnessTolerance = entry.Value.AsNumber();
                         break;
                     case "SA": // Set Stroke adjustment flag
-                        GraphicsState.StrokeAdjustment = AsBoolean(entry.Value);
+                        GraphicsState.StrokeAdjustment = entry.Value.AsBoolean();
                         break;
                     case "SMask": // Set Soft Mask
                         GraphicsState.SoftMask = entry.Value;
                         break;
                     case "AIS": // Set Alpha Source Mask
-                        GraphicsState.AlphaSourceMask = AsBoolean(entry.Value);
+                        GraphicsState.AlphaSourceMask = entry.Value.AsBoolean();
                         break;
                     case "TK": // Set Text Knockout flag
-                        GraphicsState.TextKnockout = AsBoolean(entry.Value);
+                        GraphicsState.TextKnockout = entry.Value.AsBoolean();
                         break;
                     default:
                         // Ignore anything we do not recognize
@@ -344,42 +344,33 @@ namespace PdfXenon.Standard
 
         public bool OperandAsBoolean()
         {
-            return AsBoolean(Operands.Pop());
+            return Operands.Pop().AsBoolean();
         }
 
         public string OperandAsString()
         {
-            return AsString(Operands.Pop());
+            return Operands.Pop().AsString();
         }
 
 
         public int OperandAsInteger()
         {
-            return AsInteger(Operands.Pop());
+            return Operands.Pop().AsInteger();
         }
 
         public float OperandAsNumber()
         {
-            return AsNumber(Operands.Pop());
+            return Operands.Pop().AsNumber();
         }
-
 
         public List<PdfObject> OperandAsArray()
         {
-            return AsArray(Operands.Pop());
-        }
-
-        public List<PdfObject> AsArray(PdfObject obj)
-        {
-            if (obj is PdfArray array)
-                return array.Objects;
-
-            throw new ApplicationException($"Unexpected object in content '{obj.GetType().Name}', expected an integer array.");
+            return Operands.Pop().AsArray();
         }
 
         public float[] OperandAsNumberArray()
         {
-            return AsNumberArray(Operands.Pop());
+            return Operands.Pop().AsNumberArray();
         }
     }
 }

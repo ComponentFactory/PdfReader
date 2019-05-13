@@ -14,25 +14,19 @@ namespace PdfXenon.Standard
         public RenderColorSpaceCalGray(RenderObject parent, PdfDictionary dictionary)
             : base(parent)
         {
-            PdfArray array = dictionary.MandatoryValue<PdfArray>("WhitePoint");
-            for (int i = 0; i < _whitePoint.Length; i++)
-                _whitePoint[i] = Renderer.AsNumber(array.Objects[i]);
+            _whitePoint = dictionary.MandatoryValue<PdfArray>("WhitePoint").AsNumberArray();
+            _blackPoint = dictionary.MandatoryValue<PdfArray>("BlackPoint").AsNumberArray();
+            _gamma = dictionary.OptionalValue<PdfObject>("Gamma").AsNumber();
+        }
 
-            array = dictionary.OptionalValue<PdfArray>("BlackPoint");
-            if (array != null)
-            {
-                for (int i = 0; i < _blackPoint.Length; i++)
-                    _blackPoint[i] = Renderer.AsNumber(array.Objects[i]);
-            }
-
-            PdfObject obj = dictionary.OptionalValue<PdfObject>("Gamma");
-            if (obj != null)
-                _gamma = Renderer.AsNumber(obj);
+        public override void Parse(float[] values)
+        {
+            _a = values[0];
         }
 
         public override void ParseParameters()
         {
-            _a = Renderer.OperandAsNumber();
+            Parse(new float[] { Renderer.OperandAsNumber() });
         }
 
         public override RenderColorRGB GetColorRGB()

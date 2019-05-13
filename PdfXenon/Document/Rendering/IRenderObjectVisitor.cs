@@ -8,6 +8,8 @@ namespace PdfXenon.Standard
     {
         void Visit(Renderer obj);
         void Visit(RenderGraphicsState obj);
+        void Visit(RenderColorSpacePattern pattern);
+        void Visit(RenderPatternShadingAxial axial);
         void Visit(RenderObject obj);
     }
 }

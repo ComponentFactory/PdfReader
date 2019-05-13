@@ -11,6 +11,7 @@ namespace PdfXenon.Standard
         {
         }
 
+        public abstract void Parse(float[] values);
         public abstract void ParseParameters();
 
         public static RenderColorSpace FromName(RenderObject parent, string colorSpaceName)

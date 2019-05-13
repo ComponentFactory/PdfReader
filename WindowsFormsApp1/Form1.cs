@@ -33,7 +33,7 @@ namespace WindowsFormsApp1
             if (_document == null)
             {
                 _document = new PdfDocument();
-                _document.Load(@"d:\Magazine.pdf", true);
+                _document.Load(@"d:\Shapes.pdf", true);
                 _document.Close();
             }
 

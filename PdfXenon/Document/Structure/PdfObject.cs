@@ -47,6 +47,72 @@ namespace PdfXenon.Standard
             return null;
         }
 
+        public bool AsBoolean()
+        {
+            if (this is PdfBoolean boolean)
+                return boolean.Value;
+
+            throw new ApplicationException($"Unexpected object in content '{GetType().Name}', expected a boolean.");
+        }
+
+        public string AsString()
+        {
+            if (this is PdfName name)
+                return name.Value;
+            else if (this is PdfString str)
+                return str.Value;
+
+            throw new ApplicationException($"Unexpected object in content '{GetType().Name}', expected a string.");
+        }
+
+        public int AsInteger()
+        {
+            if (this is PdfInteger integer)
+                return integer.Value;
+
+            throw new ApplicationException($"Unexpected object in content '{GetType().Name}', expected an integer.");
+        }
+
+        public float AsNumber()
+        {
+            if (this is PdfInteger integer)
+                return integer.Value;
+            else if (this is PdfReal real)
+                return real.Value;
+
+            throw new ApplicationException($"Unexpected object in content '{GetType().Name}', expected a number.");
+        }
+
+        public float[] AsNumberArray()
+        {
+            if (this is PdfArray array)
+            {
+                List<float> numbers = new List<float>();
+                foreach (PdfObject item in array.Objects)
+                {
+                    if (item is PdfInteger integer)
+                        numbers.Add(integer.Value);
+                    else if (item is PdfReal real)
+                        numbers.Add(real.Value);
+                    else
+                        throw new ApplicationException($"Array contains object of type '{GetType().Name}', expected only numbers.");
+
+                }
+
+                return numbers.ToArray();
+            }
+
+            throw new ApplicationException($"Unexpected object in content '{GetType().Name}', expected an integer array.");
+        }
+
+        public List<PdfObject> AsArray()
+        {
+            if (this is PdfArray array)
+                return array.Objects;
+
+            throw new ApplicationException($"Unexpected object in content '{GetType().Name}', expected an integer array.");
+        }
+
         public PdfObject WrapObject(ParseObject obj)
         {
             if (obj is ParseString str)

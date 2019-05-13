@@ -69,8 +69,8 @@ namespace PdfXenon.Standard
             AppendObject("ConstantAlphaStroking", state.LocalConstantAlphaStroking);
             AppendObject("ConstantAlphaNonStroking", state.LocalConstantAlphaNonStroking);
             AppendObject("TextKnockout", state.LocalTextKnockout);
-            AppendObject("ColorSpaceStroking", state.LocalColorSpaceStroking);
-            AppendObject("ColorSpaceNonStroking", state.LocalColorSpaceNonStroking);
+            VisitNotNull(state.LocalColorSpaceStroking, "ColorSpaceStroking");
+            VisitNotNull(state.LocalColorSpaceNonStroking, "ColorSpaceNonStroking");
             AppendObject("BlendMode", state.LocalBlendMode);
             AppendObject("Font", state.LocalFont);
             AppendObject("BlackGeneration", state.LocalBlackGeneration);
@@ -88,6 +88,31 @@ namespace PdfXenon.Standard
 
             if (state.ParentGraphicsState != null)
                 state.ParentGraphicsState.Visit(this);
+        }
+
+        public void Visit(RenderColorSpacePattern pattern)
+        {
+            Append("RenderColorSpacePattern ");
+            pattern.GetPattern().Visit(this);
+        }
+
+        public void Visit(RenderPatternShadingAxial axial)
+        {
+            PushNextLevel();
+            Append("RenderPatternShadingAxial");
+
+            AppendObject($"ShadingType", axial.ShadingType);
+            AppendObject($"ColorSpace", axial.ColorSpace);
+            AppendObject($"Background", axial.Background);
+            AppendObject($"BBox", axial.BBox);
+            AppendObject($"AntiAlias", axial.AntiAlias);
+            AppendObject($"Coords", axial.Coords);
+            AppendObject($"Domain", axial.Domain);
+            AppendObject($"Function", axial.Function);
+            AppendObject($"Extend", axial.Extend);
+
+            PopLevel();
+            CurrentLevelNewLine();
         }
 
         public void Visit(RenderObject obj)

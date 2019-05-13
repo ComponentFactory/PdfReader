@@ -69,6 +69,19 @@ namespace PdfXenon.Standard
             AppendObject("ConstantAlphaStroking", state.LocalConstantAlphaStroking);
             AppendObject("ConstantAlphaNonStroking", state.LocalConstantAlphaNonStroking);
             AppendObject("TextKnockout", state.LocalTextKnockout);
+            AppendObject("ColorSpaceStroking", state.LocalColorSpaceStroking);
+            AppendObject("ColorSpaceNonStroking", state.LocalColorSpaceNonStroking);
+            AppendObject("BlendMode", state.LocalBlendMode);
+            AppendObject("Font", state.LocalFont);
+            AppendObject("BlackGeneration", state.LocalBlackGeneration);
+            AppendObject("BlackGeneration2", state.LocalBlackGeneration2);
+            AppendObject("UndercolorRemoval", state.LocalUndercolorRemoval);
+            AppendObject("UndercolorRemoval2", state.LocalUndercolorRemoval2);
+            AppendObject("Transfer", state.LocalTransfer);
+            AppendObject("Transfer2", state.LocalTransfer2);
+            AppendObject("Halftone", state.LocalHalftone);
+            AppendObject("SoftMask", state.LocalSoftMask);
+            AppendObject("Clipping", state.LocalClipping);
 
             PopLevel();
             CurrentLevelNewLine();

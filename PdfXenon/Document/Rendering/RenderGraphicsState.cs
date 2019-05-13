@@ -6,20 +6,6 @@ namespace PdfXenon.Standard
 {
     public class RenderGraphicsState : RenderObject
     {
-        private RenderColorSpace _colorSpaceStroking;
-        private RenderColorSpace _colorSpaceNonStroking;
-        private PdfObject _blendMode;
-        private PdfObject _font;
-        private PdfObject _blackGeneration;
-        private PdfObject _blackGeneration2;
-        private PdfObject _undercolorRemoval;
-        private PdfObject _undercolorRemoval2;
-        private PdfObject _transfer;
-        private PdfObject _transfer2;
-        private PdfObject _halftone;
-        private PdfObject _softMask;
-        private object _clip;
-
         public RenderGraphicsState(RenderObject parent, bool init = false)
             : base(parent)
         {
@@ -87,6 +73,19 @@ namespace PdfXenon.Standard
         public bool? LocalStrokeAdjustment { get; set; }
         public bool? LocalAlphaSourceMask { get; set; }
         public bool? LocalTextKnockout { get; set; }
+        public RenderColorSpace LocalColorSpaceStroking { get; set; }
+        public RenderColorSpace LocalColorSpaceNonStroking { get; set; }
+        public PdfObject LocalBlendMode { get; set; }
+        public PdfObject LocalFont { get; set; }
+        public PdfObject LocalBlackGeneration { get; set; }
+        public PdfObject LocalBlackGeneration2 { get; set; }
+        public PdfObject LocalUndercolorRemoval { get; set; }
+        public PdfObject LocalUndercolorRemoval2 { get; set; }
+        public PdfObject LocalTransfer { get; set; }
+        public PdfObject LocalTransfer2 { get; set; }
+        public PdfObject LocalHalftone { get; set; }
+        public PdfObject LocalSoftMask { get; set; }
+        public object LocalClipping { get; set; }
 
         public RenderMatrix CTM
         {
@@ -355,169 +354,169 @@ namespace PdfXenon.Standard
         {
             get
             {
-                if (_colorSpaceStroking != null)
-                    return _colorSpaceStroking;
+                if (LocalColorSpaceStroking != null)
+                    return LocalColorSpaceStroking;
                 else
                     return ParentGraphicsState.ColorSpaceStroking;
             }
 
-            set { _colorSpaceStroking = value; }
+            set { LocalColorSpaceStroking = value; }
         }
 
         public RenderColorSpace ColorSpaceNonStroking
         {
             get
             {
-                if (_colorSpaceNonStroking != null)
-                    return _colorSpaceNonStroking;
+                if (LocalColorSpaceNonStroking != null)
+                    return LocalColorSpaceNonStroking;
                 else
                     return ParentGraphicsState.ColorSpaceNonStroking;
             }
 
-            set { _colorSpaceNonStroking = value; }
+            set { LocalColorSpaceNonStroking = value; }
         }
 
         public PdfObject BlendMode
         {
             get
             {
-                if (_blendMode != null)
-                    return _blendMode;
+                if (LocalBlendMode != null)
+                    return LocalBlendMode;
                 else
                     return ParentGraphicsState.BlendMode;
             }
 
-            set { _blendMode = value; }
+            set { LocalBlendMode = value; }
         }
 
         public PdfObject Font
         {
             get
             {
-                if (_font != null)
-                    return _font;
+                if (LocalFont != null)
+                    return LocalFont;
                 else
                     return ParentGraphicsState.Font;
             }
 
-            set { _font = value; }
+            set { LocalFont = value; }
         }
 
         public PdfObject BlackGeneration
         {
             get
             {
-                if (_blackGeneration != null)
-                    return _blackGeneration;
+                if (LocalBlackGeneration != null)
+                    return LocalBlackGeneration;
                 else
                     return ParentGraphicsState.BlackGeneration;
             }
 
-            set { _blackGeneration = value; }
+            set { LocalBlackGeneration = value; }
         }
 
         public PdfObject BlackGeneration2
         {
             get
             {
-                if (_blackGeneration2 != null)
-                    return _blackGeneration2;
+                if (LocalBlackGeneration2 != null)
+                    return LocalBlackGeneration2;
                 else
                     return ParentGraphicsState.BlackGeneration2;
             }
 
-            set { _blackGeneration2 = value; }
+            set { LocalBlackGeneration2 = value; }
         }
 
         public PdfObject UndercolorRemoval
         {
             get
             {
-                if (_undercolorRemoval != null)
-                    return _undercolorRemoval;
+                if (LocalUndercolorRemoval != null)
+                    return LocalUndercolorRemoval;
                 else
                     return ParentGraphicsState.UndercolorRemoval;
             }
 
-            set { _undercolorRemoval = value; }
+            set { LocalUndercolorRemoval = value; }
         }
 
         public PdfObject UndercolorRemoval2
         {
             get
             {
-                if (_undercolorRemoval2 != null)
-                    return _undercolorRemoval2;
+                if (LocalUndercolorRemoval2 != null)
+                    return LocalUndercolorRemoval2;
                 else
                     return ParentGraphicsState.UndercolorRemoval2;
             }
 
-            set { _undercolorRemoval2 = value; }
+            set { LocalUndercolorRemoval2 = value; }
         }
 
         public PdfObject Transfer
         {
             get
             {
-                if (_transfer != null)
-                    return _transfer;
+                if (LocalTransfer != null)
+                    return LocalTransfer;
                 else
                     return ParentGraphicsState.Transfer;
             }
 
-            set { _transfer = value; }
+            set { LocalTransfer = value; }
         }
 
         public PdfObject Transfer2
         {
             get
             {
-                if (_transfer2 != null)
-                    return _transfer2;
+                if (LocalTransfer2 != null)
+                    return LocalTransfer2;
                 else
                     return ParentGraphicsState.Transfer2;
             }
 
-            set { _transfer2 = value; }
+            set { LocalTransfer2 = value; }
         }
 
         public PdfObject Halftone
         {
             get
             {
-                if (_halftone != null)
-                    return _halftone;
+                if (LocalHalftone != null)
+                    return LocalHalftone;
                 else
                     return ParentGraphicsState.Halftone;
             }
 
-            set { _halftone = value; }
+            set { LocalHalftone = value; }
         }
 
         public PdfObject SoftMask
         {
             get
             {
-                if (_softMask != null)
-                    return _softMask;
+                if (LocalSoftMask != null)
+                    return LocalSoftMask;
                 else
                     return ParentGraphicsState.SoftMask;
             }
 
-            set { _softMask = value; }
+            set { LocalSoftMask = value; }
         }
 
         public object Clipping
         {
             get
             {
-                if (_clip != null)
-                    return _clip;
+                if (LocalClipping != null)
+                    return LocalClipping;
                 else
                     return ParentGraphicsState.Clipping;
             }
 
-            set { _clip = value; }
+            set { LocalClipping = value; }
         }
     }
 }

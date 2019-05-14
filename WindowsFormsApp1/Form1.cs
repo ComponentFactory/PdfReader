@@ -33,7 +33,7 @@ namespace WindowsFormsApp1
             if (_document == null)
             {
                 _document = new PdfDocument();
-                _document.Load(@"d:\Shapes.pdf", true);
+                _document.Load(@"d:\PDF17.pdf", true);
                 _document.Close();
             }
 
@@ -43,14 +43,13 @@ namespace WindowsFormsApp1
                 RendererGDI renderer = new RendererGDI();
                 RenderPageResolver processsor = new RenderPageResolver(_document.Catalog.Pages[_pageIndex++], renderer);
                 processsor.Process();
-                Console.WriteLine(new RenderDebugBuilder(renderer));
                 _bitmap = renderer.Bitmap;
                 Refresh();
             }
         }
 
         private PdfDocument _document;
-        private int _pageIndex = 0;
+        private int _pageIndex = 1144;
         private Bitmap _bitmap;
     }
 }

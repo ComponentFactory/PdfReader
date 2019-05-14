@@ -73,9 +73,6 @@ namespace PdfXenon.Standard
             if (_open)
                 throw new ApplicationException("Document already has a stream open.");
 
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
             _stream = stream;
             _parser = new Parser(_stream);
             _parser.ResolveReference += Parser_ResolveReference;

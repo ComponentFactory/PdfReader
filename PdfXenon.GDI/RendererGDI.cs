@@ -108,7 +108,33 @@ namespace PdfXenon.GDI
             using (TemporaryResource resource = CreateBrush().Apply(this))
             {
                 _graphics.Clip = (Region)GraphicsState.Clipping;
+
+                if (resource.Background != null)
+                    _graphics.FillPath(resource.Background, _currentPath);
+
                 _graphics.FillPath(resource.Brush, _currentPath);
+            }
+        }
+
+        public override void PathShading(RenderPatternShading shading)
+        {
+            Region clipping = (Region)GraphicsState.Clipping;
+            RectangleF clippingBounds = clipping.GetBounds(_graphics);
+            GraphicsPath clippingPath = new GraphicsPath();
+            clippingPath.AddRectangle(clippingBounds);
+
+            List<ParseObject> matrixValues = new List<ParseObject>()
+            {
+                new ParseReal(clippingBounds.Width), new ParseReal(0f),
+                new ParseReal(0f), new ParseReal(clippingBounds.Height),
+                new ParseReal(clippingBounds.X), new ParseReal(clippingBounds.Y)
+            };
+            shading.Matrix = new PdfArray(null, new ParseArray(matrixValues));
+
+            using (TemporaryResource resource = CreateBrushFromShading(shading).Apply(this))
+            {
+                _graphics.Clip = clipping;
+                _graphics.FillPath(resource.Brush, clippingPath);
             }
         }
 
@@ -148,125 +174,156 @@ namespace PdfXenon.GDI
         private TemporaryResource CreateBrush()
         {
             if (GraphicsState.ColorSpaceNonStroking is RenderColorSpaceRGB colorSpaceRGB)
-            {
-                RenderColorRGB rgb = colorSpaceRGB.GetColorRGB();
-                Color color = Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
-                SolidBrush brush = new SolidBrush(color);
-                return new TemporaryResource() { Brush = brush };
-            }
+                return CreateBrushFromRGB(colorSpaceRGB);
             else if (GraphicsState.ColorSpaceNonStroking is RenderColorSpacePattern colorSpacePatten)
-            {
-                RenderPatternType pattern = colorSpacePatten.GetPattern();
-                if (pattern is RenderPatternShadingAxial axial)
-                {
-                    // Get the points that represents the start and end of the axial gradient line
-                    PdfArray coord = axial.Coords;
-                    PointF pointStart = new PointF(coord.Objects[0].AsNumber(), coord.Objects[1].AsNumber());
-                    PointF pointEnd = new PointF(coord.Objects[2].AsNumber(), coord.Objects[3].AsNumber());
-
-                    // Default the colors to white and black, they are overridden later with actual colors
-                    LinearGradientBrush brush = new LinearGradientBrush(pointStart, pointEnd, Color.White, Color.Black);
-
-                    // Get the color space, needed to convert the function result to RGB color values
-                    RenderColorSpaceRGB colorSpace = (RenderColorSpaceRGB)axial.ColorSpaceValue;
-
-                    // The more positions we provide, the more accurate the gradient becomes
-                    Color[] colors = new Color[512];
-                    float[] positions = new float[512];
-                    for (int i = 0; i < positions.Length; i++)
-                    {
-                        // Ensure that the first and last positions are exactly 0 and 1
-                        float position = 0f;
-                        if (i == (positions.Length - 1))
-                            position = 1f;
-                        else
-                            position = 1f / positions.Length * i;
-
-                        // Use the function to get values for the position, then use the color space to convert that result that into actual RGB values
-                        colorSpace.Parse(axial.FunctionValue.Call(new float[] { position }));
-                        RenderColorRGB rgb = colorSpace.GetColorRGB();
-
-                        colors[i] = Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
-                        positions[i] = position;
-                    }
-
-                    brush.InterpolationColors = new ColorBlend()
-                    {
-                        Colors = colors,
-                        Positions = positions
-                    };
-
-                    // Make sure we apply any optional dictionary changes in pushed graphics state
-                    return new TemporaryResource() { Brush = brush, PushPop = true, ExtGState = axial.ExtGState };
-                }
-                else if (pattern is RenderPatternShadingRadial radial)
-                {
-                    // Get the points that represents the two circles
-                    PdfArray coordArray = radial.Coords;
-                    float[] coords = coordArray.AsNumberArray();
-
-                    if (radial.Matrix != null)
-                    {
-                        // Apply the matrix to the coordinates
-                        RenderMatrix matrix = new RenderMatrix(radial.Matrix.AsNumberArray());
-                        RenderPoint t1 = matrix.Transform(coords[0], coords[1]);
-                        RenderPoint t2 = matrix.Transform(coords[0] + coords[2], coords[1]);
-                        coords[0] = t1.X;
-                        coords[1] = t1.Y;
-                        coords[2] = t1.Distance(t2);
-                        t1 = matrix.Transform(coords[3], coords[4]);
-                        t2 = matrix.Transform(coords[3] + coords[5], coords[4]);
-                        coords[3] = t1.X;
-                        coords[4] = t1.Y;
-                        coords[5] = t1.Distance(t2);
-                    }
-
-                    // Create a path that represents the two circles, but ignore empty circles
-                    GraphicsPath path = new GraphicsPath();
-
-                    if (coords[2] != 0)
-                        path.AddEllipse(coords[0] - coords[2], coords[1] - coords[2], coords[2] * 2, coords[2] * 2);
-
-                    if (coords[5] != 0)
-                        path.AddEllipse(coords[3] - coords[5], coords[4] - coords[5],  coords[5] * 2, coords[5] * 2);
-
-                    PathGradientBrush brush = new PathGradientBrush(path);
-
-                    //// Get the color space, needed to convert the function result to RGB color values
-                    RenderColorSpaceRGB colorSpace = (RenderColorSpaceRGB)radial.ColorSpaceValue;
-
-                    // The more positions we provide, the more accurate the gradient becomes
-                    Color[] colors = new Color[512];
-                    float[] positions = new float[512];
-                    for (int i = 0; i < positions.Length; i++)
-                    {
-                        // Ensure that the first and last positions are exactly 0 and 1
-                        float position = 0f;
-                        if (i == (positions.Length - 1))
-                            position = 1f;
-                        else
-                            position = 1f / positions.Length * i;
-
-                        // Use the function to get values for the position, then use the color space to convert that result that into actual RGB values
-                        colorSpace.Parse(radial.FunctionValue.Call(new float[] { 1f- position }));
-                        RenderColorRGB rgb = colorSpace.GetColorRGB();
-
-                        colors[i] = Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
-                        positions[i] = position;
-                    }
-
-                    brush.InterpolationColors = new ColorBlend()
-                    {
-                        Colors = colors,
-                        Positions = positions
-                    };
-
-                    // Make sure we apply any optional dictionary changes in pushed graphics state
-                    return new TemporaryResource() { Brush = brush, PushPop = true, ExtGState = radial.ExtGState };
-                }
-            }
+                return CreateBrushFromPattern(colorSpacePatten);
 
             throw new NotImplementedException($"Colorspace '{GraphicsState.ColorSpaceNonStroking.GetType().Name}' not recogonized.");
+        }
+
+        private TemporaryResource CreateBrushFromRGB(RenderColorSpaceRGB colorSpaceRGB)
+        {
+            RenderColorRGB rgb = colorSpaceRGB.GetColorRGB();
+            SolidBrush brush = new SolidBrush(Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B)));
+            return new TemporaryResource() { Brush = brush };
+        }
+
+        private TemporaryResource CreateBrushFromPattern(RenderColorSpacePattern colorSpacePatten)
+        {
+            RenderPatternType pattern = colorSpacePatten.GetPattern();
+            if (pattern is RenderPatternShading shading)
+                return CreateBrushFromShading(shading);
+
+            throw new NotImplementedException($"Pattern '{pattern.GetType().Name}' not recogonized.");
+        }
+
+        private TemporaryResource CreateBrushFromShading(RenderPatternShading shading)
+        {
+            if (shading is RenderPatternShadingAxial axial)
+            {
+                // Get the points that represents the start and end of the axial gradient line
+                PdfArray coord = axial.Coords;
+                PointF pointStart = new PointF(coord.Objects[0].AsNumber(), coord.Objects[1].AsNumber());
+                PointF pointEnd = new PointF(coord.Objects[2].AsNumber(), coord.Objects[3].AsNumber());
+
+                // Default the colors to white and black, they are overridden later with actual colors
+                LinearGradientBrush brush = new LinearGradientBrush(pointStart, pointEnd, Color.White, Color.Black);
+
+                // Get the color space, needed to convert the function result to RGB color values
+                RenderColorSpaceRGB colorSpace = (RenderColorSpaceRGB)axial.ColorSpaceValue;
+
+                // The more positions we provide, the more accurate the gradient becomes
+                Color[] colors = new Color[512];
+                float[] positions = new float[512];
+                for (int i = 0; i < positions.Length; i++)
+                {
+                    // Ensure that the first and last positions are exactly 0 and 1
+                    float position = 0f;
+                    if (i == (positions.Length - 1))
+                        position = 1f;
+                    else
+                        position = 1f / positions.Length * i;
+
+                    // Use the function to get values for the position, then use the color space to convert that result that into actual RGB values
+                    colorSpace.Parse(axial.FunctionValue.Call(new float[] { position }));
+                    RenderColorRGB rgb = colorSpace.GetColorRGB();
+
+                    colors[i] = Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
+                    positions[i] = position;
+                }
+
+                brush.InterpolationColors = new ColorBlend()
+                {
+                    Colors = colors,
+                    Positions = positions
+                };
+
+                Brush backgroundBrush = null;
+                if (axial.Background != null)
+                {
+                    colorSpace.Parse(axial.Background.AsNumberArray());
+                    RenderColorRGB rgb = colorSpace.GetColorRGB();
+                    backgroundBrush = new SolidBrush(Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B)));
+                }
+
+                // Make sure we apply any optional dictionary changes in pushed graphics state
+                return new TemporaryResource() { Brush = brush, PushPop = true, ExtGState = axial.ExtGState, Background = backgroundBrush };
+            }
+            else if (shading is RenderPatternShadingRadial radial)
+            {
+                // Get the points that represents the two circles
+                PdfArray coordArray = radial.Coords;
+                float[] coords = coordArray.AsNumberArray();
+
+                if (radial.Matrix != null)
+                {
+                    // Apply the matrix to the coordinates
+                    RenderMatrix matrix = new RenderMatrix(radial.Matrix.AsNumberArray());
+                    RenderPoint t1 = matrix.Transform(coords[0], coords[1]);
+                    RenderPoint t2 = matrix.Transform(coords[0] + coords[2], coords[1]);
+                    coords[0] = t1.X;
+                    coords[1] = t1.Y;
+                    coords[2] = t1.Distance(t2);
+                    t1 = matrix.Transform(coords[3], coords[4]);
+                    t2 = matrix.Transform(coords[3] + coords[5], coords[4]);
+                    coords[3] = t1.X;
+                    coords[4] = t1.Y;
+                    coords[5] = t1.Distance(t2);
+                }
+
+                // Create a path that represents the two circles, but ignore empty circles
+                GraphicsPath path = new GraphicsPath();
+
+                if (coords[2] != 0)
+                    path.AddEllipse(coords[0] - coords[2], coords[1] - coords[2], coords[2] * 2, coords[2] * 2);
+
+                if (coords[5] != 0)
+                    path.AddEllipse(coords[3] - coords[5], coords[4] - coords[5], coords[5] * 2, coords[5] * 2);
+
+                PathGradientBrush brush = new PathGradientBrush(path);
+
+                //// Get the color space, needed to convert the function result to RGB color values
+                RenderColorSpaceRGB colorSpace = (RenderColorSpaceRGB)radial.ColorSpaceValue;
+
+                // The more positions we provide, the more accurate the gradient becomes
+                Color[] colors = new Color[512];
+                float[] positions = new float[512];
+                for (int i = 0; i < positions.Length; i++)
+                {
+                    // Ensure that the first and last positions are exactly 0 and 1
+                    float position = 0f;
+                    if (i == (positions.Length - 1))
+                        position = 1f;
+                    else
+                        position = 1f / positions.Length * i;
+
+                    // Use the function to get values for the position, then use the color space to convert that result that into actual RGB values
+                    colorSpace.Parse(radial.FunctionValue.Call(new float[] { 1f - position }));
+                    RenderColorRGB rgb = colorSpace.GetColorRGB();
+
+                    colors[i] = Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
+                    positions[i] = position;
+                }
+
+                brush.InterpolationColors = new ColorBlend()
+                {
+                    Colors = colors,
+                    Positions = positions
+                };
+
+                Brush backgroundBrush = null;
+                if (radial.Background != null)
+                {
+                    colorSpace.Parse(radial.Background.AsNumberArray());
+                    RenderColorRGB rgb = colorSpace.GetColorRGB();
+                    backgroundBrush = new SolidBrush(Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B)));
+                }
+
+                // Make sure we apply any optional dictionary changes in pushed graphics state
+                return new TemporaryResource() { Brush = brush, PushPop = true, ExtGState = radial.ExtGState, Background = backgroundBrush };
+            }
+
+            throw new NotImplementedException($"Shading '{shading.GetType().Name}' not recogonized.");
         }
 
         private TemporaryResource CreatePen()
@@ -333,6 +390,7 @@ namespace PdfXenon.GDI
         public Renderer Renderer { get; set; }
         public bool PushPop { get; set; }
         public PdfDictionary ExtGState { get; set; }
+        public Brush Background { get; set; }
 
         public TemporaryResource Apply(Renderer renderer)
         {
@@ -362,6 +420,12 @@ namespace PdfXenon.GDI
             {
                 Brush.Dispose();
                 Brush = null;
+            }
+
+            if (Background != null)
+            {
+                Background.Dispose();
+                Background = null;
             }
         }
     }

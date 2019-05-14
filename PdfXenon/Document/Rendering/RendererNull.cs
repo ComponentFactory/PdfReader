@@ -39,6 +39,10 @@ namespace PdfXenon.Standard
         {
         }
 
+        public override void PathShading(RenderPatternShading shading)
+        {
+        }
+
         public override void PathClip(bool evenOdd)
         {
         }

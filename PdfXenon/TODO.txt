@@ -1,20 +1,12 @@
 ﻿TODO
     FlatDecode
 	    Implement Predictors
-	DCTDecode
-	    Is just the jpeg header/data bytes
     Renderer
+	    Sh operator not drawing in correct coordinates
 		Pattern
-		    Push
-		       ExtGState
-			Pop
 		    Shading
 			    Radial
-	     
-		 Lab, Indexed, Separation, DeviceN
-		 CalGray needs testing (our impl is different from pdfium)
-
-sh command
+				    Handle both circles specified, for cone/inner cirlce
 
 PDFClown
 iTextSharp-Develop

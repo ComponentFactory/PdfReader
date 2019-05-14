@@ -10,5 +10,6 @@ namespace PdfXenon.Standard
         PdfDictionary GetGraphicsStateDictionary(string dictName);
         PdfObject GetColorSpaceObject(string colorSpaceName);
         PdfObject GetPatternObject(string patternName);
+        PdfDictionary GetShadingObject(string shadingName);
     }
 }

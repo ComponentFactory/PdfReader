@@ -32,23 +32,26 @@ namespace PdfXenon.Standard
 
         public PdfDictionary GetGraphicsStateDictionary(string dictName)
         {
-            // Page resources should have a dictionary with set of graphics state dictionaries
             PdfDictionary extGStates = Page.Resources.MandatoryValueRef<PdfDictionary>("ExtGState");
             return extGStates.OptionalValueRef<PdfDictionary>(dictName);
         }
 
         public PdfObject GetColorSpaceObject(string colorSpaceName)
         {
-            // Page resources should have a dictionary with set of graphics state dictionaries
             PdfDictionary colorSpaces = Page.Resources.MandatoryValueRef<PdfDictionary>("ColorSpace");
             return colorSpaces.OptionalValueRef<PdfObject>(colorSpaceName);
         }
 
         public PdfObject GetPatternObject(string patternName)
         {
-            // Page resources should have a dictionary with set of graphics state dictionaries
             PdfDictionary patterns = Page.Resources.MandatoryValueRef<PdfDictionary>("Pattern");
             return patterns.OptionalValueRef<PdfObject>(patternName);
+        }
+
+        public PdfDictionary GetShadingObject(string shadingName)
+        {
+            PdfDictionary patterns = Page.Resources.MandatoryValueRef<PdfDictionary>("Shading");
+            return patterns.OptionalValueRef<PdfDictionary>(shadingName);
         }
 
         public void Process()

@@ -8,8 +8,8 @@ namespace PdfXenon.Standard
     {
         private PdfFunction _function;
 
-        public RenderPatternShadingRadial(RenderObject parent, PdfDictionary extGState, PdfArray matrix, PdfDictionary dictionary)
-            : base(parent, extGState, matrix, dictionary)
+        public RenderPatternShadingRadial(RenderObject parent, PdfDictionary dictionary, PdfDictionary extGState, PdfArray matrix)
+            : base(parent, dictionary, extGState, matrix)
         {
         }
 

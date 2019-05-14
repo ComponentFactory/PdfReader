@@ -46,6 +46,7 @@ namespace PdfXenon.Standard
                 {
                     switch (filter.Value)
                     {
+                        case "Fl":
                         case "FlateDecode":
                             bytes = FlateDecode(bytes);
                             break;

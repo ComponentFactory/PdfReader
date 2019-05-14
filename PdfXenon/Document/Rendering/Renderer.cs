@@ -31,6 +31,7 @@ namespace PdfXenon.Standard
         public abstract void PathRectangle(RenderPoint pt, float width, float height);
         public abstract void PathStroke();
         public abstract void PathFill(bool evenOdd);
+        public abstract void PathShading(RenderPatternShading shading);
         public abstract void PathClip(bool evenOdd);
         public abstract void PathEnd();
         public abstract void Finshed();
@@ -144,6 +145,9 @@ namespace PdfXenon.Standard
                         SubPathClose();
                         PathStroke();
                         PathEnd();
+                        break;
+                    case "sh":
+                        PathShading(RenderPatternShading.ParseShading(this, Resolver.GetShadingObject(OperandAsString()), null, null));
                         break;
                     case "f": // Fill the path
                     case "F": // Fill the path (used in older versions, does same as 'f')

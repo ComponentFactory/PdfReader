@@ -27,7 +27,7 @@ namespace ConsoleApp
             document.Load(filename, true);
             document.Close();
 
-            PdfPage page = document.Catalog.Pages[1144];
+            PdfPage page = document.Catalog.Pages[1142];
             Console.WriteLine(new PdfDebugBuilder(page) { Document = document, Resolve = true, StreamContent = true });
             RenderPageResolver processor = new RenderPageResolver(page, new RendererNull());
             processor.Process();

@@ -2,11 +2,10 @@
     FlatDecode
 	    Implement Predictors
     Renderer
-	    Sh operator not drawing in correct coordinates
 		Pattern
 		    Shading
 			    Radial
-				    Handle both circles specified, for cone/inner cirlce
+				    Two circles of non-zero size, contained within each other (Plate 13) or not contained (Plate 11)
 
 PDFClown
 iTextSharp-Develop

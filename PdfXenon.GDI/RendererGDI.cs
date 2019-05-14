@@ -78,20 +78,20 @@ namespace PdfXenon.GDI
             else
                 _currentPath.StartFigure();
 
-            // Convert points to user space
-            GraphicsState.CTM.Transform(pt);
+            // Convert to user space
+            RenderPoint pt1 = GraphicsState.CTM.Transform(pt.X, pt.Y);
             RenderPoint pt2 = GraphicsState.CTM.Transform(pt.X + width, pt.Y + height);
 
-            _currentPath.AddLine(pt.X, pt.Y, pt2.X, pt.Y);
-            _currentPath.AddLine(pt2.X, pt.Y, pt2.X, pt2.Y);
-            _currentPath.AddLine(pt2.X, pt2.Y, pt.X, pt2.Y);
+            _currentPath.AddLine(pt1.X, pt1.Y, pt2.X, pt1.Y);
+            _currentPath.AddLine(pt2.X, pt1.Y, pt2.X, pt2.Y);
+            _currentPath.AddLine(pt2.X, pt2.Y, pt1.X, pt2.Y);
 
             _currentPath.CloseFigure();
         }
 
         public override void PathStroke()
         {
-            using (TemporaryResource resource = CreatePen().Apply(this))
+            using (DrawingResource resource = CreatePen().Apply(this))
             {
                 _graphics.Clip = (Region)GraphicsState.Clipping;
                 _graphics.DrawPath(resource.Pen, _currentPath);
@@ -105,7 +105,7 @@ namespace PdfXenon.GDI
             else
                 _currentPath.FillMode = FillMode.Winding;
 
-            using (TemporaryResource resource = CreateBrush().Apply(this))
+            using (DrawingResource resource = CreateBrush().Apply(this))
             {
                 _graphics.Clip = (Region)GraphicsState.Clipping;
 
@@ -123,15 +123,18 @@ namespace PdfXenon.GDI
             GraphicsPath clippingPath = new GraphicsPath();
             clippingPath.AddRectangle(clippingBounds);
 
+            // Take the unit sized shading and update using the matrix so it maps to the clipping area
+            float distance = (clippingBounds.Width + clippingBounds.Height) / 2;
             List<ParseObject> matrixValues = new List<ParseObject>()
             {
-                new ParseReal(clippingBounds.Width), new ParseReal(0f),
-                new ParseReal(0f), new ParseReal(clippingBounds.Height),
-                new ParseReal(clippingBounds.X), new ParseReal(clippingBounds.Y)
+                new ParseReal(distance), new ParseReal(0f),
+                new ParseReal(0f), new ParseReal(distance),
+                new ParseReal(clippingBounds.X + (clippingBounds.Width / 2)),
+                new ParseReal(clippingBounds.Y + (clippingBounds.Height / 2))
             };
             shading.Matrix = new PdfArray(null, new ParseArray(matrixValues));
 
-            using (TemporaryResource resource = CreateBrushFromShading(shading).Apply(this))
+            using (DrawingResource resource = CreateBrushFromShading(shading).Apply(this))
             {
                 _graphics.Clip = clipping;
                 _graphics.FillPath(resource.Brush, clippingPath);
@@ -171,33 +174,33 @@ namespace PdfXenon.GDI
             }
         }
 
-        private TemporaryResource CreateBrush()
+        private DrawingResource CreateBrush()
         {
             if (GraphicsState.ColorSpaceNonStroking is RenderColorSpaceRGB colorSpaceRGB)
                 return CreateBrushFromRGB(colorSpaceRGB);
             else if (GraphicsState.ColorSpaceNonStroking is RenderColorSpacePattern colorSpacePatten)
                 return CreateBrushFromPattern(colorSpacePatten);
 
-            throw new NotImplementedException($"Colorspace '{GraphicsState.ColorSpaceNonStroking.GetType().Name}' not recogonized.");
+            throw new NotImplementedException($"Colorspace type '{GraphicsState.ColorSpaceNonStroking.GetType().Name}' not implemented.");
         }
 
-        private TemporaryResource CreateBrushFromRGB(RenderColorSpaceRGB colorSpaceRGB)
+        private DrawingResource CreateBrushFromRGB(RenderColorSpaceRGB colorSpaceRGB)
         {
             RenderColorRGB rgb = colorSpaceRGB.GetColorRGB();
             SolidBrush brush = new SolidBrush(Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B)));
-            return new TemporaryResource() { Brush = brush };
+            return new DrawingResource() { Brush = brush };
         }
 
-        private TemporaryResource CreateBrushFromPattern(RenderColorSpacePattern colorSpacePatten)
+        private DrawingResource CreateBrushFromPattern(RenderColorSpacePattern colorSpacePatten)
         {
             RenderPatternType pattern = colorSpacePatten.GetPattern();
             if (pattern is RenderPatternShading shading)
                 return CreateBrushFromShading(shading);
 
-            throw new NotImplementedException($"Pattern '{pattern.GetType().Name}' not recogonized.");
+            throw new NotImplementedException($"Pattern type '{pattern.GetType().Name}' not implemented.");
         }
 
-        private TemporaryResource CreateBrushFromShading(RenderPatternShading shading)
+        private DrawingResource CreateBrushFromShading(RenderPatternShading shading)
         {
             if (shading is RenderPatternShadingAxial axial)
             {
@@ -213,8 +216,8 @@ namespace PdfXenon.GDI
                 RenderColorSpaceRGB colorSpace = (RenderColorSpaceRGB)axial.ColorSpaceValue;
 
                 // The more positions we provide, the more accurate the gradient becomes
-                Color[] colors = new Color[512];
-                float[] positions = new float[512];
+                Color[] colors = new Color[256];
+                float[] positions = new float[256];
                 for (int i = 0; i < positions.Length; i++)
                 {
                     // Ensure that the first and last positions are exactly 0 and 1
@@ -247,7 +250,7 @@ namespace PdfXenon.GDI
                 }
 
                 // Make sure we apply any optional dictionary changes in pushed graphics state
-                return new TemporaryResource() { Brush = brush, PushPop = true, ExtGState = axial.ExtGState, Background = backgroundBrush };
+                return new DrawingResource() { Brush = brush, PushPop = true, ExtGState = axial.ExtGState, Background = backgroundBrush };
             }
             else if (shading is RenderPatternShadingRadial radial)
             {
@@ -274,20 +277,22 @@ namespace PdfXenon.GDI
                 // Create a path that represents the two circles, but ignore empty circles
                 GraphicsPath path = new GraphicsPath();
 
-                if (coords[2] != 0)
-                    path.AddEllipse(coords[0] - coords[2], coords[1] - coords[2], coords[2] * 2, coords[2] * 2);
-
-                if (coords[5] != 0)
-                    path.AddEllipse(coords[3] - coords[5], coords[4] - coords[5], coords[5] * 2, coords[5] * 2);
+                // We only add a circle that has an actual size
+                if (coords[2] != 0) path.AddEllipse(coords[0] - coords[2], coords[1] - coords[2], coords[2] * 2, coords[2] * 2);
+                if (coords[5] != 0) path.AddEllipse(coords[3] - coords[5], coords[4] - coords[5], coords[5] * 2, coords[5] * 2);
 
                 PathGradientBrush brush = new PathGradientBrush(path);
+
+                // A zero sized circle identifies the center point that color start from
+                if (coords[2] == 0) brush.CenterPoint = new PointF(coords[0], coords[1]);
+                if (coords[5] == 0) brush.CenterPoint = new PointF(coords[3], coords[4]);
 
                 //// Get the color space, needed to convert the function result to RGB color values
                 RenderColorSpaceRGB colorSpace = (RenderColorSpaceRGB)radial.ColorSpaceValue;
 
                 // The more positions we provide, the more accurate the gradient becomes
-                Color[] colors = new Color[512];
-                float[] positions = new float[512];
+                Color[] colors = new Color[256];
+                float[] positions = new float[256];
                 for (int i = 0; i < positions.Length; i++)
                 {
                     // Ensure that the first and last positions are exactly 0 and 1
@@ -297,8 +302,9 @@ namespace PdfXenon.GDI
                     else
                         position = 1f / positions.Length * i;
 
-                    // Use the function to get values for the position, then use the color space to convert that result that into actual RGB values
-                    colorSpace.Parse(radial.FunctionValue.Call(new float[] { 1f - position }));
+                    // If the first circle is the center point then invert the color ordering
+                    float funcPosition = (coords[2] == 0) ? 1f - position : position;
+                    colorSpace.Parse(radial.FunctionValue.Call(new float[] { funcPosition }));
                     RenderColorRGB rgb = colorSpace.GetColorRGB();
 
                     colors[i] = Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
@@ -320,112 +326,115 @@ namespace PdfXenon.GDI
                 }
 
                 // Make sure we apply any optional dictionary changes in pushed graphics state
-                return new TemporaryResource() { Brush = brush, PushPop = true, ExtGState = radial.ExtGState, Background = backgroundBrush };
+                return new DrawingResource() { Brush = brush, PushPop = true, ExtGState = radial.ExtGState, Background = backgroundBrush };
             }
 
-            throw new NotImplementedException($"Shading '{shading.GetType().Name}' not recogonized.");
+            throw new NotImplementedException($"Shading type '{shading.GetType().Name}' not implemented.");
         }
 
-        private TemporaryResource CreatePen()
+        private DrawingResource CreatePen()
         {
             if (GraphicsState.ColorSpaceStroking is RenderColorSpaceRGB colorSpaceRGB)
-            {
-                // Get the current stroke colour and convert to GDI color
-                RenderColorRGB rgb = colorSpaceRGB.GetColorRGB();
-                Color color = Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
-                Pen pen = new Pen(color, GraphicsState.LineWidth);
+                return CreatePenFromRGB(colorSpaceRGB);
 
-                // Only if the dash pattern is more than a single value, do we need to apply it
-                if ((GraphicsState.DashArray != null) && (GraphicsState.DashArray.Length > 0))
-                {
-                    pen.DashStyle = DashStyle.Custom;
-                    pen.DashPattern = GraphicsState.DashArray;
-                    pen.DashOffset = GraphicsState.DashPhase;
-                }
-
-                // Define how the start and end caps of the line appear
-                switch (GraphicsState.LineCapStyle)
-                {
-                    case 0:
-                    default:
-                        pen.StartCap = LineCap.Flat;
-                        pen.EndCap = LineCap.Flat;
-                        break;
-                    case 1:
-                        pen.StartCap = LineCap.Round;
-                        pen.EndCap = LineCap.Round;
-                        break;
-                    case 2:
-                        pen.StartCap = LineCap.Square;
-                        pen.EndCap = LineCap.Square;
-                        break;
-                }
-
-                // Define how multiple lines are joined together
-                switch (GraphicsState.LineJoinStyle)
-                {
-                    case 0:
-                    default:
-                        pen.LineJoin = LineJoin.Miter;
-                        break;
-                    case 1:
-                        pen.LineJoin = LineJoin.Round;
-                        break;
-                    case 2:
-                        pen.LineJoin = LineJoin.Bevel;
-                        break;
-                }
-
-                return new TemporaryResource() { Pen = pen };
-            }
-
-            throw new NotImplementedException($"Colorspace '{GraphicsState.ColorSpaceStroking.GetType().Name}' not recogonized.");
-        }
-    }
-
-    public class TemporaryResource : IDisposable
-    {
-        public Pen Pen { get; set; }
-        public Brush Brush { get; set; }
-        public Renderer Renderer { get; set; }
-        public bool PushPop { get; set; }
-        public PdfDictionary ExtGState { get; set; }
-        public Brush Background { get; set; }
-
-        public TemporaryResource Apply(Renderer renderer)
-        {
-            Renderer = renderer;
-
-            if (PushPop)
-                Renderer.PushGraphicsState();
-
-            if (ExtGState != null)
-                Renderer.ProcessExtGState(ExtGState);
-
-            return this;
+            throw new NotImplementedException($"Colorspace type '{GraphicsState.ColorSpaceStroking.GetType().Name}' not implemented.");
         }
 
-        public void Dispose()
+        private DrawingResource CreatePenFromRGB(RenderColorSpaceRGB colorSpaceRGB)
         {
-            if (PushPop)
-                Renderer.PopGraphicsState();
+            // Get the current stroke colour and convert to GDI color
+            RenderColorRGB rgb = colorSpaceRGB.GetColorRGB();
+            Color color = Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
+            Pen pen = new Pen(color, GraphicsState.LineWidth);
 
-            if (Pen != null)
+            // Only if the dash pattern is more than a single value, do we need to apply it
+            if ((GraphicsState.DashArray != null) && (GraphicsState.DashArray.Length > 0))
             {
-                Pen.Dispose();
-                Pen = null;
+                pen.DashStyle = DashStyle.Custom;
+                pen.DashPattern = GraphicsState.DashArray;
+                pen.DashOffset = GraphicsState.DashPhase;
             }
 
-            if (Brush != null)
+            // Define how the start and end caps of the line appear
+            switch (GraphicsState.LineCapStyle)
             {
-                Brush.Dispose();
-                Brush = null;
+                case 0:
+                default:
+                    pen.StartCap = LineCap.Flat;
+                    pen.EndCap = LineCap.Flat;
+                    break;
+                case 1:
+                    pen.StartCap = LineCap.Round;
+                    pen.EndCap = LineCap.Round;
+                    break;
+                case 2:
+                    pen.StartCap = LineCap.Square;
+                    pen.EndCap = LineCap.Square;
+                    break;
             }
 
-            if (Background != null)
+            // Define how multiple lines are joined together
+            switch (GraphicsState.LineJoinStyle)
             {
-                Background.Dispose();
-                Background = null;
+                case 0:
+                default:
+                    pen.LineJoin = LineJoin.Miter;
+                    break;
+                case 1:
+                    pen.LineJoin = LineJoin.Round;
+                    break;
+                case 2:
+                    pen.LineJoin = LineJoin.Bevel;
+                    break;
+            }
+
+            return new DrawingResource() { Pen = pen };
+        }
+
+        public class DrawingResource : IDisposable
+        {
+            public Pen Pen { get; set; }
+            public Brush Brush { get; set; }
+            public Renderer Renderer { get; set; }
+            public bool PushPop { get; set; }
+            public PdfDictionary ExtGState { get; set; }
+            public Brush Background { get; set; }
+
+            public DrawingResource Apply(Renderer renderer)
+            {
+                Renderer = renderer;
+
+                if (PushPop)
+                    Renderer.PushGraphicsState();
+
+                if (ExtGState != null)
+                    Renderer.ProcessExtGState(ExtGState);
+
+                return this;
+            }
+
+            public void Dispose()
+            {
+                if (PushPop)
+                    Renderer.PopGraphicsState();
+
+                if (Pen != null)
+                {
+                    Pen.Dispose();
+                    Pen = null;
+                }
+
+                if (Brush != null)
+                {
+                    Brush.Dispose();
+                    Brush = null;
+                }
+
+                if (Background != null)
+                {
+                    Background.Dispose();
+                    Background = null;
+                }
             }
         }
     }

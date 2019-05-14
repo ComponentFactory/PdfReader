@@ -44,7 +44,21 @@ namespace PdfXenon.Standard
                         }
                         break;
                     default:
-                        throw new NotImplementedException($"Pattern type '{patternType.Value}' not implemented.");
+                        throw new NotImplementedException($"Pattern provided as a '{obj.GetType().Name}' not implemented.");
+                }
+            }
+            else if (obj is PdfStream stream)
+            {
+                // Pattern implementation comes from the type
+                PdfInteger patternType = stream.Dictionary.MandatoryValue<PdfInteger>("PatternType");
+                switch (patternType.Value)
+                {
+                    case 1: // Tiling Pattern
+                        {
+                        }
+                        break;
+                    default:
+                        throw new NotImplementedException($"Pattern provided as a '{obj.GetType().Name}' not implemented.");
                 }
             }
             else

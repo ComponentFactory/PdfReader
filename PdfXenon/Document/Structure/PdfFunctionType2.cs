@@ -6,18 +6,18 @@ namespace PdfXenon.Standard
 {
     public class PdfFunctionType2 : PdfFunction
     {
+        private float _n;
         private float[] _c0;
         private float[] _c1;
-        private float _n;
 
         public PdfFunctionType2(PdfObject parent, PdfDictionary dictionary)
             : base(parent, dictionary)
         {
         }
 
+        public PdfInteger N { get => Dictionary.MandatoryValue<PdfInteger>("N"); }
         public PdfArray C0 { get => Dictionary.OptionalValue<PdfArray>("C0"); }
         public PdfArray C1 { get => Dictionary.OptionalValue<PdfArray>("C1"); }
-        public PdfInteger N { get => Dictionary.MandatoryValue<PdfInteger>("N"); }
 
         public override float[] Call(float[] inputs)
         {
@@ -38,6 +38,7 @@ namespace PdfXenon.Standard
         {
             base.Initialize();
 
+            // Extract and cache values from the dictionary
             _n = N.Value;
 
             if (C0 != null)

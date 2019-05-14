@@ -82,13 +82,8 @@ namespace PdfXenon.Standard
         {
             base.Initialize();
 
+            // Extract and cache values from the dictionary
             _sizeValues = Size.AsNumberArray();
-
-            _samplesValues = new int[_sizeValues.Length];
-            _samplesValues[0] = 1;
-            for (int i = 1; i < _sizeValues.Length; i++)
-                _samplesValues[i] = (int)(_samplesValues[i - 1] * _sizeValues[i]);
-
             _bitsPerSampleValue = BitsPerSample.Value;
             _orderValue = (Order != null) ? Order.Value : 1;
 
@@ -105,6 +100,12 @@ namespace PdfXenon.Standard
                 _decodeValues = Decode.AsNumberArray();
             else
                 _decodeValues = _rangeValues;
+
+            // Calculate number of samples by dimension
+            _samplesValues = new int[_sizeValues.Length];
+            _samplesValues[0] = 1;
+            for (int i = 1; i < _sizeValues.Length; i++)
+                _samplesValues[i] = (int)(_samplesValues[i - 1] * _sizeValues[i]);
         }
     }
 }

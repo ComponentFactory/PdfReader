@@ -10,6 +10,11 @@ namespace PdfXenon.Standard
         {
         }
 
+        public RenderMatrix(float[] values)
+            : this(values[0], values[1], values[2], values[3], values[4], values[5])
+        {
+        }
+
         public RenderMatrix(float m11, float m12, float m21, float m22, float offsetX, float offsetY)
         {
             M11 = m11;

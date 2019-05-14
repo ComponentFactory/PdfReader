@@ -42,10 +42,10 @@ namespace PdfXenon.Standard
                 switch (identifer.Value)
                 {
                     case "q": // Save graphics state
-                        GraphicsState = new RenderGraphicsState(GraphicsState);
+                        PushGraphicsState();
                         break;
                     case "Q": // Restore graphics state
-                        GraphicsState = GraphicsState.ParentGraphicsState;
+                        PopGraphicsState();
                         break;
                     case "cm":
                         {
@@ -247,6 +247,16 @@ namespace PdfXenon.Standard
             Operands.Push(obj);
         }
 
+        public void PushGraphicsState()
+        {
+            GraphicsState = new RenderGraphicsState(GraphicsState);
+        }
+
+        public void PopGraphicsState()
+        {
+            GraphicsState = GraphicsState.ParentGraphicsState;
+        }
+
         public void ProcessExtGState(PdfDictionary dictionary)
         {
             foreach (var entry in dictionary)
@@ -351,7 +361,6 @@ namespace PdfXenon.Standard
         {
             return Operands.Pop().AsString();
         }
-
 
         public int OperandAsInteger()
         {

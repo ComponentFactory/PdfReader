@@ -32,7 +32,7 @@ namespace PdfXenon.Standard
                                                                         _encodeValues[d], 
                                                                         _encodeValues[d + 1]) });
 
-            // Use the last function
+            // Value must be above the last bound, so use the last function
             return _functions[_functions.Count - 1].Call(new float[] { Interpolate(inputs[0], 
                                                                                    _boundValues[_boundValues.Length - 1], 
                                                                                    _domainValues[_domainValues.Length - 1], 
@@ -44,6 +44,7 @@ namespace PdfXenon.Standard
         {
             base.Initialize();
 
+            // Extract and cache values from the dictionary
             _functions = new List<PdfFunction>();
             foreach (PdfObject obj in Functions.Objects)
                 _functions.Add(FromObject(this, obj));

@@ -13,6 +13,11 @@ namespace PdfXenon.Standard
         {
         }
 
+        public override int NumberOfComponents()
+        {
+            return 4;
+        }
+
         public override void Parse(float[] values)
         {
             _cmyk = values;

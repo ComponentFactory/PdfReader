@@ -34,6 +34,8 @@ namespace PdfXenon.Standard
         public abstract void PathShading(RenderPatternShading shading);
         public abstract void PathClip(bool evenOdd);
         public abstract void PathEnd();
+        public abstract void DrawJpegImage(byte[] bytes);
+        public abstract void DrawSampledImage(int width, int height, int bitsPerComponent, int components, RenderColorSpaceRGB colorSpace, byte[] bytes);
         public abstract void Finshed();
 
         public void Render(PdfObject obj)
@@ -231,6 +233,9 @@ namespace PdfXenon.Standard
                         GraphicsState.ColorSpaceNonStroking = RenderColorSpace.FromName(this, "DeviceCMYK");
                         GraphicsState.ColorSpaceNonStroking.ParseParameters();
                         break;
+                    case "Do":
+                        ProcessDo(Resolver.GetXObjectDictionary(OperandAsString()));
+                        break;
                     default:
                         // Ignore anything we do not recognize
                         break;
@@ -249,6 +254,26 @@ namespace PdfXenon.Standard
 
             // Any other type must be an operand
             Operands.Push(obj);
+        }
+
+        public void ProcessDo(PdfStream xObject)
+        {
+            int width = xObject.Dictionary.MandatoryValue<PdfInteger>("Width").Value;
+            int height = xObject.Dictionary.MandatoryValue<PdfInteger>("Height").Value;
+            int bitsPerComponent = xObject.Dictionary.MandatoryValue<PdfInteger>("BitsPerComponent").Value;
+
+            RenderColorSpace colorSpace = RenderColorSpace.FromObject(this, xObject.Dictionary.MandatoryValueRef<PdfObject>("ColorSpace"));
+            RenderColorSpaceRGB colorSpaceRGB = colorSpace as RenderColorSpaceRGB;
+            if (colorSpace == null)
+                throw new NotImplementedException($"XObject image with ColorSpace of '{colorSpace.GetType().Name}' not implemented.");
+
+            int components = colorSpaceRGB.NumberOfComponents();
+
+            PdfObject filterObj = xObject.Dictionary.MandatoryValue<PdfObject>("Filter");
+            if ((filterObj is PdfName name) && (name.Value == "DCTDecode"))
+                DrawJpegImage(xObject.ValueAsBytes);
+            else
+                DrawSampledImage(width, height, bitsPerComponent, components, colorSpaceRGB, xObject.ValueAsBytes);
         }
 
         public void PushGraphicsState()

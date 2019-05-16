@@ -51,6 +51,14 @@ namespace PdfXenon.Standard
         {
         }
 
+        public override void DrawJpegImage(byte[] bytes)
+        {
+        }
+
+        public override void DrawSampledImage(int width, int height, int bitsPerComponent, int components, RenderColorSpaceRGB colorSpace, byte[] bytes)
+        {
+        }
+
         public override void Finshed()
         {
         }

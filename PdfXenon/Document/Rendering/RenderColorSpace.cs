@@ -11,8 +11,19 @@ namespace PdfXenon.Standard
         {
         }
 
+        public abstract int NumberOfComponents();
         public abstract void Parse(float[] values);
         public abstract void ParseParameters();
+
+        public static RenderColorSpace FromObject(RenderObject parent, PdfObject obj)
+        {
+            if (obj is PdfName name)
+                return FromName(parent, name.Value);
+            else if (obj is PdfArray array)
+                return FromArray(parent, array);
+            else
+                throw new NotImplementedException($"Colorspace has unexpected type '{obj.GetType().Name}' when only name and array are recognized.");
+        }
 
         public static RenderColorSpace FromName(RenderObject parent, string colorSpaceName)
         {
@@ -28,17 +39,11 @@ namespace PdfXenon.Standard
                     return new RenderColorSpacePattern(parent);
                 default:
                     // Must be a name that needs looking up in the color space dictionary, use resolver
-                    PdfObject obj = parent.Renderer.Resolver.GetColorSpaceObject(colorSpaceName);
-                    if (obj is PdfName name)
-                        return FromName(parent, name.Value);
-                    else if (obj is PdfArray array)
-                        return FromArray(parent, array);
-                    else
-                        throw new NotImplementedException($"Colorspace has unexpected type '{obj.GetType().Name}' when only name and array are recognized.");
+                    return FromObject(parent, parent.Renderer.Resolver.GetColorSpaceObject(colorSpaceName));
             }
         }
 
-        private static RenderColorSpace FromArray(RenderObject parent, PdfArray array)
+        public static RenderColorSpace FromArray(RenderObject parent, PdfArray array)
         {
             // The first entry in the array is the name of the color space
             string dictName = (array.Objects[0] as PdfName).Value;

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using PdfXenon.Standard;
@@ -164,6 +166,99 @@ namespace PdfXenon.GDI
             }
         }
 
+        public override void DrawJpegImage(byte[] bytes)
+        {
+            using(MemoryStream stream = new MemoryStream(bytes))
+            {
+                Bitmap bitmap = (Bitmap)Image.FromStream(stream);
+                BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+
+                int stride = bitmapData.Stride;
+                int lines = bitmap.Height / 2;
+
+                IntPtr ptr1 = bitmapData.Scan0;
+                IntPtr ptr2 = ptr1 + (bitmapData.Stride * (bitmap.Height - 1));
+
+                // Invert the image vertically to match the PDF standard of drawing with increasing numbers upwards
+                byte[] temp1 = new byte[bitmapData.Stride];
+                byte[] temp2 = new byte[bitmapData.Stride];
+                for (int h = 0; h < lines; h++)
+                {
+                    Marshal.Copy(ptr1, temp1, 0, stride);
+                    Marshal.Copy(ptr2, temp2, 0, stride);
+                    Marshal.Copy(temp1, 0, ptr2, stride);
+                    Marshal.Copy(temp2, 0, ptr1, stride);
+
+                    ptr1 += stride;
+                    ptr2 -= stride;
+                }
+
+                bitmap.UnlockBits(bitmapData);
+                DrawBitmap(bitmap);
+            }
+        }
+
+        public override void DrawSampledImage(int width, int height, int bitsPerComponent, int components, RenderColorSpaceRGB colorSpace, byte[] bytes)
+        {
+            Bitmap bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            IntPtr ptr = bitmapData.Scan0;
+
+            int imageOffset = 0;
+            byte[] imageData = new byte[width * height * 4];
+            float[] pixelValues = new float[components];
+            int componentOffset = 0;
+
+            for (int h = 0; h < height; h++)
+            {
+                for (int w = 0; w < width; w++)
+                {
+                    // Extra each component into an array of values
+                    for (int c = 0; c < components; c++)
+                    {
+                        switch (bitsPerComponent)
+                        {
+                            case 8:
+                                pixelValues[c] = bytes[componentOffset] / 255f;
+                                break;
+                            default:
+                                throw new NotImplementedException($"Create image with BitsPerSample of '{bitsPerComponent}' not implemented.");
+                        }
+
+                        componentOffset++;
+                    }
+
+                    // Convert from component values in color space to RGB
+                    colorSpace.Parse(pixelValues);
+                    RenderColorRGB rgb = colorSpace.GetColorRGB();
+
+                    imageData[imageOffset++] = (byte)(255 * rgb.B);
+                    imageData[imageOffset++] = (byte)(255 * rgb.G);
+                    imageData[imageOffset++] = (byte)(255 * rgb.R);
+                    imageData[imageOffset++] = 255;
+                }
+            }
+
+            Marshal.Copy(imageData, 0, bitmapData.Scan0, imageData.Length);
+            bitmap.UnlockBits(bitmapData);
+            DrawBitmap(bitmap);
+        }
+
+        private void DrawBitmap(Bitmap bitmap)
+        {
+            // Remember current transform, it needs restoring when we finish
+            Matrix temp = _graphics.Transform;
+
+            // Apply the current transformation matrix, so rotation/translation/scale are applied during drawing
+            RenderMatrix render = GraphicsState.CTM;
+            Matrix matrix = new Matrix(render.M11, render.M12, render.M21, render.M22, render.OffsetX, render.OffsetY);
+            _graphics.MultiplyTransform(matrix);
+
+            // Draw as a unit size of 1, the CTM is setup so that it positions and sizes correctly
+            _graphics.DrawImage(bitmap, new RectangleF(0, 0, 1, 1), new RectangleF(0, 0, bitmap.Width, bitmap.Height), GraphicsUnit.Pixel);
+            _graphics.Transform = temp;
+        }
+
         public override void Finshed()
         {
             if (_graphics != null)
@@ -186,14 +281,7 @@ namespace PdfXenon.GDI
 
         private DrawingResource CreateNonStrokingBrushFromRGB(RenderColorSpaceRGB colorSpaceRGB)
         {
-            RenderColorRGB rgb = colorSpaceRGB.GetColorRGB();
-
-            SolidBrush brush = new SolidBrush(Color.FromArgb((int)(255 * GraphicsState.ConstantAlphaNonStroking), 
-                                                             (int)(255 * rgb.R), 
-                                                             (int)(255 * rgb.G), 
-                                                             (int)(255 * rgb.B)));
-
-            return new DrawingResource() { Brush = brush };
+            return new DrawingResource() { Brush = new SolidBrush(ColorFromNonStrokingRender(colorSpaceRGB.GetColorRGB())) };
         }
 
         private DrawingResource CreateNonStrokingBrushFromPattern(RenderColorSpacePattern colorSpacePatten)
@@ -234,9 +322,7 @@ namespace PdfXenon.GDI
 
                     // Use the function to get values for the position, then use the color space to convert that result that into actual RGB values
                     colorSpace.Parse(axial.FunctionValue.Call(new float[] { position }));
-                    RenderColorRGB rgb = colorSpace.GetColorRGB();
-
-                    colors[i] = Color.FromArgb((int)(255 * GraphicsState.ConstantAlphaNonStroking), (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
+                    colors[i] = ColorFromNonStrokingRender(colorSpace.GetColorRGB());
                     positions[i] = position;
                 }
 
@@ -250,8 +336,7 @@ namespace PdfXenon.GDI
                 if (axial.Background != null)
                 {
                     colorSpace.Parse(axial.Background.AsNumberArray());
-                    RenderColorRGB rgb = colorSpace.GetColorRGB();
-                    backgroundBrush = new SolidBrush(Color.FromArgb((int)(255 * GraphicsState.ConstantAlphaNonStroking), (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B)));
+                    backgroundBrush = new SolidBrush(ColorFromNonStrokingRender(colorSpace.GetColorRGB()));
                 }
 
                 // Make sure we apply any optional dictionary changes in pushed graphics state
@@ -288,11 +373,11 @@ namespace PdfXenon.GDI
 
                 PathGradientBrush brush = new PathGradientBrush(path);
 
-                // A zero sized circle identifies the center point that color start from
+                // A zero sized circle identifies the center point that color starts from
                 if (coords[2] == 0) brush.CenterPoint = new PointF(coords[0], coords[1]);
                 if (coords[5] == 0) brush.CenterPoint = new PointF(coords[3], coords[4]);
 
-                //// Get the color space, needed to convert the function result to RGB color values
+                // Get the color space, needed to convert the function result to RGB color values
                 RenderColorSpaceRGB colorSpace = (RenderColorSpaceRGB)radial.ColorSpaceValue;
 
                 // The more positions we provide, the more accurate the gradient becomes
@@ -310,9 +395,7 @@ namespace PdfXenon.GDI
                     // If the first circle is the center point then invert the color ordering
                     float funcPosition = (coords[2] == 0) ? 1f - position : position;
                     colorSpace.Parse(radial.FunctionValue.Call(new float[] { funcPosition }));
-                    RenderColorRGB rgb = colorSpace.GetColorRGB();
-
-                    colors[i] = Color.FromArgb((int)(255 * GraphicsState.ConstantAlphaNonStroking), (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
+                    colors[i] = ColorFromNonStrokingRender(colorSpace.GetColorRGB());
                     positions[i] = position;
                 }
 
@@ -327,7 +410,7 @@ namespace PdfXenon.GDI
                 {
                     colorSpace.Parse(radial.Background.AsNumberArray());
                     RenderColorRGB rgb = colorSpace.GetColorRGB();
-                    backgroundBrush = new SolidBrush(Color.FromArgb((int)(255 * GraphicsState.ConstantAlphaNonStroking), (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B)));
+                    backgroundBrush = new SolidBrush(ColorFromNonStrokingRender(colorSpace.GetColorRGB()));
                 }
 
                 // Make sure we apply any optional dictionary changes in pushed graphics state
@@ -348,14 +431,7 @@ namespace PdfXenon.GDI
         private DrawingResource CreateStrokingPenFromRGB(RenderColorSpaceRGB colorSpaceRGB)
         {
             // Get the current stroke colour and convert to GDI color
-            RenderColorRGB rgb = colorSpaceRGB.GetColorRGB();
-
-            Color color = Color.FromArgb((int)(255 * GraphicsState.ConstantAlphaStroking), 
-                                         (int)(255 * rgb.R), 
-                                         (int)(255 * rgb.G), 
-                                         (int)(255 * rgb.B));
-
-            Pen pen = new Pen(color, GraphicsState.LineWidth);
+            Pen pen = new Pen(ColorFromStrokingRender(colorSpaceRGB.GetColorRGB()), GraphicsState.LineWidth);
 
             // Only if the dash pattern is more than a single value, do we need to apply it
             if ((GraphicsState.DashArray != null) && (GraphicsState.DashArray.Length > 0))
@@ -399,6 +475,16 @@ namespace PdfXenon.GDI
             }
 
             return new DrawingResource() { Pen = pen };
+        }
+
+        private Color ColorFromNonStrokingRender(RenderColorRGB rgb)
+        {
+            return Color.FromArgb((int)(255 * GraphicsState.ConstantAlphaNonStroking), (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
+        }
+
+        private Color ColorFromStrokingRender(RenderColorRGB rgb)
+        {
+            return Color.FromArgb((int)(255 * GraphicsState.ConstantAlphaStroking), (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
         }
 
         public class DrawingResource : IDisposable

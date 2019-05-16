@@ -18,6 +18,11 @@ namespace PdfXenon.Standard
             visitor.Visit(this);
         }
 
+        public override int NumberOfComponents()
+        {
+            throw new ArgumentOutOfRangeException($"Pattern should never be asked for number of components.");
+        }
+
         public override void Parse(float[] values)
         {
             throw new NotImplementedException($"Pattern parse of numbers is not implemented.");

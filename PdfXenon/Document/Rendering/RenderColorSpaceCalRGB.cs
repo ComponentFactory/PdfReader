@@ -86,6 +86,11 @@ namespace PdfXenon.Standard
             _xyz_rgb = _rgb_xyz.Multiply(wp_inverse_rgb).Inverse();
         }
 
+        public override int NumberOfComponents()
+        {
+            return 3;
+        }
+
         public override void Parse(float[] values)
         {
             _abc[0] = values[0];

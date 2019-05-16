@@ -7,6 +7,10 @@
 			    Radial
 				    Two circles of non-zero size, contained within each other (Plate 13) or not contained (Plate 11)
 
+Handle DCTDecode for jpg images
+Handle the unit scale not drawing images well.
+Handle the rotation not working for drawing images.
+
 PDFClown
 iTextSharp-Develop
 https://github.com/PDFium/PDFium

@@ -54,6 +54,12 @@ namespace PdfXenon.Standard
             return patterns.OptionalValueRef<PdfDictionary>(shadingName);
         }
 
+        public PdfStream GetXObjectDictionary(string xObjectName)
+        {
+            PdfDictionary xObjects = Page.Resources.MandatoryValueRef<PdfDictionary>("XObject");
+            return xObjects.OptionalValueRef<PdfStream>(xObjectName);
+        }
+
         public void Process()
         {
             PdfContentsParser parser = Page.Contents.CreateParser();

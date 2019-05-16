@@ -19,6 +19,11 @@ namespace PdfXenon.Standard
             _gamma = dictionary.OptionalValue<PdfObject>("Gamma").AsNumber();
         }
 
+        public override int NumberOfComponents()
+        {
+            return 1;
+        }
+
         public override void Parse(float[] values)
         {
             _a = values[0];

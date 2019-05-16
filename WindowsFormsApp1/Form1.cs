@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -50,5 +51,15 @@ namespace WindowsFormsApp1
         private PdfDocument _document;
         private int _pageIndex = 0;
         private Bitmap _bitmap;
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            byte[] bytes = File.ReadAllBytes(@"d:\horse.jpg");
+            using (MemoryStream stream = new MemoryStream(bytes))
+            {
+                _bitmap = (Bitmap)Image.FromStream(stream);
+                Refresh();
+            }
+        }
     }
 }

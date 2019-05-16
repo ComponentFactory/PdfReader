@@ -50,6 +50,9 @@ namespace PdfXenon.Standard
                         case "FlateDecode":
                             bytes = FlateDecode(bytes);
                             break;
+                        case "DCT":
+                        case "DCTDecode":
+                            break;
                         default:
                             throw new NotImplementedException($"Cannot process unrecognized stream filter '{filter.Value}'.");
                     }

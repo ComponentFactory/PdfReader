@@ -33,8 +33,7 @@ namespace WindowsFormsApp1
             if (_document == null)
             {
                 _document = new PdfDocument();
-                _document.Load(@"d:\PDF17.pdf", true);
-                _document.Close();
+                _document.Load(@"d:\Shapes.pdf");
             }
 
             if (_pageIndex < _document.Catalog.Pages.Count)
@@ -49,7 +48,7 @@ namespace WindowsFormsApp1
         }
 
         private PdfDocument _document;
-        private int _pageIndex = 1143;
+        private int _pageIndex = 0;
         private Bitmap _bitmap;
     }
 }

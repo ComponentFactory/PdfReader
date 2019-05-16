@@ -9,14 +9,14 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            //TestFileLoads(@"d:\Shapes.pdf");
             //TestFileLoads(@"d:\Blank.pdf");
+            TestFileLoads(@"d:\Shapes.pdf");
             //TestFileLoads(@"d:\Coffee.pdf");
             //TestFileLoads(@"d:\FSharp.pdf");
             //TestFileLoads(@"d:\Magazine.pdf");
             //TestFileLoads(@"d:\Maths.pdf");
             //TestFileLoads(@"d:\Slides.pdf");
-            TestFileLoads(@"d:\PDF17.pdf");
+            //TestFileLoads(@"d:\PDF17.pdf");
 
             Console.ReadLine();
         }
@@ -27,7 +27,7 @@ namespace ConsoleApp
             document.Load(filename, true);
             document.Close();
 
-            PdfPage page = document.Catalog.Pages[1142];
+            PdfPage page = document.Catalog.Pages[0];
             Console.WriteLine(new PdfDebugBuilder(page) { Document = document, Resolve = true, StreamContent = true });
             RenderPageResolver processor = new RenderPageResolver(page, new RendererNull());
             processor.Process();

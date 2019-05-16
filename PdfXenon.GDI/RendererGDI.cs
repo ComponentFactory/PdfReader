@@ -91,7 +91,7 @@ namespace PdfXenon.GDI
 
         public override void PathStroke()
         {
-            using (DrawingResource resource = CreatePen().Apply(this))
+            using (DrawingResource resource = CreateStrokingPen().Apply(this))
             {
                 _graphics.Clip = (Region)GraphicsState.Clipping;
                 _graphics.DrawPath(resource.Pen, _currentPath);
@@ -105,7 +105,7 @@ namespace PdfXenon.GDI
             else
                 _currentPath.FillMode = FillMode.Winding;
 
-            using (DrawingResource resource = CreateBrush().Apply(this))
+            using (DrawingResource resource = CreateNonStrokingBrush().Apply(this))
             {
                 _graphics.Clip = (Region)GraphicsState.Clipping;
 
@@ -134,7 +134,7 @@ namespace PdfXenon.GDI
             };
             shading.Matrix = new PdfArray(null, new ParseArray(matrixValues));
 
-            using (DrawingResource resource = CreateBrushFromShading(shading).Apply(this))
+            using (DrawingResource resource = CreateNonStrokingBrushFromShading(shading).Apply(this))
             {
                 _graphics.Clip = clipping;
                 _graphics.FillPath(resource.Brush, clippingPath);
@@ -174,33 +174,38 @@ namespace PdfXenon.GDI
             }
         }
 
-        private DrawingResource CreateBrush()
+        private DrawingResource CreateNonStrokingBrush()
         {
             if (GraphicsState.ColorSpaceNonStroking is RenderColorSpaceRGB colorSpaceRGB)
-                return CreateBrushFromRGB(colorSpaceRGB);
+                return CreateNonStrokingBrushFromRGB(colorSpaceRGB);
             else if (GraphicsState.ColorSpaceNonStroking is RenderColorSpacePattern colorSpacePatten)
-                return CreateBrushFromPattern(colorSpacePatten);
+                return CreateNonStrokingBrushFromPattern(colorSpacePatten);
 
             throw new NotImplementedException($"Colorspace type '{GraphicsState.ColorSpaceNonStroking.GetType().Name}' not implemented.");
         }
 
-        private DrawingResource CreateBrushFromRGB(RenderColorSpaceRGB colorSpaceRGB)
+        private DrawingResource CreateNonStrokingBrushFromRGB(RenderColorSpaceRGB colorSpaceRGB)
         {
             RenderColorRGB rgb = colorSpaceRGB.GetColorRGB();
-            SolidBrush brush = new SolidBrush(Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B)));
+
+            SolidBrush brush = new SolidBrush(Color.FromArgb((int)(255 * GraphicsState.ConstantAlphaNonStroking), 
+                                                             (int)(255 * rgb.R), 
+                                                             (int)(255 * rgb.G), 
+                                                             (int)(255 * rgb.B)));
+
             return new DrawingResource() { Brush = brush };
         }
 
-        private DrawingResource CreateBrushFromPattern(RenderColorSpacePattern colorSpacePatten)
+        private DrawingResource CreateNonStrokingBrushFromPattern(RenderColorSpacePattern colorSpacePatten)
         {
             RenderPatternType pattern = colorSpacePatten.GetPattern();
             if (pattern is RenderPatternShading shading)
-                return CreateBrushFromShading(shading);
+                return CreateNonStrokingBrushFromShading(shading);
 
             throw new NotImplementedException($"Pattern type '{pattern.GetType().Name}' not implemented.");
         }
 
-        private DrawingResource CreateBrushFromShading(RenderPatternShading shading)
+        private DrawingResource CreateNonStrokingBrushFromShading(RenderPatternShading shading)
         {
             if (shading is RenderPatternShadingAxial axial)
             {
@@ -216,8 +221,8 @@ namespace PdfXenon.GDI
                 RenderColorSpaceRGB colorSpace = (RenderColorSpaceRGB)axial.ColorSpaceValue;
 
                 // The more positions we provide, the more accurate the gradient becomes
-                Color[] colors = new Color[256];
-                float[] positions = new float[256];
+                Color[] colors = new Color[32];
+                float[] positions = new float[32];
                 for (int i = 0; i < positions.Length; i++)
                 {
                     // Ensure that the first and last positions are exactly 0 and 1
@@ -231,7 +236,7 @@ namespace PdfXenon.GDI
                     colorSpace.Parse(axial.FunctionValue.Call(new float[] { position }));
                     RenderColorRGB rgb = colorSpace.GetColorRGB();
 
-                    colors[i] = Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
+                    colors[i] = Color.FromArgb((int)(255 * GraphicsState.ConstantAlphaNonStroking), (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
                     positions[i] = position;
                 }
 
@@ -246,7 +251,7 @@ namespace PdfXenon.GDI
                 {
                     colorSpace.Parse(axial.Background.AsNumberArray());
                     RenderColorRGB rgb = colorSpace.GetColorRGB();
-                    backgroundBrush = new SolidBrush(Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B)));
+                    backgroundBrush = new SolidBrush(Color.FromArgb((int)(255 * GraphicsState.ConstantAlphaNonStroking), (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B)));
                 }
 
                 // Make sure we apply any optional dictionary changes in pushed graphics state
@@ -291,8 +296,8 @@ namespace PdfXenon.GDI
                 RenderColorSpaceRGB colorSpace = (RenderColorSpaceRGB)radial.ColorSpaceValue;
 
                 // The more positions we provide, the more accurate the gradient becomes
-                Color[] colors = new Color[256];
-                float[] positions = new float[256];
+                Color[] colors = new Color[32];
+                float[] positions = new float[32];
                 for (int i = 0; i < positions.Length; i++)
                 {
                     // Ensure that the first and last positions are exactly 0 and 1
@@ -307,7 +312,7 @@ namespace PdfXenon.GDI
                     colorSpace.Parse(radial.FunctionValue.Call(new float[] { funcPosition }));
                     RenderColorRGB rgb = colorSpace.GetColorRGB();
 
-                    colors[i] = Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
+                    colors[i] = Color.FromArgb((int)(255 * GraphicsState.ConstantAlphaNonStroking), (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
                     positions[i] = position;
                 }
 
@@ -322,7 +327,7 @@ namespace PdfXenon.GDI
                 {
                     colorSpace.Parse(radial.Background.AsNumberArray());
                     RenderColorRGB rgb = colorSpace.GetColorRGB();
-                    backgroundBrush = new SolidBrush(Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B)));
+                    backgroundBrush = new SolidBrush(Color.FromArgb((int)(255 * GraphicsState.ConstantAlphaNonStroking), (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B)));
                 }
 
                 // Make sure we apply any optional dictionary changes in pushed graphics state
@@ -332,19 +337,24 @@ namespace PdfXenon.GDI
             throw new NotImplementedException($"Shading type '{shading.GetType().Name}' not implemented.");
         }
 
-        private DrawingResource CreatePen()
+        private DrawingResource CreateStrokingPen()
         {
             if (GraphicsState.ColorSpaceStroking is RenderColorSpaceRGB colorSpaceRGB)
-                return CreatePenFromRGB(colorSpaceRGB);
+                return CreateStrokingPenFromRGB(colorSpaceRGB);
 
             throw new NotImplementedException($"Colorspace type '{GraphicsState.ColorSpaceStroking.GetType().Name}' not implemented.");
         }
 
-        private DrawingResource CreatePenFromRGB(RenderColorSpaceRGB colorSpaceRGB)
+        private DrawingResource CreateStrokingPenFromRGB(RenderColorSpaceRGB colorSpaceRGB)
         {
             // Get the current stroke colour and convert to GDI color
             RenderColorRGB rgb = colorSpaceRGB.GetColorRGB();
-            Color color = Color.FromArgb(255, (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
+
+            Color color = Color.FromArgb((int)(255 * GraphicsState.ConstantAlphaStroking), 
+                                         (int)(255 * rgb.R), 
+                                         (int)(255 * rgb.G), 
+                                         (int)(255 * rgb.B));
+
             Pen pen = new Pen(color, GraphicsState.LineWidth);
 
             // Only if the dash pattern is more than a single value, do we need to apply it

@@ -34,7 +34,7 @@ namespace WindowsFormsApp1
             if (_document == null)
             {
                 _document = new PdfDocument();
-                _document.Load(@"d:\Shapes.pdf");
+                _document.Load(@"d:\Slides.pdf");
             }
 
             if (_pageIndex < _document.Catalog.Pages.Count)
@@ -49,7 +49,7 @@ namespace WindowsFormsApp1
         }
 
         private PdfDocument _document;
-        private int _pageIndex = 0;
+        private int _pageIndex = 7;
         private Bitmap _bitmap;
 
         private void button2_Click(object sender, EventArgs e)

@@ -169,33 +169,7 @@ namespace PdfXenon.GDI
         public override void DrawJpegImage(byte[] bytes)
         {
             using(MemoryStream stream = new MemoryStream(bytes))
-            {
-                Bitmap bitmap = (Bitmap)Image.FromStream(stream);
-                BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-
-                int stride = bitmapData.Stride;
-                int lines = bitmap.Height / 2;
-
-                IntPtr ptr1 = bitmapData.Scan0;
-                IntPtr ptr2 = ptr1 + (bitmapData.Stride * (bitmap.Height - 1));
-
-                // Invert the image vertically to match the PDF standard of drawing with increasing numbers upwards
-                byte[] temp1 = new byte[bitmapData.Stride];
-                byte[] temp2 = new byte[bitmapData.Stride];
-                for (int h = 0; h < lines; h++)
-                {
-                    Marshal.Copy(ptr1, temp1, 0, stride);
-                    Marshal.Copy(ptr2, temp2, 0, stride);
-                    Marshal.Copy(temp1, 0, ptr2, stride);
-                    Marshal.Copy(temp2, 0, ptr1, stride);
-
-                    ptr1 += stride;
-                    ptr2 -= stride;
-                }
-
-                bitmap.UnlockBits(bitmapData);
-                DrawBitmap(bitmap);
-            }
+                DrawBitmap((Bitmap)Image.FromStream(stream));
         }
 
         public override void DrawSampledImage(int width, int height, int bitsPerComponent, int components, RenderColorSpaceRGB colorSpace, byte[] bytes)
@@ -235,28 +209,14 @@ namespace PdfXenon.GDI
                     imageData[imageOffset++] = (byte)(255 * rgb.B);
                     imageData[imageOffset++] = (byte)(255 * rgb.G);
                     imageData[imageOffset++] = (byte)(255 * rgb.R);
-                    imageData[imageOffset++] = 255;
+                    imageData[imageOffset++] = (byte)(255 * GraphicsState.ConstantAlphaNonStroking);
                 }
             }
 
             Marshal.Copy(imageData, 0, bitmapData.Scan0, imageData.Length);
             bitmap.UnlockBits(bitmapData);
+
             DrawBitmap(bitmap);
-        }
-
-        private void DrawBitmap(Bitmap bitmap)
-        {
-            // Remember current transform, it needs restoring when we finish
-            Matrix temp = _graphics.Transform;
-
-            // Apply the current transformation matrix, so rotation/translation/scale are applied during drawing
-            RenderMatrix render = GraphicsState.CTM;
-            Matrix matrix = new Matrix(render.M11, render.M12, render.M21, render.M22, render.OffsetX, render.OffsetY);
-            _graphics.MultiplyTransform(matrix);
-
-            // Draw as a unit size of 1, the CTM is setup so that it positions and sizes correctly
-            _graphics.DrawImage(bitmap, new RectangleF(0, 0, 1, 1), new RectangleF(0, 0, bitmap.Width, bitmap.Height), GraphicsUnit.Pixel);
-            _graphics.Transform = temp;
         }
 
         public override void Finshed()
@@ -485,6 +445,50 @@ namespace PdfXenon.GDI
         private Color ColorFromStrokingRender(RenderColorRGB rgb)
         {
             return Color.FromArgb((int)(255 * GraphicsState.ConstantAlphaStroking), (int)(255 * rgb.R), (int)(255 * rgb.G), (int)(255 * rgb.B));
+        }
+
+        private void VerticalInvertImage(Bitmap bitmap)
+        {
+            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+
+            int stride = bitmapData.Stride;
+            int lines = bitmap.Height / 2;
+
+            IntPtr ptr1 = bitmapData.Scan0;
+            IntPtr ptr2 = ptr1 + (bitmapData.Stride * (bitmap.Height - 1));
+
+            byte[] temp1 = new byte[bitmapData.Stride];
+            byte[] temp2 = new byte[bitmapData.Stride];
+
+            for (int h = 0; h < lines; h++)
+            {
+                Marshal.Copy(ptr1, temp1, 0, stride);
+                Marshal.Copy(ptr2, temp2, 0, stride);
+                Marshal.Copy(temp1, 0, ptr2, stride);
+                Marshal.Copy(temp2, 0, ptr1, stride);
+
+                ptr1 += stride;
+                ptr2 -= stride;
+            }
+
+            bitmap.UnlockBits(bitmapData);
+        }
+
+        private void DrawBitmap(Bitmap bitmap)
+        {
+            // Invert the image vertically to match the PDF standard of drawing with increasing numbers upwards
+            VerticalInvertImage(bitmap);
+
+            // Remember current transform, it needs restoring when we finish
+            Matrix temp = _graphics.Transform;
+
+            // Apply the current transformation matrix, so rotation/translation/scale are applied during drawing
+            RenderMatrix render = GraphicsState.CTM;
+            _graphics.MultiplyTransform(new Matrix(render.M11, render.M12, render.M21, render.M22, render.OffsetX, render.OffsetY));
+
+            // Draw as a unit size of 1, the CTM is setup so that it positions and sizes correctly
+            _graphics.DrawImage(bitmap, new RectangleF(0, 0, 1, 1), new RectangleF(0, 0, bitmap.Width, bitmap.Height), GraphicsUnit.Pixel);
+            _graphics.Transform = temp;
         }
 
         public class DrawingResource : IDisposable

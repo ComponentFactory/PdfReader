@@ -1,4 +1,4 @@
-using PdfXenon.Standard;
+using PdfReader;
 using System;
 using System.Text;
 using System.IO;
@@ -291,7 +291,7 @@ namespace ParserUnitTesting
             Assert.NotNull(d);
             Assert.True(d.Count == 1);
 
-            ParseObject obj = d["Example"];
+            ParseObjectBase obj = d["Example"];
             Assert.NotNull(obj);
             Assert.True(obj is ParseString);
             Assert.True((obj as ParseString).Value == "de");
